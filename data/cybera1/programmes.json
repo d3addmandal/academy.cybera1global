@@ -1,0 +1,733 @@
+[
+  {
+    "slug": "cceh-certified-ethical-hacker",
+    "shortTitle": "CCEH",
+    "title": "CCEH — Cyber A1 Certified Ethical Hacker",
+    "badge": "Beginner-Friendly Career Track",
+    "category": "career-track",
+    "level": "Beginner",
+    "duration": "3 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On Practical",
+    "description": "A practical cybersecurity foundation program designed to help students and beginners build real-world skills in networking, ethical hacking, reconnaissance, vulnerability assessment, Linux, wireless security, and modern cyber threats.",
+    "overview": "CCEH is a 3-month foundation program that covers everything a beginner needs to start a career in cybersecurity. From networking basics to ethical hacking, scanning, enumeration, system hacking, malware, social engineering, and AI-based threats.",
+    "image": "/uploads/cybera1/courses/1779590050125-image.jpg",
+    "heroImage": "/images/courses/cceh-hero.jpg",
+    "color": "#e00000",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [
+      "Students & Freshers",
+      "IT Beginners",
+      "BCA / B.Tech Students",
+      "Aspiring Ethical Hackers",
+      "Career Switchers"
+    ],
+    "topics": [
+      "Ethical Hacking",
+      "Network Security",
+      "System Hacking",
+      "Linux",
+      "Reconnaissance",
+      "Malware Analysis"
+    ],
+    "modules": [
+      {
+        "id": "m1",
+        "number": "01",
+        "title": "Networking Basics",
+        "description": "OSI, TCP/IP, DNS, DHCP, Subnetting, Wireless Basics, Protocols & more."
+      },
+      {
+        "id": "m2",
+        "number": "02",
+        "title": "Linux & Lab Setup",
+        "description": "Linux basics, commands, Kali Linux setup and practical lab environment."
+      },
+      {
+        "id": "m3",
+        "number": "03",
+        "title": "Ethical Hacking Fundamentals",
+        "description": "Hacking phases, attack vectors, tools and legal awareness."
+      },
+      {
+        "id": "m4",
+        "number": "04",
+        "title": "Reconnaissance",
+        "description": "WHOIS, Shodan, Maltego, Nmap, Passive & Active Recon techniques."
+      },
+      {
+        "id": "m5",
+        "number": "05",
+        "title": "Scanning & Vulnerability Assessment",
+        "description": "Nmap scanning, Nessus, OpenVAS, Banner Grabbing, Network Mapping."
+      },
+      {
+        "id": "m6",
+        "number": "06",
+        "title": "System Hacking Basics",
+        "description": "Gaining access, password cracking, privilege escalation, Metasploit basics."
+      },
+      {
+        "id": "m7",
+        "number": "07",
+        "title": "Malware & Threats",
+        "description": "Types of malware, ransomware, trojans, vishing, smishing, malware analysis concepts."
+      },
+      {
+        "id": "m8",
+        "number": "08",
+        "title": "Social Engineering",
+        "description": "Phishing, spear phishing, vishing, smishing, AI-based manipulation awareness."
+      },
+      {
+        "id": "m9",
+        "number": "09",
+        "title": "Wireless Security",
+        "description": "Wireless encryption, threats, attack methodologies and countermeasures."
+      },
+      {
+        "id": "m10",
+        "number": "10",
+        "title": "Cryptography Fundamentals",
+        "description": "Encryption basics, PKI, crypto attacks, disk & email encryption."
+      }
+    ],
+    "tools": [
+      "Kali Linux",
+      "Nmap",
+      "Nessus",
+      "OpenVAS",
+      "Wireshark",
+      "Metasploit",
+      "Hashcat",
+      "Shodan",
+      "Burp Suite"
+    ],
+    "labs": [
+      "Practical Network Setup",
+      "Kali Linux Environment",
+      "Reconnaissance Activities",
+      "Vulnerability Scanning",
+      "Wireshark Packet Analysis",
+      "Controlled Phishing Simulation",
+      "Metasploit Exploitation Basics"
+    ],
+    "certificationTitle": "Cyber A1 Certified Ethical Hacker (CCEH)",
+    "careerPaths": [
+      {
+        "id": "cp1",
+        "title": "SOC Analyst (Beginner)",
+        "description": "Start your journey in Security Operations Center."
+      },
+      {
+        "id": "cp2",
+        "title": "Security Trainee",
+        "description": "Work with security teams and monitoring tools."
+      },
+      {
+        "id": "cp3",
+        "title": "VAPT Intern",
+        "description": "Learn vulnerability assessment & penetration testing."
+      },
+      {
+        "id": "cp4",
+        "title": "IT Security Support",
+        "description": "Grow in IT security operations and infrastructure."
+      }
+    ],
+    "faqs": [
+      {
+        "id": "fq1",
+        "question": "Is CCEH suitable for beginners?",
+        "answer": "Yes, CCEH is designed from the ground up for students and freshers with no prior cybersecurity knowledge.",
+        "order": 0,
+        "isActive": true
+      },
+      {
+        "id": "fq2",
+        "question": "Do I need any coding knowledge?",
+        "answer": "No coding knowledge is required. The course focuses on practical tools and concepts.",
+        "order": 1,
+        "isActive": true
+      },
+      {
+        "id": "fq3",
+        "question": "Will I get access to practical labs?",
+        "answer": "Yes, you will get access to our dedicated lab environment throughout the program.",
+        "order": 2,
+        "isActive": true
+      }
+    ],
+    "order": 0,
+    "id": "f81c8a8f-fcb3-4062-a64f-e61155a01b1b",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.529Z",
+    "updatedAt": "2026-05-24T02:34:11.704Z"
+  },
+  {
+    "slug": "ccse-certified-cyber-security-expert",
+    "shortTitle": "CCSE",
+    "title": "CCSE — Cyber A1 Certified Cyber Security Expert",
+    "badge": "Comprehensive Cybersecurity Expert Program",
+    "category": "career-track",
+    "level": "Beginner to Advanced",
+    "duration": "12 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On Practical",
+    "description": "A comprehensive 12-month advanced cybersecurity expert program covering VAPT, security operations, incident response, and enterprise-grade security workflows.",
+    "overview": "CCSE is our flagship 12-month comprehensive program that transforms beginners into cybersecurity experts.",
+    "image": "/images/courses/ccse.jpg",
+    "heroImage": "/images/courses/ccse-hero.jpg",
+    "color": "#8b0000",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [
+      "Serious Cybersecurity Career Seekers",
+      "IT Professionals",
+      "CCEH Graduates"
+    ],
+    "topics": [
+      "VAPT",
+      "Security Operations",
+      "Incident Response",
+      "Cloud Security",
+      "Advanced Exploitation"
+    ],
+    "modules": [
+      {
+        "id": "m1",
+        "number": "01",
+        "title": "Cybersecurity Foundations",
+        "description": "Complete networking, Linux, and security fundamentals."
+      },
+      {
+        "id": "m2",
+        "number": "02",
+        "title": "Ethical Hacking & VAPT",
+        "description": "Comprehensive VAPT methodology and real-world assessments."
+      },
+      {
+        "id": "m3",
+        "number": "03",
+        "title": "Web Application Security",
+        "description": "OWASP Top 10, web hacking, and secure coding."
+      },
+      {
+        "id": "m4",
+        "number": "04",
+        "title": "Cloud Security",
+        "description": "AWS, Azure security, cloud misconfigurations, and cloud VAPT."
+      },
+      {
+        "id": "m5",
+        "number": "05",
+        "title": "SOC Operations",
+        "description": "SIEM tools, log analysis, threat detection, and incident response."
+      }
+    ],
+    "tools": [
+      "Kali Linux",
+      "Burp Suite",
+      "Metasploit",
+      "Splunk",
+      "Nessus",
+      "OWASP ZAP",
+      "Nmap"
+    ],
+    "labs": [
+      "Full VAPT Lab Simulations",
+      "SOC Blue Team Operations",
+      "Cloud Security Labs",
+      "Incident Response Drills"
+    ],
+    "certificationTitle": "Cyber A1 Certified Cyber Security Expert (CCSE)",
+    "careerPaths": [
+      {
+        "id": "cp1",
+        "title": "Penetration Tester",
+        "description": "Conduct professional security assessments."
+      },
+      {
+        "id": "cp2",
+        "title": "SOC Analyst",
+        "description": "Work in enterprise security operations centers."
+      },
+      {
+        "id": "cp3",
+        "title": "Security Consultant",
+        "description": "Provide expert cybersecurity advisory services."
+      }
+    ],
+    "faqs": [
+      {
+        "id": "fq1",
+        "question": "What is the difference between CCEH and CCSE?",
+        "answer": "CCEH is a 3-month foundation program while CCSE is a 12-month comprehensive expert-level program.",
+        "order": 0,
+        "isActive": true
+      }
+    ],
+    "order": 1,
+    "id": "dd1e9061-9f09-4af2-8ea0-272d01e798ed",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.530Z",
+    "updatedAt": "2026-05-23T03:04:00.530Z"
+  },
+  {
+    "slug": "soc-analyst-program",
+    "shortTitle": "SOC Analyst",
+    "title": "SOC Analyst Program",
+    "badge": "Blue Team Career Track",
+    "category": "career-track",
+    "level": "Intermediate",
+    "duration": "3–6 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On SIEM Labs",
+    "description": "Master SOC operations, SIEM tools, threat detection, and incident response with real enterprise-grade simulations.",
+    "overview": "The SOC Analyst Program prepares you for a career in Security Operations Centers.",
+    "image": "/images/courses/soc.jpg",
+    "heroImage": "/images/courses/soc-hero.jpg",
+    "color": "#1a56db",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [
+      "IT Professionals",
+      "Network Engineers",
+      "CCEH Graduates",
+      "Blue Team Aspirants"
+    ],
+    "topics": [
+      "SOC Fundamentals",
+      "SIEM Tools",
+      "Threat Detection",
+      "Incident Response",
+      "Log Analysis"
+    ],
+    "modules": [
+      {
+        "id": "m1",
+        "number": "01",
+        "title": "SOC Fundamentals",
+        "description": "SOC architecture, roles, tiers, and workflows."
+      },
+      {
+        "id": "m2",
+        "number": "02",
+        "title": "SIEM Tools",
+        "description": "Splunk, Microsoft Sentinel, QRadar hands-on."
+      },
+      {
+        "id": "m3",
+        "number": "03",
+        "title": "Log Analysis",
+        "description": "Windows, Linux, firewall, and web server logs."
+      },
+      {
+        "id": "m4",
+        "number": "04",
+        "title": "Incident Response",
+        "description": "IR lifecycle, playbooks, and escalation procedures."
+      }
+    ],
+    "tools": [
+      "Splunk",
+      "Microsoft Sentinel",
+      "QRadar",
+      "Wazuh",
+      "TheHive"
+    ],
+    "labs": [
+      "SIEM Configuration Labs",
+      "Incident Response Simulations",
+      "Threat Hunting Exercises"
+    ],
+    "certificationTitle": "Cyber A1 Certified SOC Analyst",
+    "careerPaths": [
+      {
+        "id": "cp1",
+        "title": "SOC Analyst L1/L2",
+        "description": "Work in enterprise security operations."
+      },
+      {
+        "id": "cp2",
+        "title": "Threat Intelligence Analyst",
+        "description": "Analyze and respond to cyber threats."
+      }
+    ],
+    "faqs": [
+      {
+        "id": "fq1",
+        "question": "Do I need prior security experience?",
+        "answer": "Basic networking knowledge is helpful. The program starts from SOC fundamentals.",
+        "order": 0,
+        "isActive": true
+      }
+    ],
+    "order": 2,
+    "id": "0dfa4e83-f143-4f0b-9736-8311f108f649",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.531Z",
+    "updatedAt": "2026-05-23T03:04:00.531Z"
+  },
+  {
+    "shortTitle": "CCDFIR",
+    "title": "CCDFIR-Cyber A1 Certified Digital Forensic and Incident Response",
+    "slug": "ccdfir",
+    "badge": "Biginer to Advance | Complete Knowledge of CEH",
+    "category": "career-track",
+    "level": "Beginner",
+    "duration": "3 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On Practical",
+    "description": "Cyber A1 Certified Digital Forensic and Incident Response is a professional cybersecurity course focused on Digital Forensics and Incident Response (DFIR). The course provides practical knowledge on identifying, analyzing, investigating, and responding to cyber incidents such as malware attacks, ransomware, insider threats, and system compromises.",
+    "overview": "It covers topics including evidence collection, memory forensics, log analysis, network forensics, malware investigation, incident handling procedures, threat hunting, and forensic reporting using industry-standard tools and methodologies. The course is designed for SOC analysts, incident responders, cybersecurity professionals, and forensic investigators who want hands-on DFIR skills for real-world investigations.",
+    "image": "/uploads/cybera1/courses/1779569081196-pexels-divinetechygirl-1181354.jpg",
+    "heroImage": "/uploads/cybera1/courses/1779569088493-pexels-cookiecutter-17323801.jpg",
+    "color": "#e00000",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [
+      "* SOC Analysts",
+      "* Incident Responders",
+      "* Digital Forensic Investigators",
+      "* Cybersecurity Analysts",
+      "* Threat Hunters",
+      "* Security Engineers",
+      "* Blue Team Professionals",
+      "* IT Security Professionals",
+      "* System Administrators",
+      "* Law Enforcement Cyber Units"
+    ],
+    "topics": [
+      "Digital Forensics",
+      "Incident Response",
+      "Memory Forensics",
+      "Network Forensics",
+      "Malware Analysis",
+      "Threat Hunting",
+      "Log Analysis",
+      "Cyber Investigation",
+      "DFIR",
+      "SOC Operations",
+      "Security Monitoring",
+      "Evidence Collection",
+      "Windows Forensics",
+      "Linux Forensics",
+      "Cyber Threat Intelligence",
+      "Ransomware Investigation",
+      "Volatility Framework",
+      "SIEM",
+      "Endpoint Investigation",
+      "Chain of Custody"
+    ],
+    "modules": [
+      {
+        "id": "0b1072ac-b598-4bf6-ba65-0d9d45acb427",
+        "number": "01",
+        "title": "Introduction to Digital Forensics and Incident Response",
+        "description": "Understand the fundamentals of Digital Forensics and Incident Response (DFIR), incident lifecycle, evidence handling procedures, legal considerations, and the role of DFIR in modern cybersecurity operation"
+      },
+      {
+        "id": "6eca1d29-b92f-4019-8180-9a59ed874a03",
+        "number": "02",
+        "title": "Cyber Incident Handling Process",
+        "description": "Learn the complete incident response process including preparation, identification, containment, eradication, recovery, and post-incident activities using industry best practices."
+      },
+      {
+        "id": "85e72e2d-25fe-4358-a6b1-b898bc76280b",
+        "number": "03",
+        "title": "Evidence Collection and Preservation",
+        "description": "Gain practical knowledge on collecting, preserving, and validating digital evidence while maintaining integrity and chain of custody during investigations."
+      },
+      {
+        "id": "939d0e95-a8ed-4937-87ef-69b82b5e2e0e",
+        "number": "04",
+        "title": "Windows and Linux Forensics",
+        "description": "Explore forensic investigation techniques for Windows and Linux systems including user activity analysis, registry investigation, file system artifacts, and persistence mechanisms."
+      },
+      {
+        "id": "d7784638-2c26-4e01-a1c5-a8e78b0d9700",
+        "number": "05",
+        "title": "Memory Forensics",
+        "description": "Learn how to analyze volatile memory to identify running processes, malware activity, credential artifacts, hidden connections, and malicious persistence using forensic frameworks."
+      },
+      {
+        "id": "4cc016f2-7538-44b6-86f2-8c268579f7fb",
+        "number": "06",
+        "title": "Network Forensics and Traffic Analysis",
+        "description": "Understand network packet analysis, suspicious communication detection, DNS investigation, log correlation, and identifying indicators of compromise from network traffic."
+      },
+      {
+        "id": "d7ae4a65-679f-4fb1-8eee-a9a1a6290c14",
+        "number": "07",
+        "title": "Malware Analysis Fundamentals",
+        "description": "Study malware behavior analysis, static and dynamic analysis concepts, malicious scripts, persistence techniques, and ransomware investigation methodologies."
+      },
+      {
+        "id": "77d77630-c8a0-467b-bf31-5b14dc31a0aa",
+        "number": "08",
+        "title": "Log Analysis and SIEM Investigation",
+        "description": "Learn to investigate security events using logs from endpoints, servers, firewalls, and SIEM platforms to detect attacks and trace attacker activities."
+      },
+      {
+        "id": "476cd4d9-42f3-4ec9-87d9-37513fbd0e35",
+        "number": "09",
+        "title": "Threat Hunting and IOC Analysis",
+        "description": "Develop proactive threat hunting skills using Indicators of Compromise (IOCs), Indicators of Attack (IOAs), behavioral analysis, and attack pattern correlation."
+      },
+      {
+        "id": "1aab632f-5dde-41b0-a9fa-f950e686e221",
+        "number": "10",
+        "title": "Web and Email Forensics",
+        "description": "Understand forensic investigation techniques for phishing emails, malicious attachments, web attacks, browser artifacts, and suspicious web activities."
+      },
+      {
+        "id": "137bf3b9-a3c9-45a2-8b58-f7fd620ec0a2",
+        "number": "11",
+        "title": "Cloud and Endpoint Incident Response",
+        "description": "Learn incident response approaches for cloud environments and modern endpoints including detection, containment, and forensic acquisition techniques."
+      },
+      {
+        "id": "1c2eb8a0-b54d-4ca1-b611-d5657e628b19",
+        "number": "12",
+        "title": "Reporting and Case Documentation",
+        "description": "Learn how to prepare professional forensic reports, incident documentation, executive summaries, technical findings, and remediation recommendations for stakeholders."
+      }
+    ],
+    "tools": [
+      "Volatility Framework",
+      "Autopsy",
+      "Wireshark",
+      "FTK Imager",
+      "KAPE",
+      "Sysinternals Suite",
+      "Burp Suite",
+      "Splunk",
+      "ELK Stack",
+      "YARA",
+      "Procmon",
+      "Process Explorer",
+      "TCPDump",
+      "OSQuery",
+      "VirusTotal",
+      "Chainsaw",
+      "Velociraptor",
+      "CrowdStrike Falcon",
+      "Microsoft Defender for Endpoint",
+      "Suricata"
+    ],
+    "labs": [
+      "Memory Dump Investigation",
+      "Ransomware Incident Analysis",
+      "Phishing Email Investigation",
+      "Malware Traffic Analysis",
+      "Windows Registry Forensics",
+      "Linux Log Investigation",
+      "SIEM Alert Investigation",
+      "Packet Capture Analysis",
+      "Threat Hunting Exercises",
+      "IOC Extraction and Correlation",
+      "Web Attack Investigation",
+      "Live Incident Response Simulation",
+      "Persistence Mechanism Detection",
+      "Endpoint Compromise Investigation",
+      "File Recovery and Timeline Analysis",
+      "Cloud Incident Investigation",
+      "Forensic Report Preparation",
+      "Real-World DFIR Case Studies"
+    ],
+    "certificationTitle": "Cyber A1 Certified Digital Forensic and Incident Response (CCDFIR)",
+    "careerPaths": [
+      {
+        "id": "b4eb81fb-aa6e-4efb-980d-2d4e26261544",
+        "title": "SOC Analyst",
+        "description": "Monitor security events, investigate alerts, and respond to cyber incidents in Security Operations Centers."
+      },
+      {
+        "id": "45cd3a46-b24d-4615-88a6-2a57d41b4dde",
+        "title": "Incident Responder",
+        "description": "Handle active cyber incidents, perform containment, eradication, and recovery activities for organizations."
+      },
+      {
+        "id": "03a08e49-28f9-46e1-8589-66b7276d8f64",
+        "title": "Digital Forensic Investigator",
+        "description": "Conduct forensic investigations on compromised systems, collect evidence, and prepare investigation reports."
+      },
+      {
+        "id": "294c6a54-5916-4b96-808e-5904a75c9d79",
+        "title": "Threat Hunter",
+        "description": "Proactively identify hidden threats, suspicious behaviors, and attacker activities within enterprise environments."
+      },
+      {
+        "id": "0d5e3bab-3c42-4c82-91c2-1993d613d5c4",
+        "title": "Malware Analyst",
+        "description": "Analyze malicious files, scripts, and ransomware behavior to identify attack techniques and indicators of compromise."
+      },
+      {
+        "id": "e9319d6a-2e06-41a9-a1db-a97e59d30c3e",
+        "title": "Cybersecurity Analyst",
+        "description": "Investigate security events, perform risk analysis, and strengthen organizational security posture."
+      },
+      {
+        "id": "1914add3-4f08-4fe2-b4f8-cf9e5aa1ba56",
+        "title": "DFIR Consultant",
+        "description": "Provide Digital Forensics and Incident Response services for organizations during security breaches and investigations."
+      },
+      {
+        "id": "5e7108a6-7da5-42e2-93d7-c561a4b94958",
+        "title": "SIEM Analyst",
+        "description": "Monitor and analyze logs and alerts using SIEM platforms to detect and investigate security threats."
+      },
+      {
+        "id": "6ebdc4ef-3ff7-4ed0-8f14-05fc557289dd",
+        "title": "Endpoint Security Analyst",
+        "description": "Investigate endpoint-based threats, suspicious processes, persistence mechanisms, and malware activities."
+      },
+      {
+        "id": "fe7f2287-5b79-4998-93de-cb4be95989a6",
+        "title": "Blue Team Security Engineer",
+        "description": "Build and improve defensive security strategies, monitoring systems, and incident response capabilities."
+      }
+    ],
+    "faqs": [
+      {
+        "id": "3695721e-01e6-4eb4-bf4e-5e5964694929",
+        "question": "What is CCDFIR?",
+        "answer": "CCDFIR is a Digital Forensics and Incident Response certification programme focused on cyber investigation, evidence analysis, and incident handling techniques.",
+        "order": 0,
+        "isActive": true
+      },
+      {
+        "id": "ed15d81a-d638-4d73-81de-a74445203be0",
+        "question": "Who should enroll in this programme?",
+        "answer": "The programme is suitable for SOC analysts, cybersecurity professionals, forensic investigators, students, and IT administrators interested in DFIR.",
+        "order": 1,
+        "isActive": true
+      },
+      {
+        "id": "2ae24b41-220c-474d-82a9-b98cb7868faa",
+        "question": "Are there any prerequisites?",
+        "answer": "Basic knowledge of networking, operating systems, and cybersecurity concepts is recommended but not mandatory.",
+        "order": 2,
+        "isActive": true
+      },
+      {
+        "id": "5e3f8fa9-31e7-4706-9446-b2c28b8e6681",
+        "question": "Is the programme practical or theoretical?",
+        "answer": "The programme is highly practical and includes real-world labs, investigations, and incident response simulations.",
+        "order": 3,
+        "isActive": true
+      },
+      {
+        "id": "3b3e01ae-a64f-43b2-8555-723c6bd123ff",
+        "question": "What tools will be covered during training?",
+        "answer": "The course covers tools such as Volatility, Wireshark, Autopsy, Splunk, FTK Imager, YARA, and other DFIR platforms.",
+        "order": 4,
+        "isActive": true
+      },
+      {
+        "id": "4e65524c-ff6b-495e-a841-821b904c9016",
+        "question": "Will I receive a certificate after completion?",
+        "answer": "Yes, participants will receive the CCDFIR certification upon successful completion of the programme and assessments.",
+        "order": 5,
+        "isActive": true
+      },
+      {
+        "id": "e1ea42e7-be90-4c8c-9c05-676c46564ea9",
+        "question": "Does the programme include hands-on labs?",
+        "answer": "Yes, the programme includes multiple hands-on labs covering memory forensics, malware analysis, network forensics, and incident response.",
+        "order": 6,
+        "isActive": true
+      },
+      {
+        "id": "a519b6d0-3243-4ca9-971e-b3400c2c976c",
+        "question": "Can beginners join this programme?",
+        "answer": "Yes, beginners with basic IT or cybersecurity knowledge can join and gradually build DFIR skills through the training.",
+        "order": 7,
+        "isActive": true
+      },
+      {
+        "id": "ac48d858-27fa-4ea1-ac26-d16188e5c304",
+        "question": "What career opportunities are available after this course?",
+        "answer": "Participants can pursue roles such as SOC Analyst, Incident Responder, Digital Forensic Investigator, Threat Hunter, and DFIR Consultant.",
+        "order": 8,
+        "isActive": true
+      },
+      {
+        "id": "bd793941-7abf-416d-ad04-8558dce7a666",
+        "question": "Is the certification industry relevant?",
+        "answer": "Yes, the programme is designed based on modern cyber threats, enterprise incident response practices, and real-world forensic investigation methodologies.",
+        "order": 9,
+        "isActive": true
+      }
+    ],
+    "id": "841f5071-ab4b-4e17-bf01-a4fe7efd2899",
+    "companySlug": "cybera1",
+    "order": 3,
+    "createdAt": "2026-05-23T20:26:55.519Z",
+    "updatedAt": "2026-05-23T20:59:16.999Z"
+  },
+  {
+    "shortTitle": "test1",
+    "title": "eee",
+    "slug": "test1",
+    "badge": "",
+    "category": "career-track",
+    "level": "Beginner",
+    "duration": "3 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On Practical",
+    "description": "",
+    "overview": "",
+    "image": "",
+    "heroImage": "",
+    "color": "#e00000",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [],
+    "topics": [],
+    "modules": [],
+    "tools": [],
+    "labs": [],
+    "certificationTitle": "",
+    "careerPaths": [],
+    "faqs": [],
+    "id": "595a47f0-d85e-4b4a-b698-9aac26056c82",
+    "companySlug": "cybera1",
+    "order": 4,
+    "createdAt": "2026-05-24T02:13:36.476Z",
+    "updatedAt": "2026-05-24T02:14:47.950Z"
+  },
+  {
+    "shortTitle": "test2",
+    "title": "222",
+    "slug": "test2",
+    "badge": "",
+    "category": "career-track",
+    "level": "Beginner",
+    "duration": "3 Months",
+    "mode": "Online / Offline",
+    "labsType": "Hands-On Practical",
+    "description": "",
+    "overview": "",
+    "image": "/uploads/cybera1/courses/1779589027679-image.jpg",
+    "heroImage": "/uploads/cybera1/courses/1779589045948-image.jpg",
+    "color": "#e00000",
+    "isFeatured": true,
+    "status": "published",
+    "bestFor": [],
+    "topics": [],
+    "modules": [],
+    "tools": [],
+    "labs": [],
+    "certificationTitle": "",
+    "careerPaths": [],
+    "faqs": [],
+    "id": "f37e763d-fd36-41f4-923d-1c21d56e2d16",
+    "companySlug": "cybera1",
+    "order": 5,
+    "createdAt": "2026-05-24T02:13:45.343Z",
+    "updatedAt": "2026-05-24T02:17:27.935Z"
+  }
+]

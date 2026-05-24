@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "soc-analyst-career-roadmap-2025",
+    "title": "SOC Analyst Career Roadmap 2025",
+    "excerpt": "Complete guide to becoming a SOC Analyst in 2025 — skills, certifications, tools, and the career path.",
+    "content": "<p>The SOC Analyst role is one of the most in-demand positions in cybersecurity...</p>",
+    "category": "Career",
+    "tags": [
+      "SOC Analyst",
+      "Career",
+      "Blue Team"
+    ],
+    "author": {
+      "name": "Rohan Das",
+      "role": "SOC Team Lead",
+      "imageUrl": ""
+    },
+    "publishedAt": "2025-05-08",
+    "readTime": "8 min read",
+    "image": "/uploads/cybera1/blog/1779585834939-exif.jpg",
+    "isFeatured": true,
+    "status": "published",
+    "seo": {
+      "metaTitle": "SOC Analyst Career Roadmap 2025",
+      "metaDescription": "Complete guide to building a SOC Analyst career."
+    },
+    "id": "c9ee2961-f261-48c4-81c9-262d2606cb3d",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.535Z",
+    "updatedAt": "2026-05-24T01:23:58.728Z"
+  },
+  {
+    "slug": "vapt-vs-pen-testing-key-differences",
+    "title": "VAPT vs Pen Testing: Key Differences",
+    "excerpt": "Many professionals confuse VAPT with penetration testing. This article breaks down the key differences.",
+    "content": "<p>VAPT and penetration testing are often used interchangeably...</p>",
+    "category": "VAPT",
+    "tags": [
+      "VAPT",
+      "Penetration Testing",
+      "Security Assessment"
+    ],
+    "author": {
+      "name": "Priya Nair",
+      "role": "Penetration Testing Lead",
+      "imageUrl": ""
+    },
+    "publishedAt": "2025-05-12",
+    "readTime": "5 min read",
+    "image": "/images/blog/blog-vapt.jpg",
+    "isFeatured": true,
+    "status": "published",
+    "seo": {
+      "metaTitle": "VAPT vs Pen Testing",
+      "metaDescription": "Understanding the key differences between VAPT and penetration testing."
+    },
+    "id": "0747e9c2-8cc6-4f18-b9fe-78bf2d29aa5d",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.534Z",
+    "updatedAt": "2026-05-23T03:04:00.534Z"
+  },
+  {
+    "slug": "how-ai-is-transforming-cybersecurity",
+    "title": "How AI is Transforming Cybersecurity",
+    "excerpt": "Artificial intelligence is reshaping the cybersecurity landscape — from AI-powered threat detection to adversarial machine learning attacks.",
+    "content": "<p>The cybersecurity landscape is constantly evolving...</p>",
+    "category": "AI Security",
+    "tags": [
+      "AI",
+      "Machine Learning",
+      "Threat Detection"
+    ],
+    "author": {
+      "name": "Arjun Mehta",
+      "role": "Senior Security Researcher",
+      "imageUrl": ""
+    },
+    "publishedAt": "2025-05-18",
+    "readTime": "6 min read",
+    "image": "/images/blog/blog-ai.jpg",
+    "isFeatured": true,
+    "status": "published",
+    "seo": {
+      "metaTitle": "How AI is Transforming Cybersecurity",
+      "metaDescription": "A deep dive into AI-powered cybersecurity threats and defenses."
+    },
+    "id": "9aa63d01-2145-486d-b825-13273c2b5d36",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.533Z",
+    "updatedAt": "2026-05-23T03:04:00.533Z"
+  }
+]

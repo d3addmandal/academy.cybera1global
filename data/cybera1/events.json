@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "cybersecurity-workshop-2025",
+    "title": "Cybersecurity Foundations Workshop",
+    "type": "workshop",
+    "date": "2025-06-15",
+    "time": "10:00 AM – 4:00 PM",
+    "venue": "Cyber A1 Academy, Durgapur",
+    "mode": "offline",
+    "description": "A full-day hands-on workshop covering networking basics, ethical hacking fundamentals, and Kali Linux setup.",
+    "image": "/uploads/cybera1/events/1779585414396-sam-roy-tmxmjtud658-unsplash.jpg",
+    "tags": [
+      "Beginner",
+      "Workshop",
+      "Ethical Hacking"
+    ],
+    "registrationLink": "#",
+    "isFree": true,
+    "isFeatured": true,
+    "status": "published",
+    "id": "529395fa-37e0-43fc-8e1a-25d13d5ad3e7",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.536Z",
+    "updatedAt": "2026-05-24T01:16:57.725Z"
+  },
+  {
+    "slug": "capture-the-flag-2025",
+    "title": "Capture The Flag (CTF) Competition",
+    "type": "ctf",
+    "date": "2025-07-05",
+    "time": "10:00 AM – 8:00 PM",
+    "venue": "Online + Durgapur Campus",
+    "mode": "hybrid",
+    "description": "Compete in our quarterly CTF competition. Win prizes and get recognized by our hiring partner companies.",
+    "image": "/images/events/event-ctf.jpg",
+    "tags": [
+      "CTF",
+      "Competition",
+      "All Levels"
+    ],
+    "registrationLink": "#",
+    "isFree": true,
+    "isFeatured": true,
+    "status": "published",
+    "id": "03525ba2-01a3-4e4c-b1c9-2ac62636adaa",
+    "companySlug": "cybera1",
+    "createdAt": "2026-05-23T03:04:00.537Z",
+    "updatedAt": "2026-05-23T03:04:00.537Z"
+  }
+]

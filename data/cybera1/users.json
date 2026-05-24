@@ -1,0 +1,13 @@
+[
+  {
+    "companySlug": "cybera1",
+    "name": "Administrator",
+    "email": "admin@cybera1academy.com",
+    "passwordHash": "$2b$12$rlFhdkyMCP79bmuD.ZHIduAR3vViNmtYLdh2e8Rjuva1xNb.4mLSK",
+    "role": "admin",
+    "isActive": true,
+    "id": "7096eb66-de6d-48d0-ae74-19f2be164799",
+    "createdAt": "2026-05-23T03:04:00.522Z",
+    "lastLogin": "2026-05-23T20:44:30.151Z"
+  }
+]

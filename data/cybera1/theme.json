@@ -1,0 +1,21 @@
+{
+  "colors": {
+    "primary": "#E00000",
+    "primaryDark": "#8b0000",
+    "darkBg": "#12213b",
+    "semiDark": "#0d1117",
+    "black": "#050505"
+  },
+  "logo": {
+    "text": "Cyber A1",
+    "highlight": "A1",
+    "imageUrl": "/uploads/cybera1/logo.png",
+    "faviconUrl": "/uploads/cybera1/favicon-1779594991849-1c72f57df87b4760.ico",
+    "siteIconUrl": "/uploads/cybera1/site-icon-1779595001130-445e83decdb24ad5.ico"
+  },
+  "typography": {
+    "headingFont": "Inter",
+    "bodyFont": "Inter"
+  },
+  "updatedAt": "2026-05-24T03:56:44.516Z"
+}

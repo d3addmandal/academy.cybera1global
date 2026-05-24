@@ -1,0 +1,81 @@
+[
+  {
+    "id": "menu-quick-links",
+    "header": "Quick Links",
+    "items": [
+      {
+        "id": "ql-1",
+        "label": "Home",
+        "href": "/"
+      },
+      {
+        "id": "ql-3",
+        "label": "Courses",
+        "href": "/courses"
+      },
+      {
+        "id": "ql-4",
+        "label": "Corporate Training",
+        "href": "/corporate-training"
+      },
+      {
+        "id": "ql-5",
+        "label": "Institutions",
+        "href": "/institutions"
+      },
+      {
+        "id": "ql-8",
+        "label": "Career & Placement",
+        "href": "/career-placement"
+      }
+    ],
+    "createdAt": "2026-05-24T00:00:00.000Z",
+    "updatedAt": "2026-05-24T00:43:24.222Z"
+  },
+  {
+    "id": "menu-programs",
+    "header": "Programs",
+    "items": [
+      {
+        "id": "pg-1",
+        "label": "CCEH (3 Months)",
+        "href": "/courses/cceh-certified-ethical-hacker"
+      },
+      {
+        "id": "pg-2",
+        "label": "CCSE (12 Months)",
+        "href": "/courses/ccse-certified-cyber-security-expert"
+      },
+      {
+        "id": "pg-3",
+        "label": "SOC Analyst Program",
+        "href": "/courses/soc-analyst-program"
+      },
+      {
+        "id": "pg-5",
+        "label": "Web Application Security",
+        "href": "/courses/web-application-security"
+      },
+      {
+        "id": "pg-6",
+        "label": "Cloud Security",
+        "href": "/courses/cloud-security-program"
+      }
+    ],
+    "createdAt": "2026-05-24T00:00:00.000Z",
+    "updatedAt": "2026-05-24T00:44:32.908Z"
+  },
+  {
+    "header": "Academy",
+    "items": [
+      {
+        "id": "mpj0l2u2oa86",
+        "label": "Courses",
+        "href": "/courses"
+      }
+    ],
+    "id": "fda57851-cf11-4684-9cba-7b509dc85ee1",
+    "createdAt": "2026-05-24T00:08:00.060Z",
+    "updatedAt": "2026-05-24T00:08:00.060Z"
+  }
+]

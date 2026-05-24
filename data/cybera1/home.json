@@ -1,0 +1,985 @@
+{
+  "hero": {
+    "badge": "Enterprise-Focused Cybersecurity Training Platformvv",
+    "headlineLine1": "Build Real",
+    "headlineLine2": "Cybersecurity",
+    "headlineAccent": "Skills For Industry & Enterprise56",
+    "subheadline": "Hands-on cybersecurity programs designed by security professionals with practical exposure in VAPT, cloud security, SOC operations, secure coding, and enterprise security workflows.",
+    "buttons": [
+      {
+        "label": "Explore Programs",
+        "href": "/courses",
+        "variant": "primary"
+      },
+      {
+        "label": "Corporate Training",
+        "href": "/corporate-training",
+        "variant": "outline"
+      },
+      {
+        "label": "Watch Student Journey",
+        "href": "#",
+        "variant": "ghost"
+      }
+    ],
+    "trustItems": [
+      {
+        "icon": "Building2",
+        "label": "Industry-Led Training"
+      },
+      {
+        "icon": "FlaskConical",
+        "label": "Hands-On Labs"
+      },
+      {
+        "icon": "Compass",
+        "label": "Career Guidance"
+      },
+      {
+        "icon": "Shield",
+        "label": "Enterprise Exposure"
+      },
+      {
+        "icon": "Users",
+        "label": "Community Ecosystem"
+      }
+    ],
+    "heroImage": "/images/home-hero.jpg",
+    "floatingCards": {
+      "popularProgram": {
+        "enabled": true,
+        "badgeText": "Popular Program",
+        "title": "CCSE (12 Months)",
+        "subtitle": "Comprehensive Cybersecurity Expert Program",
+        "href": "/courses/ccse-certified-cyber-security-expert",
+        "iconColor": "#e00000"
+      },
+      "upcomingBatch": {
+        "enabled": false,
+        "badgeText": "Upcoming Batch",
+        "title": "24th June 2026",
+        "subtitle": "Weekend Batch (Online + Offline)",
+        "href": "/contact",
+        "iconColor": "#e00000"
+      },
+      "careerSupport": {
+        "enabled": true,
+        "badgeText": "Career Support",
+        "title": "100% Practical",
+        "subtitle": "Placement Guidance, Mock Interviews & More",
+        "href": "/career-placement",
+        "iconColor": "#10b981"
+      }
+    }
+  },
+  "trustStrip": [
+    {
+      "icon": "Award",
+      "label": "CEH Certified Trainer"
+    },
+    {
+      "icon": "Briefcase",
+      "label": "Real Industry Projects"
+    },
+    {
+      "icon": "FlaskConical",
+      "label": "Practical Labs"
+    },
+    {
+      "icon": "Shield",
+      "label": "Enterprise Security Exposure"
+    },
+    {
+      "icon": "Users",
+      "label": "Placement Support"
+    },
+    {
+      "icon": "Building2",
+      "label": "Corporate Training Programs"
+    }
+  ],
+  "programmes": {
+    "sectionLabel": "Our Programs",
+    "title": "Industry-Focused Cybersecurity Programs",
+    "subtitle": "Designed for students, professionals, and enterprise teams.",
+    "ctaText": "View All Programs",
+    "ctaLink": "/courses",
+    "featuredProgrammeIds": []
+  },
+  "stats": {
+    "trainers": "200+",
+    "labs": "50+",
+    "students": "1000+",
+    "workshops": "100+"
+  },
+  "why": {
+    "sectionLabel": "Why Cyber A1 Academy?",
+    "title": "Why Students & Organizations Choose Cyber A1",
+    "subtitle": "We combine enterprise-grade training with practical industry exposure to create job-ready cybersecurity professionals.",
+    "features": [
+      {
+        "id": "f1",
+        "icon": "Briefcase",
+        "title": "Real Industry Exposure",
+        "description": "Work on real VAPT projects and learn enterprise reporting methodology.",
+        "points": [
+          "Real-world security assessments",
+          "Enterprise security workflows",
+          "Professional reporting standards"
+        ]
+      },
+      {
+        "id": "f2",
+        "icon": "FlaskConical",
+        "title": "Practical Learning",
+        "description": "Hands-on labs, real-world simulations and industry-grade tools.",
+        "points": [
+          "Dedicated lab environments",
+          "Virtual machines & attack ranges",
+          "Cloud-based security labs"
+        ]
+      },
+      {
+        "id": "f3",
+        "icon": "TrendingUp",
+        "title": "Career-Focused Training",
+        "description": "Career roadmap, interview preparation, resume building & placement support.",
+        "points": [
+          "Resume & LinkedIn optimization",
+          "Mock interview sessions",
+          "Direct company referrals"
+        ]
+      },
+      {
+        "id": "f4",
+        "icon": "Users",
+        "title": "Community & Events",
+        "description": "Active community, GDG Durgapur, workshops, DevFest & tech events.",
+        "points": [
+          "GDG Durgapur community",
+          "Monthly workshops & seminars",
+          "CTF competitions"
+        ]
+      },
+      {
+        "id": "f5",
+        "icon": "Building2",
+        "title": "Corporate Training Capability",
+        "description": "Custom training for organizations on latest security topics.",
+        "points": [
+          "Tailored corporate programs",
+          "Compliance training",
+          "Security awareness"
+        ]
+      }
+    ]
+  },
+  "careerRoadmap": {
+    "sectionLabel": "Choose Your Path",
+    "title": "Cybersecurity Career Roadmap",
+    "ctaText": "View Full Roadmap",
+    "ctaLink": "/courses",
+    "tracks": [
+      {
+        "id": "ethical-hacking",
+        "label": "Ethical Hacking",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–6 Months",
+            "topics": [
+              "Networking Basics",
+              "Linux Fundamentals",
+              "Cybersecurity Basics",
+              "Tools & Techniques"
+            ],
+            "certifications": [
+              "CompTIA Security+"
+            ],
+            "jobs": [
+              "Junior Security Analyst",
+              "Security Trainee"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "6–12 Months",
+            "topics": [
+              "Ethical Hacking",
+              "VAPT Methodology",
+              "Web & Network Security",
+              "Privilege Escalation"
+            ],
+            "certifications": [
+              "CEH"
+            ],
+            "jobs": [
+              "Penetration Tester",
+              "VAPT Analyst"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "1–2 Years",
+            "topics": [
+              "Advanced Exploitation",
+              "Post Exploitation",
+              "Red Teaming Basics",
+              "Report Writing"
+            ],
+            "certifications": [
+              "OSCP",
+              "CRTP"
+            ],
+            "jobs": [
+              "Security Consultant",
+              "Red Team Operator"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Cloud Security",
+              "AI Security",
+              "Malware Analysis",
+              "Bug Bounty"
+            ],
+            "certifications": [
+              "AWS Security",
+              "CISSP / OSWE"
+            ],
+            "jobs": [
+              "Security Architect",
+              "Bug Bounty Hunter"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "soc-analyst",
+        "label": "SOC Analyst",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–3 Months",
+            "topics": [
+              "Networking Fundamentals",
+              "OS Basics",
+              "Security Concepts",
+              "Log Analysis Intro"
+            ],
+            "certifications": [
+              "CompTIA Security+"
+            ],
+            "jobs": [
+              "SOC Intern",
+              "IT Support"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "3–9 Months",
+            "topics": [
+              "SIEM Platforms",
+              "Threat Detection",
+              "Incident Triage",
+              "Threat Intelligence"
+            ],
+            "certifications": [
+              "CySA+",
+              "Splunk Core"
+            ],
+            "jobs": [
+              "SOC Analyst L1",
+              "Security Analyst"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "9–18 Months",
+            "topics": [
+              "SOAR Automation",
+              "Malware Analysis",
+              "Digital Forensics",
+              "Advanced IR"
+            ],
+            "certifications": [
+              "GCIH",
+              "GCIA"
+            ],
+            "jobs": [
+              "SOC Analyst L2/L3",
+              "IR Analyst"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Threat Hunting",
+              "Purple Teaming",
+              "Security Engineering",
+              "SIEM Tuning"
+            ],
+            "certifications": [
+              "GDAT",
+              "CISSP"
+            ],
+            "jobs": [
+              "SOC Lead",
+              "Detection Engineer"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cloud-security",
+        "label": "Cloud Security",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–4 Months",
+            "topics": [
+              "Cloud Concepts",
+              "AWS / Azure Basics",
+              "IAM Fundamentals",
+              "Shared Responsibility"
+            ],
+            "certifications": [
+              "AWS Cloud Practitioner"
+            ],
+            "jobs": [
+              "Cloud Support",
+              "Junior Cloud Engineer"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "4–10 Months",
+            "topics": [
+              "Cloud Security Controls",
+              "Network Security",
+              "S3 / Blob Security",
+              "Compliance"
+            ],
+            "certifications": [
+              "AWS SAA",
+              "AZ-500"
+            ],
+            "jobs": [
+              "Cloud Security Analyst",
+              "DevSecOps"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "10–18 Months",
+            "topics": [
+              "CSPM Tools",
+              "Container Security",
+              "Kubernetes Security",
+              "Cloud Forensics"
+            ],
+            "certifications": [
+              "CCSP",
+              "AWS Security Specialty"
+            ],
+            "jobs": [
+              "Cloud Security Engineer",
+              "Security Architect"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Multi-Cloud Strategy",
+              "Zero Trust",
+              "Cloud Red Teaming",
+              "FinOps Security"
+            ],
+            "certifications": [
+              "CCSK",
+              "CISSP"
+            ],
+            "jobs": [
+              "Cloud Security Architect",
+              "CISO"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "app-security",
+        "label": "App Security",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–4 Months",
+            "topics": [
+              "OWASP Top 10",
+              "HTTP Protocol",
+              "Burp Suite Basics",
+              "Recon & Enumeration"
+            ],
+            "certifications": [
+              "CompTIA Security+"
+            ],
+            "jobs": [
+              "QA Tester",
+              "Jr Web Tester"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "4–10 Months",
+            "topics": [
+              "SQL Injection",
+              "XSS & CSRF",
+              "API Security",
+              "Authentication Flaws"
+            ],
+            "certifications": [
+              "eWPT",
+              "BSCP"
+            ],
+            "jobs": [
+              "Web Pentester",
+              "AppSec Analyst"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "10–18 Months",
+            "topics": [
+              "Business Logic Flaws",
+              "Deserialization",
+              "Source Code Review",
+              "Mobile Security"
+            ],
+            "certifications": [
+              "OSWA",
+              "GWEB"
+            ],
+            "jobs": [
+              "AppSec Engineer",
+              "Security Researcher"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Bug Bounty Hunting",
+              "0-day Research",
+              "Secure SDLC",
+              "DevSecOps"
+            ],
+            "certifications": [
+              "OSWE",
+              "CSSLP"
+            ],
+            "jobs": [
+              "AppSec Lead",
+              "Bug Bounty Hunter"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "red-teaming",
+        "label": "Red Teaming",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–6 Months",
+            "topics": [
+              "Linux & Windows",
+              "Networking Basics",
+              "Scripting (Python/Bash)",
+              "OSINT"
+            ],
+            "certifications": [
+              "CompTIA PenTest+"
+            ],
+            "jobs": [
+              "Security Intern",
+              "Jr Pentester"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "6–12 Months",
+            "topics": [
+              "C2 Frameworks",
+              "Active Directory Attacks",
+              "Lateral Movement",
+              "Pivoting"
+            ],
+            "certifications": [
+              "CRTP",
+              "CEH"
+            ],
+            "jobs": [
+              "Pentester",
+              "Red Team Analyst"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "1–2 Years",
+            "topics": [
+              "Custom Tooling",
+              "AV/EDR Evasion",
+              "Physical Security",
+              "Red Team Ops"
+            ],
+            "certifications": [
+              "OSCP",
+              "CRTE"
+            ],
+            "jobs": [
+              "Red Team Operator",
+              "Offensive Security Eng."
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Adversary Simulation",
+              "Threat Intel Integration",
+              "Purple Team Ops",
+              "Zero-day Research"
+            ],
+            "certifications": [
+              "CRTL",
+              "GRTP"
+            ],
+            "jobs": [
+              "Red Team Lead",
+              "Adversary Emulation Eng."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ai-security",
+        "label": "AI Security",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–3 Months",
+            "topics": [
+              "AI / ML Basics",
+              "LLM Concepts",
+              "Prompt Engineering",
+              "AI Risk Overview"
+            ],
+            "certifications": [
+              "Google AI Essentials"
+            ],
+            "jobs": [
+              "AI Support Analyst",
+              "Security Analyst"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "3–9 Months",
+            "topics": [
+              "LLM Prompt Injection",
+              "Model Poisoning",
+              "AI Red Teaming",
+              "Responsible AI"
+            ],
+            "certifications": [
+              "OWASP LLM Top 10"
+            ],
+            "jobs": [
+              "AI Security Analyst",
+              "ML Security Eng."
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "9–18 Months",
+            "topics": [
+              "Adversarial ML",
+              "AI Forensics",
+              "Supply Chain Attacks on AI",
+              "AutoML Security"
+            ],
+            "certifications": [
+              "GAIOPS"
+            ],
+            "jobs": [
+              "AI Red Teamer",
+              "AI Security Engineer"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "AI Policy & Governance",
+              "AI Security Research",
+              "Secure AI Architecture",
+              "Deepfake Detection"
+            ],
+            "certifications": [
+              "CISSP",
+              "CDPSE"
+            ],
+            "jobs": [
+              "AI Security Architect",
+              "AI Policy Lead"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "grc-compliance",
+        "label": "GRC & Compliance",
+        "stages": [
+          {
+            "level": "Beginner",
+            "duration": "0–3 Months",
+            "topics": [
+              "GRC Fundamentals",
+              "Risk Concepts",
+              "Compliance Frameworks",
+              "Policy Writing"
+            ],
+            "certifications": [
+              "CompTIA Security+"
+            ],
+            "jobs": [
+              "GRC Intern",
+              "Compliance Analyst"
+            ]
+          },
+          {
+            "level": "Intermediate",
+            "duration": "3–9 Months",
+            "topics": [
+              "ISO 27001",
+              "GDPR & DPDP",
+              "Audit Practices",
+              "Vendor Risk Management"
+            ],
+            "certifications": [
+              "ISO 27001 LA",
+              "CISA"
+            ],
+            "jobs": [
+              "GRC Analyst",
+              "IT Auditor"
+            ]
+          },
+          {
+            "level": "Advanced",
+            "duration": "9–18 Months",
+            "topics": [
+              "SOC 2 Audits",
+              "NIST CSF",
+              "BCP / DR Planning",
+              "Third-Party Risk"
+            ],
+            "certifications": [
+              "CISM",
+              "CRISC"
+            ],
+            "jobs": [
+              "Senior GRC Analyst",
+              "Risk Manager"
+            ]
+          },
+          {
+            "level": "Specialization",
+            "duration": "2+ Years",
+            "topics": [
+              "Enterprise Risk Governance",
+              "Board Reporting",
+              "Regulatory Strategy",
+              "Security Leadership"
+            ],
+            "certifications": [
+              "CISSP",
+              "CGEIT"
+            ],
+            "jobs": [
+              "GRC Manager",
+              "CISO / DPO"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "corporate": {
+    "sectionLabel": "Corporate Training Solutions",
+    "title": "Empower Your Team With",
+    "highlight": "Cybersecurity Skills",
+    "subtitle": "We design role-based and industry-specific training programs to meet your organization's security goals.",
+    "services": [
+      {
+        "icon": "Eye",
+        "label": "Security Awareness"
+      },
+      {
+        "icon": "Target",
+        "label": "SOC Awareness"
+      },
+      {
+        "icon": "Shield",
+        "label": "Phishing Simulation"
+      },
+      {
+        "icon": "CheckCircle2",
+        "label": "Compliance Awareness"
+      },
+      {
+        "icon": "Code",
+        "label": "Secure Coding"
+      },
+      {
+        "icon": "Zap",
+        "label": "Red Team Awareness"
+      },
+      {
+        "icon": "Cloud",
+        "label": "Cloud Security Workshops"
+      },
+      {
+        "icon": "Users",
+        "label": "Custom Training Programs"
+      }
+    ],
+    "ctaText": "Train Your Team",
+    "ctaLink": "/corporate-training",
+    "image": "/uploads/cybera1/home/1779582209333-pexels-divinetechygirl-1181354.jpg",
+    "statValue": "500+",
+    "statLabel": "Professionals Trained"
+  },
+  "institutional": {
+    "sectionLabel": "Institutional Collaboration",
+    "title": "Partner With",
+    "highlight": "Cyber A1 Academy",
+    "subtitle": "Build the next generation of cybersecurity professionals with us for training, workshops, internships & placement support.",
+    "services": [
+      {
+        "icon": "BookOpen",
+        "label": "Workshops & Seminars"
+      },
+      {
+        "icon": "GraduationCap",
+        "label": "Faculty Development"
+      },
+      {
+        "icon": "Users",
+        "label": "Cybersecurity Clubs"
+      },
+      {
+        "icon": "Zap",
+        "label": "Bootcamps & Hackathons"
+      },
+      {
+        "icon": "Briefcase",
+        "label": "Internship Collaboration"
+      },
+      {
+        "icon": "Link2",
+        "label": "Industry Connect"
+      },
+      {
+        "icon": "Heart",
+        "label": "Placement Support"
+      },
+      {
+        "icon": "BookMarked",
+        "label": "Curriculum Support"
+      }
+    ],
+    "ctaText": "Partner With Us",
+    "ctaLink": "/institutions",
+    "image": "/uploads/cybera1/home/1779582228754-pexels-divinetechygirl-1181316.jpg",
+    "statValue": "25+",
+    "statLabel": "Partner Institutions"
+  },
+  "events": {
+    "sectionLabel": "Events & Community",
+    "title": "Building A Strong Cybersecurity Community",
+    "subtitle": "Our events, workshops and community initiatives help you stay connected, up-to-date, and competitive.",
+    "featuredEventIds": [],
+    "ctaText": "Explore Events",
+    "ctaLink": "/events"
+  },
+  "testimonials": {
+    "sectionLabel": "Student Success Stories",
+    "title": "Hear From Our Learners",
+    "subtitle": "",
+    "featuredTestimonialIds": [],
+    "hiringPartners": [
+      {
+        "name": "Deloitte",
+        "logoUrl": ""
+      },
+      {
+        "name": "TCS",
+        "logoUrl": ""
+      },
+      {
+        "name": "Wipro",
+        "logoUrl": ""
+      },
+      {
+        "name": "Infosys",
+        "logoUrl": ""
+      },
+      {
+        "name": "Accenture",
+        "logoUrl": ""
+      }
+    ]
+  },
+  "blog": {
+    "sectionLabel": "Latest From Our Blog",
+    "title": "Insights & Resources",
+    "subtitle": "",
+    "featuredPostIds": [],
+    "ctaText": "Explore All Blogs",
+    "ctaLink": "/blog"
+  },
+  "faqs": [
+    {
+      "id": "faq1",
+      "question": "Who can join Cyber A1 Academy programs?",
+      "answer": "Anyone interested in cybersecurity can join — students, freshers, IT professionals, working professionals, and career switchers.",
+      "order": 0,
+      "isActive": true
+    },
+    {
+      "id": "faq2",
+      "question": "Do I need coding knowledge to start?",
+      "answer": "No coding knowledge is required for our foundation programs like CCEH.",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": "faq3",
+      "question": "Do you provide practical labs?",
+      "answer": "Yes, we have dedicated practical lab environments including virtual machines, attack ranges, vulnerable applications, and SIEM environments.",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": "faq4",
+      "question": "Do you offer placement assistance?",
+      "answer": "Yes, we provide resume building, mock interviews, and direct referrals to our hiring partner companies.",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": "faq5",
+      "question": "Are the classes online or offline?",
+      "answer": "We offer both online and offline modes.",
+      "order": 4,
+      "isActive": true
+    },
+    {
+      "id": "faq6",
+      "question": "Can working professionals join?",
+      "answer": "Yes! We have weekend batches designed for working professionals.",
+      "order": 5,
+      "isActive": true
+    }
+  ],
+  "cta": {
+    "eyebrow": "Ready To Start Your Journey?",
+    "headline": "Start Your Cybersecurity Journey With Real Industry-Focused Training",
+    "subtext": "Practical Learning | Career Guidance | Industry Exposure| Placement Support",
+    "primaryButton": {
+      "text": "Book Free Counseling",
+      "href": "/contact"
+    },
+    "secondaryButton": {
+      "text": "Download Brochure",
+      "href": "/courses"
+    },
+    "trustPoints": [
+      {
+        "icon": "Users",
+        "label": "Expert Trainers",
+        "sub": "Industry Professionals"
+      },
+      {
+        "icon": "FlaskConical",
+        "label": "Hands-On Labs",
+        "sub": "Real-world Experience"
+      },
+      {
+        "icon": "TrendingUp",
+        "label": "Career Support",
+        "sub": "Placement Assistance"
+      },
+      {
+        "icon": "Shield",
+        "label": "Practical Learning",
+        "sub": "Industry Exposure"
+      }
+    ],
+    "bgStyle": "dark",
+    "bgImage": "/uploads/cybera1/home/1779575750844-chatgpt-image-may-24--2026--04_03_25-am.png"
+  },
+  "footer": {
+    "description": "Cyber A1 Academy provides practical cybersecurity education, enterprise training, and career-focused learning experiences designed for the modern security industry.",
+    "copyright": "© 2026 Cyber A1 Academy. All Rights Reserved.",
+    "bottomLinks": [
+      {
+        "label": "Privacy Policy",
+        "href": "/privacy-policy"
+      },
+      {
+        "label": "Terms & Conditions",
+        "href": "/terms"
+      },
+      {
+        "label": "Refund Policy",
+        "href": "/refund-policy"
+      }
+    ],
+    "socialLinks": {
+      "linkedin": "#",
+      "instagram": "#",
+      "youtube": "#",
+      "facebook": "#"
+    },
+    "menuSections": [
+      {
+        "enabled": true,
+        "menuId": "menu-quick-links"
+      },
+      {
+        "enabled": true,
+        "menuId": "menu-programs"
+      },
+      {
+        "enabled": false,
+        "menuId": "fda57851-cf11-4684-9cba-7b509dc85ee1"
+      }
+    ],
+    "lastSection": "newsletter",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Subscribe to get updates on new courses, events and more."
+    },
+    "achievements": [],
+    "contactPhone": "+918388812126",
+    "contactAddress": "Kolkata",
+    "contactEmail": "mandaldipanjan2019@gmail.com"
+  },
+  "updatedAt": "2026-05-24T01:30:50.870Z",
+  "faqCardBgImage": "/uploads/cybera1/home/1779577817771-chatgpt-image-may-24--2026--04_40_11-am.png"
+}

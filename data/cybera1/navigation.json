@@ -1,0 +1,130 @@
+{
+  "announcementBar": {
+    "enabled": true,
+    "text": "🎓 Admissions Open for 2026 Batch | Corporate Training Available | Free Career Counseling|||",
+    "whatsappLabel": "WhatsApp",
+    "phone": "+91 8240 006 007",
+    "ctaText": "Book Counseling",
+    "ctaLink": "/contact"
+  },
+  "headerNav": [
+    {
+      "id": "1",
+      "label": "Home",
+      "href": "/",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 0,
+      "children": []
+    },
+    {
+      "id": "2",
+      "label": "Academy",
+      "href": "/academy",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 1,
+      "children": []
+    },
+    {
+      "id": "3",
+      "label": "Courses",
+      "href": "/courses",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 2,
+      "children": []
+    },
+    {
+      "id": "4",
+      "label": "Corporate Training",
+      "href": "/corporate-training",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 3,
+      "children": []
+    },
+    {
+      "id": "5",
+      "label": "Institutions",
+      "href": "/institutions",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 4,
+      "children": []
+    },
+    {
+      "id": "6",
+      "label": "Events",
+      "href": "/events",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 5,
+      "children": []
+    },
+    {
+      "id": "7",
+      "label": "Blog",
+      "href": "/blog",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 6,
+      "children": []
+    },
+    {
+      "id": "8",
+      "label": "Career & Placement",
+      "href": "/career-placement",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 7,
+      "children": []
+    },
+    {
+      "id": "9",
+      "label": "Contact",
+      "href": "/contact",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 8,
+      "children": []
+    }
+  ],
+  "headerCta": {
+    "text": "Contactb ",
+    "href": "/courses"
+  },
+  "footerQuickLinks": [],
+  "footerProgramLinks": [],
+  "footerCorporateLinks": [],
+  "footerBottomLinks": [
+    {
+      "id": "fp1",
+      "label": "Privacy Policy",
+      "href": "/privacy-policy",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 0,
+      "children": []
+    },
+    {
+      "id": "fp2",
+      "label": "Terms & Conditions",
+      "href": "/terms",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 1,
+      "children": []
+    },
+    {
+      "id": "fp3",
+      "label": "Refund Policy",
+      "href": "/refund-policy",
+      "isExternal": false,
+      "openInNewTab": false,
+      "order": 2,
+      "children": []
+    }
+  ],
+  "updatedAt": "2026-05-24T03:27:29.530Z"
+}

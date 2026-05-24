@@ -1,0 +1,40 @@
+{
+  "companyName": "Cybera1 Academy",
+  "companySlug": "cybera1",
+  "tagline": "Industry-Focused Cybersecurity Training",
+  "phone": "+91 8240 006 007",
+  "whatsapp": "+918240006007",
+  "email": "info@cybera1academy.com",
+  "address": "Durgapur, West Bengal",
+  "hours": "Mon–Sat: 9:30 AM – 7:00 PM",
+  "locations": [
+    "Durgapur",
+    "Delhi",
+    "Kolkata"
+  ],
+  "socialLinks": {
+    "linkedin": "#",
+    "instagram": "#",
+    "youtube": "#",
+    "facebook": "#",
+    "twitter": "#"
+  },
+  "seo": {
+    "defaultTitle": "cybera1 Academy — Industry-Focused Cybersecurity Training",
+    "titleTemplate": "%s | Academy",
+    "defaultDescription": "Hands-on cybersecurity programs designed by security professionals.",
+    "keywords": [
+      "cybersecurity",
+      "ethical hacking",
+      "VAPT",
+      "SOC analyst"
+    ],
+    "ogImage": "/images/og-image.jpg"
+  },
+  "scripts": {
+    "headScripts": "",
+    "bodyStartScripts": "",
+    "bodyEndScripts": ""
+  },
+  "updatedAt": "2026-05-23T03:04:00.523Z"
+}
