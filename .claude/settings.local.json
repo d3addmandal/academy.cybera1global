@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"C:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\"; npx next build 2>&1 | Where-Object { $_ -match \"error|Error|warning|Warning|failed|Failed\" -and $_ -notmatch \"vulnerability\" } | Select-Object -Last 40)",
+      "PowerShell(Head -30)",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\\\\app\\\\webapplication\")",
+      "PowerShell(if \\(-not \\(Test-Path -LiteralPath \"c:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\\\\sections\\\\home\\\\CareerRoadmap.tsx\"\\)\\) { \"not found\" } else { \"exists\" })",
+      "PowerShell(ls -R \"c:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\" -Directory)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\webapplication\\[company]\\[adminSlug]\\dashboard",
+      "c:\\Users\\Dipanjan\\.claude\\projects\\c--Users-Dipanjan-OneDrive---Panacea-InfoSec-Pvt--Ltd-Documents-Dipanjan-RD-Python-Projects-a1-academy\\memory",
+      "C:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\api\\admin\\[company]",
+      "c:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\webapplication\\[company]\\[adminSlug]\\dashboard"
+    ]
+  }
+}

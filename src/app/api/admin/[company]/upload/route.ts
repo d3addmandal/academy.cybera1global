@@ -1,0 +1,143 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthFromRequest } from "@/lib/auth";
+import fs from "fs";
+import path from "path";
+
+type Params = { params: Promise<{ company: string }> };
+
+const ALLOWED_MIME = new Set([
+  "image/jpeg", "image/png", "image/webp",
+  "image/gif", "image/svg+xml",
+  "image/x-icon", "image/vnd.microsoft.icon",
+]);
+const MAX_BYTES = 15 * 1024 * 1024; // 15 MB (client crops/compresses before sending)
+
+// Magic byte validators
+function validateMagicBytes(buf: Buffer, mime: string): boolean {
+  // SVG is text — validate content instead of magic bytes
+  if (mime === "image/svg+xml") return true;
+  // JPEG: FF D8 FF
+  if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return true;
+  // PNG: 89 50 4E 47
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return true;
+  // WebP: RIFF????WEBP
+  if (buf.length >= 12 &&
+    buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
+    buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return true;
+  // GIF87a / GIF89a
+  if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) return true;
+  // ICO: 00 00 01 00
+  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x01 && buf[3] === 0x00) return true;
+  // CUR (cursor, same container as ICO): 00 00 02 00
+  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x02 && buf[3] === 0x00) return true;
+  return false;
+}
+
+// Scan file content for embedded malicious patterns
+function containsMaliciousContent(buf: Buffer): boolean {
+  const scan = buf.slice(0, 8192).toString("latin1").toLowerCase();
+  const patterns = [
+    "<?php", "<?=", "<script", "<%", "eval(",
+    "base64_decode(", "exec(", "system(", "passthru(",
+    "shell_exec(", "popen(", "__import__",
+  ];
+  return patterns.some((p) => scan.includes(p));
+}
+
+export async function POST(req: NextRequest, { params }: Params) {
+  const auth = await getAuthFromRequest(req);
+  if (!auth) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { company } = await params;
+
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
+
+    if (!file || file.size === 0) {
+      return NextResponse.json({ success: false, error: "No file provided." }, { status: 400 });
+    }
+    if (file.size > MAX_BYTES) {
+      return NextResponse.json({ success: false, error: "File too large. Maximum 15 MB." }, { status: 400 });
+    }
+
+    // MIME type whitelist
+    const declaredMime = file.type.toLowerCase();
+    if (!ALLOWED_MIME.has(declaredMime)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid file type. Accepted: JPEG, PNG, WebP, GIF, SVG, ICO." },
+        { status: 400 }
+      );
+    }
+
+    // Read buffer for magic byte + content validation
+    const bytes = Buffer.from(await file.arrayBuffer());
+
+    // Magic bytes must match declared MIME
+    if (!validateMagicBytes(bytes, declaredMime)) {
+      return NextResponse.json(
+        { success: false, error: "File rejected: magic bytes do not match declared type." },
+        { status: 400 }
+      );
+    }
+
+    // SVG: reject if it contains any script tags (XSS vector)
+    if (declaredMime === "image/svg+xml") {
+      const svgText = bytes.slice(0, 65536).toString("utf8").toLowerCase();
+      if (svgText.includes("<script") || svgText.includes("javascript:") || svgText.includes("on load=") || svgText.includes("onerror=")) {
+        return NextResponse.json(
+          { success: false, error: "File rejected: SVG contains unsafe content." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Scan for embedded malicious content
+    if (containsMaliciousContent(bytes)) {
+      return NextResponse.json(
+        { success: false, error: "File rejected: suspicious content detected." },
+        { status: 400 }
+      );
+    }
+
+    // Safe extension from MIME
+    const extMap: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+      "image/svg+xml": "svg",
+      "image/x-icon": "ico",
+      "image/vnd.microsoft.icon": "ico",
+    };
+    const ext = extMap[declaredMime] ?? "jpg";
+
+    const uploadType = ((formData.get("type") as string) ?? "image")
+      .replace(/[^a-z0-9-]/gi, "")
+      .toLowerCase();
+
+    const folder = ((formData.get("folder") as string) ?? "")
+      .replace(/[^a-z0-9-_/]/gi, "")
+      .toLowerCase();
+
+    // Original filename is always stripped; use a random ID to prevent enumeration
+    const randomId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    const prefix = folder ? "" : `${uploadType}-`;
+    const filename = `${prefix}${Date.now()}-${randomId}.${ext}`;
+
+    const uploadDir = path.join(process.cwd(), "public", "uploads", company, folder);
+    fs.mkdirSync(uploadDir, { recursive: true });
+    fs.writeFileSync(path.join(uploadDir, filename), bytes);
+
+    const url = folder
+      ? `/uploads/${company}/${folder}/${filename}`
+      : `/uploads/${company}/${filename}`;
+
+    return NextResponse.json({ success: true, url, filename });
+  } catch (err) {
+    console.error("[upload]", err);
+    return NextResponse.json({ success: false, error: "Upload failed." }, { status: 500 });
+  }
+}
