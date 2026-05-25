@@ -166,8 +166,8 @@ export default function LoginPage() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-red-700 to-red-600 text-white font-bold py-3.5 rounded-xl hover:from-red-600 hover:to-red-500 hover:shadow-[0_8px_20px_rgba(224,0,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+              disabled={isLoading || !captchaValid}
+              className="w-full bg-gradient-to-r from-red-700 to-red-600 text-white font-bold py-3.5 rounded-xl hover:from-red-600 hover:to-red-500 hover:shadow-[0_8px_20px_rgba(224,0,0,0.3)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
