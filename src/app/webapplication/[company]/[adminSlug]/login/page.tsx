@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Shield, Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
-import Captcha, { type CaptchaHandle } from "@/components/admin/Captcha";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,8 +16,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [captchaValid, setCaptchaValid] = useState(false);
-  const captchaRef = useRef<CaptchaHandle>(null);
 
   // If already authenticated, redirect straight to dashboard
   useEffect(() => {
@@ -30,11 +27,6 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (!captchaValid) {
-      setError("Please enter the correct verification code.");
-      captchaRef.current?.refresh();
-      return;
-    }
     setIsLoading(true);
 
     try {
@@ -48,7 +40,6 @@ export default function LoginPage() {
 
       if (!res.ok || !data.success) {
         setError(data.error || "Invalid email or password.");
-        captchaRef.current?.refresh();
         return;
       }
 
@@ -152,9 +143,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* CAPTCHA */}
-            <Captcha ref={captchaRef} onValidChange={setCaptchaValid} />
-
             {/* Error */}
             {error && (
               <div className="flex items-center gap-2.5 bg-red-950/40 border border-red-800/50 rounded-xl p-3.5 text-red-400 text-sm">
@@ -166,7 +154,7 @@ export default function LoginPage() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={isLoading || !captchaValid}
+              disabled={isLoading}
               className="w-full bg-gradient-to-r from-red-700 to-red-600 text-white font-bold py-3.5 rounded-xl hover:from-red-600 hover:to-red-500 hover:shadow-[0_8px_20px_rgba(224,0,0,0.3)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
             >
               {isLoading ? (
