@@ -117,6 +117,12 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     // On Vercel: use Blob storage (writable); locally: write to public/uploads/
     if (process.env.VERCEL === "1") {
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        return NextResponse.json(
+          { success: false, error: "Blob storage not configured. Go to Vercel Dashboard → Storage → Create Blob store → Connect to this project." },
+          { status: 500 }
+        );
+      }
       const { put } = await import("@vercel/blob");
       const blobPath = folder
         ? `uploads/${company}/${folder}/${filename}`
@@ -138,7 +144,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     return NextResponse.json({ success: true, url, filename });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Upload failed.";
     console.error("[upload]", err);
-    return NextResponse.json({ success: false, error: "Upload failed." }, { status: 500 });
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
