@@ -47,7 +47,7 @@ export default function CoursesPage() {
             <p className="text-gray-400 mb-8">
               From beginner-friendly foundations to advanced enterprise training — choose the right program based on your goal.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">
                 Explore Programs <ArrowRight className="w-4 h-4" />
               </Link>
@@ -115,7 +115,7 @@ export default function CoursesPage() {
 
       {/* CTA */}
       <section className="py-12 bg-[#080b10]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
+        <div className="site-container max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-black text-white mb-3">Not Sure Which Program Is Right For You?</h2>
           <p className="text-gray-400 mb-6">Talk to our counselor and get a personalized cybersecurity learning roadmap.</p>
           <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">

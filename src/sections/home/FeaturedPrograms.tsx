@@ -17,7 +17,7 @@ export default function FeaturedPrograms({ programmes, config }: Props) {
 
   return (
     <section className="py-8 bg-white">
-      <div className="w-[95%] mx-auto">
+      <div className="w-[90%] mx-auto">
 
         {/* Header row */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
@@ -40,7 +40,10 @@ export default function FeaturedPrograms({ programmes, config }: Props) {
         {programmes.length === 0 ? (
           <div className="text-center py-16 text-gray-400">No programmes published yet.</div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div
+            className="gap-4 grid grid-cols-2 sm:grid-cols-3 justify-center"
+            style={{ gridTemplateColumns: "repeat(auto-fill, 178px)" }}
+          >
             {programmes.map((course) => (
               <ProgramCard key={course.id} course={course} />
             ))}

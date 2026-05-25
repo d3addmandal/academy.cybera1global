@@ -26,7 +26,7 @@ export default function AboutPage() {
 
       <section className="py-20 bg-white">
         <div className="site-container">
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div>
               <h2 className="text-2xl font-black text-gray-900 mb-4">Who We Are</h2>
               <p className="text-gray-500 leading-relaxed mb-4">
@@ -70,7 +70,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-16 bg-[#080b10]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
+        <div className="site-container max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-black text-white mb-4">
             Join Us On This <span className="text-red-500">Journey</span>
           </h2>

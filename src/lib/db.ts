@@ -2,33 +2,45 @@ import fs from "fs";
 import path from "path";
 import type {
   AdminUser, SiteSettings, ThemeSettings, NavigationSettings,
-  HomePageContent, Programme, BlogPost, Event, Testimonial,
+  HomePageContent, Programme, BlogPost, Event, Testimonial, Trainer,
   CustomPage, FAQ, NavigationMenu,
   AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent,
+  ContactSubmission,
 } from "@/types/cms";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
+// On Vercel, the deployment bundle is read-only; writes must go to /tmp.
+// Reads check /tmp first (for writes made in this invocation) then fall back
+// to the committed data/ directory.
+const IS_VERCEL = process.env.VERCEL === "1";
+const WRITE_DIR = IS_VERCEL ? "/tmp/data" : DATA_DIR;
+const READ_DIRS = IS_VERCEL ? ["/tmp/data", DATA_DIR] : [DATA_DIR];
+
 // ─── Low-level file helpers ──────────────────────────────────────────────────
 
 function ensureDir(companySlug: string): void {
-  const dir = path.join(DATA_DIR, companySlug);
+  const dir = path.join(WRITE_DIR, companySlug);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 function readFile<T>(companySlug: string, filename: string): T | null {
-  const filePath = path.join(DATA_DIR, companySlug, filename);
-  if (!fs.existsSync(filePath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
-  } catch {
-    return null;
+  for (const base of READ_DIRS) {
+    const filePath = path.join(base, companySlug, filename);
+    if (fs.existsSync(filePath)) {
+      try {
+        return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
+      } catch {
+        continue;
+      }
+    }
   }
+  return null;
 }
 
 function writeFile<T>(companySlug: string, filename: string, data: T): void {
   ensureDir(companySlug);
-  const filePath = path.join(DATA_DIR, companySlug, filename);
+  const filePath = path.join(WRITE_DIR, companySlug, filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
@@ -40,40 +52,57 @@ function now(): string {
   return new Date().toISOString();
 }
 
-// ─── Sessions (no-concurrent-login) ─────────────────────────────────────────
+// ─── Sessions (no-concurrent-login + inactivity timeout) ────────────────────
+
+const SESSION_INACTIVITY_MS = 30 * 60 * 1000; // 30 minutes
 
 interface SessionRecord {
   userId: string;
   sessionId: string;
   createdAt: string;
+  lastActivityAt: string;
   userAgent?: string;
   ip?: string;
 }
 
 export const sessionsDb = {
-  _file: (slug: string) => "sessions.json" as const,
-
   getAll(slug: string): SessionRecord[] {
     return readFile<SessionRecord[]>(slug, "sessions.json") ?? [];
   },
 
-  /** Returns the ONE active sessionId for a given userId, or null. */
   getActive(slug: string, userId: string): string | null {
-    const sessions = this.getAll(slug);
-    const s = sessions.find((r) => r.userId === userId);
+    const s = this.getAll(slug).find((r) => r.userId === userId);
     return s ? s.sessionId : null;
   },
 
-  /** Validates that a sessionId is still the active one for this user. */
+  /** Validates sessionId AND checks 30-min inactivity. Auto-purges expired sessions. */
   isValid(slug: string, userId: string, sessionId: string): boolean {
-    const active = this.getActive(slug, userId);
-    return active === sessionId;
+    const sessions = this.getAll(slug);
+    const s = sessions.find((r) => r.userId === userId && r.sessionId === sessionId);
+    if (!s) return false;
+    const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
+    if (Date.now() - lastActivity > SESSION_INACTIVITY_MS) {
+      writeFile(slug, "sessions.json", sessions.filter((r) => r.userId !== userId));
+      return false;
+    }
+    return true;
   },
 
   /** Creates a new session, REPLACING any existing session (no concurrent login). */
   create(slug: string, userId: string, sessionId: string, meta?: { userAgent?: string; ip?: string }): void {
     const sessions = this.getAll(slug).filter((r) => r.userId !== userId);
-    sessions.push({ userId, sessionId, createdAt: now(), ...meta });
+    sessions.push({ userId, sessionId, createdAt: now(), lastActivityAt: now(), ...meta });
+    writeFile(slug, "sessions.json", sessions);
+  },
+
+  /** Updates lastActivityAt — called on each verified API request. Writes at most once/min. */
+  touch(slug: string, userId: string): void {
+    const sessions = this.getAll(slug);
+    const idx = sessions.findIndex((r) => r.userId === userId);
+    if (idx === -1) return;
+    const lastActivity = new Date(sessions[idx].lastActivityAt ?? sessions[idx].createdAt).getTime();
+    if (Date.now() - lastActivity < 60_000) return; // throttle writes
+    sessions[idx] = { ...sessions[idx], lastActivityAt: now() };
     writeFile(slug, "sessions.json", sessions);
   },
 
@@ -112,6 +141,13 @@ export const usersDb = {
   },
   updateLastLogin(slug: string, id: string): void {
     this.update(slug, id, { lastLogin: now() });
+  },
+  delete(slug: string, id: string): boolean {
+    const users = this.getAll(slug);
+    const filtered = users.filter((u) => u.id !== id);
+    if (filtered.length === users.length) return false;
+    writeFile(slug, "users.json", filtered);
+    return true;
   },
 };
 
@@ -408,10 +444,75 @@ export const menusDb = {
   },
 };
 
+// ─── Trainers ────────────────────────────────────────────────────────────────
+
+export const trainersDb = {
+  getAll(slug: string): Trainer[] {
+    return (readFile<Trainer[]>(slug, "trainers.json") ?? []).sort((a, b) => a.order - b.order);
+  },
+  getById(slug: string, id: string): Trainer | undefined {
+    return this.getAll(slug).find((t) => t.id === id);
+  },
+  getBySlug(slug: string, trainerSlug: string): Trainer | undefined {
+    return this.getAll(slug).find((t) => t.slug === trainerSlug);
+  },
+  create(slug: string, data: Omit<Trainer, "id" | "createdAt" | "updatedAt" | "companySlug">): Trainer {
+    const all = this.getAll(slug);
+    const trainer: Trainer = {
+      ...data,
+      id: generateId(),
+      companySlug: slug,
+      order: all.length,
+      createdAt: now(),
+      updatedAt: now(),
+    };
+    writeFile(slug, "trainers.json", [...all, trainer]);
+    return trainer;
+  },
+  update(slug: string, id: string, data: Partial<Trainer>): Trainer | null {
+    const all = this.getAll(slug);
+    const idx = all.findIndex((t) => t.id === id);
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...data, updatedAt: now() };
+    writeFile(slug, "trainers.json", all);
+    return all[idx];
+  },
+  delete(slug: string, id: string): boolean {
+    const all = this.getAll(slug);
+    const filtered = all.filter((t) => t.id !== id);
+    if (filtered.length === all.length) return false;
+    writeFile(slug, "trainers.json", filtered);
+    return true;
+  },
+};
+
+// ─── Contact Submissions ──────────────────────────────────────────────────────
+
+export const contactsDb = {
+  getAll(slug: string): ContactSubmission[] {
+    return (readFile<ContactSubmission[]>(slug, "contacts.json") ?? []).sort(
+      (a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+    );
+  },
+  create(slug: string, data: Omit<ContactSubmission, "id" | "submittedAt">): ContactSubmission {
+    const all = this.getAll(slug);
+    const submission: ContactSubmission = { ...data, id: generateId(), submittedAt: now() };
+    writeFile(slug, "contacts.json", [submission, ...all]);
+    return submission;
+  },
+  delete(slug: string, id: string): boolean {
+    const all = this.getAll(slug);
+    const filtered = all.filter((c) => c.id !== id);
+    if (filtered.length === all.length) return false;
+    writeFile(slug, "contacts.json", filtered);
+    return true;
+  },
+};
+
 // ─── Company check / init ─────────────────────────────────────────────────────
 
 export function companyExists(slug: string): boolean {
-  return fs.existsSync(path.join(DATA_DIR, slug, "users.json"));
+  return READ_DIRS.some((base) => fs.existsSync(path.join(base, slug, "users.json")));
 }
 
 export function isInitialized(slug: string): boolean {
@@ -492,9 +593,27 @@ function defaultSettings(slug: string): SiteSettings {
 
 function defaultTheme(): ThemeSettings {
   return {
-    colors: { primary: "#e00000", primaryDark: "#8b0000", darkBg: "#080b10", semiDark: "#0d1117", black: "#050505" },
+    colors: {
+      primary: "#e00000",
+      primaryDark: "#8b0000",
+      headerBg: "#080b10",
+      footerBg: "#050505",
+      pageBg: "#ffffff",
+      darkBg: "#080b10",
+      semiDark: "#0d1117",
+      black: "#050505",
+    },
     logo: { text: "Cyber A1", highlight: "A1", imageUrl: "", faviconUrl: "" },
-    typography: { headingFont: "Inter", bodyFont: "Inter" },
+    typography: { headingFont: "Inter", bodyFont: "Inter", baseFontSize: "md" },
+    templates: {
+      preset: "dark-cyber",
+      pageLayout: "layout-1",
+      programmeLayout: "prog-1",
+      blogLayout: "blog-1",
+      ctaStyle: "cta-1",
+      contactFormStyle: "form-1",
+      contactPageTemplate: "contact-1",
+    },
     updatedAt: new Date().toISOString(),
   };
 }
@@ -520,7 +639,7 @@ function defaultNavigation(): NavigationSettings {
       { id: "8", label: "Career & Placement", href: "/career-placement", isExternal: false, openInNewTab: false, order: 7, children: [] },
       { id: "9", label: "Contact", href: "/contact", isExternal: false, openInNewTab: false, order: 8, children: [] },
     ],
-    headerCta: { text: "Download Brochure", href: "/courses" },
+    headerCta: { text: "Contact Us", href: "/contact" },
     footerQuickLinks: [],
     footerProgramLinks: [],
     footerCorporateLinks: [],
@@ -711,7 +830,7 @@ function defaultHomeContent(): HomePageContent {
       headline: "Start Your Cybersecurity Journey With Real Industry-Focused Training",
       subtext: "Practical Learning • Career Guidance • Industry Exposure • Placement Support",
       primaryButton: { text: "Book Free Counseling", href: "/contact" },
-      secondaryButton: { text: "Download Brochure", href: "/courses" },
+      secondaryButton: { text: "Contact Us", href: "/contact" },
       trustPoints: [
         { icon: "Users", label: "Expert Trainers", sub: "Industry Professionals" },
         { icon: "FlaskConical", label: "Hands-On Labs", sub: "Real-world Experience" },

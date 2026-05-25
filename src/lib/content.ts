@@ -7,10 +7,10 @@
  */
 import {
   themeDb, settingsDb, navDb, homeDb,
-  programmesDb, blogDb, eventsDb, testimonialsDb, faqsDb, menusDb,
+  programmesDb, blogDb, eventsDb, testimonialsDb, faqsDb, menusDb, trainersDb,
   academyPageDb, corporatePageDb, institutionsPageDb, careerPageDb,
 } from "./db";
-import type { Programme, BlogPost, Event, Testimonial, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent } from "@/types/cms";
+import type { Programme, BlogPost, Event, Testimonial, Trainer, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent } from "@/types/cms";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 
@@ -94,6 +94,20 @@ export function getCRMMenus(): NavigationMenu[] {
 }
 export function getCRMMenuById(id: string): NavigationMenu | undefined {
   try { return menusDb.getById(COMPANY, id); } catch { return undefined; }
+}
+
+// ── Trainers ─────────────────────────────────────────────────────────────────
+export function getCRMTrainers(): Trainer[] {
+  try { return trainersDb.getAll(COMPANY).filter(t => t.status === "published"); } catch { return []; }
+}
+export function getCRMFeaturedTrainers(ids?: string[]): Trainer[] {
+  const all = getCRMTrainers();
+  if (!ids || ids.length === 0) return all.filter(t => t.isFeatured);
+  const byId = ids.map(id => all.find(t => t.id === id)).filter(Boolean) as Trainer[];
+  return byId.length > 0 ? byId : all.filter(t => t.isFeatured);
+}
+export function getCRMTrainerBySlug(slug: string): Trainer | undefined {
+  try { return trainersDb.getBySlug(COMPANY, slug); } catch { return undefined; }
 }
 
 // ── Static page content ──────────────────────────────────────────────────────

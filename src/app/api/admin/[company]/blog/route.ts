@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
 import { blogDb } from "@/lib/db";
+import { canWriteBlog, forbidden } from "@/lib/permissions";
 
 type Params = { params: Promise<{ company: string }> };
 
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
   if (!auth) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  if (!canWriteBlog(auth.role)) return forbidden();
   const { company } = await params;
   const body = await req.json();
   if (!body.slug || !body.title) return NextResponse.json({ success: false, error: "Slug and title required." }, { status: 400 });

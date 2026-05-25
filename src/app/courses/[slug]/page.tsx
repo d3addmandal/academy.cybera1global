@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Clock, Monitor, BarChart3, FlaskConical, CheckCircle2, ArrowRight,
-  Download, Phone, User, Award, Cpu, ChevronRight, BookOpen, Calendar,
+  Phone, User, Award, Cpu, ChevronRight, BookOpen, Calendar,
   Target, Wrench, Briefcase,
 } from "lucide-react";
 import { getCRMProgrammeBySlug, getCRMProgrammes } from "@/lib/content";
@@ -78,10 +78,10 @@ export default async function CourseDetailPage({ params }: Props) {
 
               {/* Title */}
               <h1 className="font-black text-white leading-[1.05] mb-5">
-                <span className="block text-5xl lg:text-6xl xl:text-7xl text-red-500 mb-1">
+                <span className="block text-3xl sm:text-5xl lg:text-6xl xl:text-7xl text-red-500 mb-1">
                   {programme.shortTitle}
                 </span>
-                <span className="block text-2xl lg:text-3xl xl:text-4xl">
+                <span className="block text-xl sm:text-2xl lg:text-3xl xl:text-4xl">
                   {programme.title.split("—")[1]?.trim() || programme.title}
                 </span>
               </h1>
@@ -103,7 +103,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   href="/contact"
                   className="inline-flex items-center gap-2 border border-gray-600 text-gray-200 font-semibold px-6 py-3.5 rounded-xl hover:border-gray-400 hover:text-white transition-all"
                 >
-                  <Download className="w-4 h-4" /> Download Syllabus
+                  <Phone className="w-4 h-4" /> Get Syllabus
                 </Link>
                 <Link
                   href="/contact"
@@ -133,7 +133,7 @@ export default async function CourseDetailPage({ params }: Props) {
             </div>
 
             {/* Right — contact form */}
-            <ContactForm />
+            <ContactForm courseName={programme.shortTitle} />
           </div>
         </div>
       </section>
@@ -268,8 +268,13 @@ export default async function CourseDetailPage({ params }: Props) {
         </section>
       )}
 
-      {/* FAQ */}
-      {programme.faqs.length > 0 && <FAQClient faqs={programme.faqs} />}
+      {/* FAQ + Sample Certificate */}
+      {(programme.faqs.length > 0 || programme.sampleCertificate) && (
+        <FAQClient
+          faqs={programme.faqs}
+          sampleCertificate={programme.sampleCertificate}
+        />
+      )}
 
       {/* Bottom CTA */}
       <section className="py-16 bg-[#080b10]">

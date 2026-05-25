@@ -60,7 +60,7 @@ export default function HeroSection({ content }: Props) {
       <div className="absolute hidden lg:block w-px bg-gradient-to-b from-transparent via-red-600/50 to-transparent top-16 bottom-16"
         style={{ left: "calc(50% - 80px)" }} />
 
-      <div className="relative z-10 w-full site-container pt-28 pb-16">
+      <div className="relative z-10 w-full px-5 lg:px-0 lg:w-[95%] mx-auto pt-28 pb-16">
         <div className="grid lg:grid-cols-[1fr_260px] gap-8 lg:gap-12 items-center min-h-[calc(100vh-11rem)]">
 
           {/* ── LEFT: text content ── */}
@@ -109,6 +109,31 @@ export default function HeroSection({ content }: Props) {
               })}
             </div>
 
+            {/* Mobile floating cards — compact horizontal strip */}
+            <div className="flex lg:hidden gap-3 overflow-x-auto pb-2 mb-2 -mx-1 px-1">
+              {(!cards || cards.popularProgram?.enabled !== false) && (
+                <div className="flex-shrink-0 w-44 bg-[#0d1117]/90 backdrop-blur-md border border-gray-700/60 rounded-xl p-3 shadow-xl">
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">{cards?.popularProgram?.badgeText ?? "Popular Program"}</p>
+                  <p className="text-white font-bold text-[11px] leading-snug mb-1">{cards?.popularProgram?.title ?? "CCSE (12 Months)"}</p>
+                  <Link href={cards?.popularProgram?.href ?? "/courses"} className="text-red-500 text-[10px] font-semibold">View →</Link>
+                </div>
+              )}
+              {(!cards || cards.upcomingBatch?.enabled !== false) && (
+                <div className="flex-shrink-0 w-44 bg-[#0d1117]/90 backdrop-blur-md border border-gray-700/60 rounded-xl p-3 shadow-xl">
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">{cards?.upcomingBatch?.badgeText ?? "Upcoming Batch"}</p>
+                  <p className="text-white font-bold text-[11px] leading-snug mb-1">{cards?.upcomingBatch?.title ?? "24th June 2026"}</p>
+                  <Link href={cards?.upcomingBatch?.href ?? "/contact"} className="text-red-500 text-[10px] font-semibold">Enroll →</Link>
+                </div>
+              )}
+              {(!cards || cards.careerSupport?.enabled !== false) && (
+                <div className="flex-shrink-0 w-44 bg-[#0d1117]/90 backdrop-blur-md border border-gray-700/60 rounded-xl p-3 shadow-xl">
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">{cards?.careerSupport?.badgeText ?? "Career Support"}</p>
+                  <p className="text-white font-bold text-[11px] leading-snug mb-1">{cards?.careerSupport?.title ?? "100% Practical"}</p>
+                  <Link href={cards?.careerSupport?.href ?? "/career-placement"} className="text-red-500 text-[10px] font-semibold">Know more →</Link>
+                </div>
+              )}
+            </div>
+
             {/* Trust row */}
             <div className="flex flex-wrap gap-x-5 gap-y-3">
               {trustItems.map((item) => {
@@ -125,7 +150,7 @@ export default function HeroSection({ content }: Props) {
             </div>
           </div>
 
-          {/* ── RIGHT: stacked floating cards ── */}
+          {/* ── RIGHT: stacked floating cards (desktop) ── */}
           <div className="hidden lg:flex flex-col gap-4 py-4">
 
             {/* Popular Program */}

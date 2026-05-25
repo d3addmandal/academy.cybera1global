@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Shield, Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
+import Captcha, { type CaptchaHandle } from "@/components/admin/Captcha";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,11 +11,14 @@ export default function LoginPage() {
   const company = params.company as string;
   const adminSlug = params.adminSlug as string;
 
+  const reason = searchParams.get("reason");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const captchaRef = useRef<CaptchaHandle>(null);
 
   // If already authenticated, redirect straight to dashboard
   useEffect(() => {
@@ -26,6 +30,11 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (!captchaValid) {
+      setError("Please enter the correct verification code.");
+      captchaRef.current?.refresh();
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -39,6 +48,7 @@ export default function LoginPage() {
 
       if (!res.ok || !data.success) {
         setError(data.error || "Invalid email or password.");
+        captchaRef.current?.refresh();
         return;
       }
 
@@ -78,6 +88,20 @@ export default function LoginPage() {
           </h1>
           <p className="text-slate-500 text-sm">Sign in to access the control panel</p>
         </div>
+
+        {/* Session reason banners */}
+        {reason === "timeout" && (
+          <div className="mb-4 flex items-center gap-2.5 bg-amber-950/40 border border-amber-700/50 rounded-xl p-3.5 text-amber-400 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>Session expired due to inactivity. Please sign in again.</span>
+          </div>
+        )}
+        {reason === "superseded" && (
+          <div className="mb-4 flex items-center gap-2.5 bg-red-950/40 border border-red-800/50 rounded-xl p-3.5 text-red-400 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>Your session was ended by a new login elsewhere.</span>
+          </div>
+        )}
 
         {/* Login card */}
         <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-8 shadow-2xl">
@@ -127,6 +151,9 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {/* CAPTCHA */}
+            <Captcha ref={captchaRef} onValidChange={setCaptchaValid} />
 
             {/* Error */}
             {error && (

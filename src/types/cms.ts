@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────
 // Core Identifiers
 // ─────────────────────────────────────────────
-export type UserRole = "super_admin" | "admin" | "editor" | "viewer";
+export type UserRole = "super_admin" | "admin" | "editor" | "sales" | "viewer";
 export type Status = "published" | "draft" | "archived";
 export type ProgrammeLevel = "Beginner" | "Intermediate" | "Advanced" | "Beginner to Advanced";
 export type ProgrammeCategory = "career-track" | "specialized" | "corporate" | "institutional";
@@ -53,7 +53,29 @@ export interface SiteSettings {
     bodyStartScripts: string;
     bodyEndScripts: string;
   };
+  inquiry?: {
+    deliveryMethod: "email" | "whatsapp" | "both";
+    whatsappNumber: string;
+    emailTo: string;
+  };
   updatedAt: string;
+}
+
+// ─────────────────────────────────────────────
+// Contact Submissions
+// ─────────────────────────────────────────────
+export interface ContactSubmission {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  program: string;
+  company: string;
+  message: string;
+  inquiryType: string;
+  submittedAt: string;
+  ipAddress?: string;
 }
 
 // ─────────────────────────────────────────────
@@ -63,6 +85,9 @@ export interface ThemeSettings {
   colors: {
     primary: string;
     primaryDark: string;
+    headerBg: string;
+    footerBg: string;
+    pageBg: string;
     darkBg: string;
     semiDark: string;
     black: string;
@@ -77,6 +102,16 @@ export interface ThemeSettings {
   typography: {
     headingFont: string;
     bodyFont: string;
+    baseFontSize: "sm" | "md" | "lg";
+  };
+  templates: {
+    preset: string;
+    pageLayout: string;
+    programmeLayout: string;
+    blogLayout: string;
+    ctaStyle: string;
+    contactFormStyle: string;
+    contactPageTemplate: string;
   };
   updatedAt: string;
 }
@@ -368,6 +403,7 @@ export interface Programme {
   tools: string[];
   labs: string[];
   certificationTitle: string;
+  sampleCertificate?: string;
   careerPaths: CareerPath[];
   faqs: FAQ[];
   order: number;
@@ -440,6 +476,38 @@ export interface Testimonial {
   programme: string;
   rating: number;
   linkedIn: string;
+  isFeatured: boolean;
+  status: Status;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─────────────────────────────────────────────
+// Trainers
+// ─────────────────────────────────────────────
+export interface TrainerCertBadge {
+  name: string;
+  logoUrl?: string;
+}
+
+export interface Trainer {
+  id: string;
+  companySlug: string;
+  slug: string;
+  name: string;
+  designation: string;
+  specialization: string;
+  bio: string;
+  experience: string;
+  certifications: string[];
+  certBadges?: TrainerCertBadge[];
+  expertise?: string[];
+  imageUrl: string;
+  linkedIn?: string;
+  github?: string;
+  twitter?: string;
+  courses?: string[];
   isFeatured: boolean;
   status: Status;
   order: number;

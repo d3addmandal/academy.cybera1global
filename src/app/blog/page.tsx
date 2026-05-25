@@ -38,7 +38,7 @@ export default function BlogPage() {
       </section>
 
       {/* Category bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-[105px] z-30">
+      <div className="bg-white border-b border-gray-100 sticky top-[65px] md:top-[105px] z-30">
         <div className="site-container py-4 flex items-center gap-3 overflow-x-auto">
           {categories.map((cat) => (
             <button key={cat} className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all ${cat === "All" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"}`}>
@@ -68,7 +68,7 @@ export default function BlogPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="p-8 flex flex-col justify-center">
+                  <div className="p-5 sm:p-8 flex flex-col justify-center">
                     <span className="text-xs bg-red-50 text-red-600 font-bold px-3 py-1 rounded-full self-start mb-4">{featured.category}</span>
                     <h3 className="text-2xl font-black text-gray-900 mb-3 group-hover:text-red-600 transition-colors">{featured.title}</h3>
                     <p className="text-gray-500 mb-6">{featured.excerpt}</p>

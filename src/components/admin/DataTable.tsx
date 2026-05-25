@@ -65,9 +65,9 @@ export default function DataTable<T extends { id: string }>({
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
       {/* Table header controls */}
       {(title || createHref || searchKeys.length > 0) && (
-        <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 border-b border-slate-100">
           {title && <h3 className="font-bold text-slate-800">{title}</h3>}
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex flex-wrap items-center gap-3 ml-auto">
             {searchKeys.length > 0 && (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
@@ -76,7 +76,7 @@ export default function DataTable<T extends { id: string }>({
                   placeholder="Search…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-red-400 w-48"
+                  className="pl-8 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-red-400 w-40 sm:w-48"
                 />
               </div>
             )}

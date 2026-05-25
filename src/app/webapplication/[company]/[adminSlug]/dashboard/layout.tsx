@@ -34,6 +34,7 @@ export default async function DashboardLayout({ children, params }: Props) {
       companyName={settings.companyName}
       userName={auth.email.split("@")[0]}
       userEmail={auth.email}
+      role={auth.role}
     >
       {children}
     </AdminShell>

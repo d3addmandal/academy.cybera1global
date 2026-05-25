@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
 import { academyPageDb } from "@/lib/db";
+import { isAdmin, forbidden } from "@/lib/permissions";
 
 type Params = { params: Promise<{ company: string }> };
 
@@ -15,6 +16,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 export async function PUT(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
   if (!auth) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  if (!isAdmin(auth.role)) return forbidden();
   const { company } = await params;
   const body = await req.json();
   const data = academyPageDb.save(company, body);
@@ -81,7 +83,7 @@ function defaultAcademy() {
     cta: {
       headline: "Start Building Real Cybersecurity Skills With Cyber A1 Academy",
       primaryCta: { text: "Book Free Counseling", href: "/contact" },
-      secondaryCta: { text: "Download Brochure", href: "/courses" },
+      secondaryCta: { text: "Contact Us", href: "/contact" },
     },
     updatedAt: new Date().toISOString(),
   };

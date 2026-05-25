@@ -7,7 +7,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import PartnerForm from "./PartnerForm";
 import type { InstitutionsPageContent } from "@/types/cms";
-import { getInstitutionsPageContent } from "@/lib/content";
+import { getInstitutionsPageContent, getSiteSettings } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +63,9 @@ const DEFAULTS: InstitutionsPageContent = {
 
 export default function InstitutionsPage() {
   const cms = getInstitutionsPageContent() ?? DEFAULTS;
+  const settings = getSiteSettings();
+  const phone = settings?.phone ?? "+91 8240 006 007";
+  const telHref = `tel:${phone.replace(/\s/g, "")}`;
 
   return (
     <div className="pt-24">
@@ -88,7 +91,7 @@ export default function InstitutionsPage() {
                 <Link href={cms.hero.primaryCta.href} className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">
                   {cms.hero.primaryCta.text} <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="tel:+918240006007" className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 font-semibold px-6 py-3 rounded-lg hover:border-red-500 hover:text-red-400 transition-colors">
+                <a href={telHref} className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 font-semibold px-6 py-3 rounded-lg hover:border-red-500 hover:text-red-400 transition-colors">
                   <Phone className="w-4 h-4" /> Call Us
                 </a>
               </div>
@@ -174,12 +177,12 @@ export default function InstitutionsPage() {
 
       {/* Partner form */}
       <section id="partner-form" className="py-20 bg-[#080b10]">
-        <div className="max-w-3xl mx-auto px-4 lg:px-6">
+        <div className="site-container max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-black text-white mb-3">{cms.cta.headline}</h2>
             <p className="text-gray-400">{cms.cta.description}</p>
           </div>
-          <div className="bg-[#0d1117] border border-gray-800 rounded-2xl p-8">
+          <div className="bg-[#0d1117] border border-gray-800 rounded-2xl p-5 sm:p-8">
             <PartnerForm />
           </div>
         </div>

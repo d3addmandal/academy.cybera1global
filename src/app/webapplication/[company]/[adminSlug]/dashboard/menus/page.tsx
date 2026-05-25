@@ -40,7 +40,7 @@ export default function MenusPage() {
 
   return (
     <div>
-      <PageHeader title="Menus" subtitle="Build reusable navigation menus for headers and footers." />
+      <PageHeader title="Navigation Menus" subtitle="Create and manage reusable link groups. Assign them to footer columns from the Home Content editor." />
       <DataTable
         data={data} isLoading={isLoading}
         createHref={`${base}/menus/new`} createLabel="Create Menu"

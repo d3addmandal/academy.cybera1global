@@ -107,7 +107,7 @@ export default function EventsPage() {
       </section>
 
       <section className="py-16 bg-white">
-        <div className="max-w-2xl mx-auto px-4 text-center">
+        <div className="site-container max-w-2xl mx-auto text-center">
           <h2 className="text-2xl font-black text-gray-900 mb-3">Want to Host an Event at Your Institution?</h2>
           <p className="text-gray-500 mb-6">We conduct free/subsidized cybersecurity workshops at colleges and communities.</p>
           <div className="flex flex-wrap gap-3 justify-center">

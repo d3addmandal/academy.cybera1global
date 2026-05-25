@@ -75,7 +75,7 @@
   "trustStrip": [
     {
       "icon": "Award",
-      "label": "CEH Certified Trainer"
+      "label": "Certified Trainer"
     },
     {
       "icon": "Briefcase",
@@ -980,6 +980,6 @@
     "contactAddress": "Kolkata",
     "contactEmail": "mandaldipanjan2019@gmail.com"
   },
-  "updatedAt": "2026-05-24T05:15:53.455Z",
+  "updatedAt": "2026-05-24T20:54:02.272Z",
   "faqCardBgImage": "/uploads/cybera1/home/1779577817771-chatgpt-image-may-24--2026--04_40_11-am.png"
 }

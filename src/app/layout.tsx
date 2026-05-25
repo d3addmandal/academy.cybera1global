@@ -1,17 +1,22 @@
+import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import WhatsAppFloat from "@/components/shared/WhatsAppFloat";
+import FloatingButtons from "@/components/shared/FloatingButtons";
 import { getSiteTheme, getSiteSettings, getSiteNav, getCRMPublishedProgrammes } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
+
+const FONT_SIZE_MAP = { sm: "14px", md: "16px", lg: "18px" } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const theme = getSiteTheme();
@@ -66,15 +71,59 @@ export default async function RootLayout({
   const nav = isAdmin ? null : getSiteNav();
   const programmes = isAdmin ? [] : getCRMPublishedProgrammes();
 
+  // Build Google Fonts URL for selected fonts
+  const headingFont = theme?.typography?.headingFont ?? "Inter";
+  const bodyFont = theme?.typography?.bodyFont ?? "Inter";
+  const baseFontSize = theme?.typography?.baseFontSize ?? "md";
+  const googleFonts = [...new Set([headingFont, bodyFont])].filter((f) => f !== "Inter");
+  const googleFontsUrl = googleFonts.length > 0
+    ? `https://fonts.googleapis.com/css2?${googleFonts.map((f) => `family=${f.replace(/ /g, "+")}:wght@300;400;500;600;700;800;900`).join("&")}&display=swap`
+    : null;
+
+  // CSS variables for global theme application
+  const cssVars = {
+    "--color-primary": theme?.colors?.primary ?? "#e00000",
+    "--color-primary-dark": theme?.colors?.primaryDark ?? "#8b0000",
+    "--color-header-bg": theme?.colors?.headerBg ?? "#080b10",
+    "--color-footer-bg": theme?.colors?.footerBg ?? "#050505",
+    "--color-page-bg": theme?.colors?.pageBg ?? "#ffffff",
+    "--color-dark-bg": theme?.colors?.darkBg ?? "#080b10",
+    "--color-semi-dark": theme?.colors?.semiDark ?? "#0d1117",
+    "--color-black": theme?.colors?.black ?? "#050505",
+    "--font-heading": headingFont === "Inter" ? `var(--font-inter), sans-serif` : `"${headingFont}", sans-serif`,
+    "--font-body": bodyFont === "Inter" ? `var(--font-inter), sans-serif` : `"${bodyFont}", sans-serif`,
+    "--font-base-size": FONT_SIZE_MAP[baseFontSize],
+    // Template data passed as CSS vars for use in CSS selectors
+    "--tmpl-page": `"${theme?.templates?.pageLayout ?? "layout-1"}"`,
+    "--tmpl-prog": `"${theme?.templates?.programmeLayout ?? "prog-1"}"`,
+    "--tmpl-blog": `"${theme?.templates?.blogLayout ?? "blog-1"}"`,
+  } as React.CSSProperties;
+
   return (
     <html
       lang="en"
       className={`${inter.variable} h-full`}
+      style={cssVars}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
+      data-page-template={theme?.templates?.pageLayout ?? "layout-1"}
+      data-prog-template={theme?.templates?.programmeLayout ?? "prog-1"}
+      data-blog-template={theme?.templates?.blogLayout ?? "blog-1"}
+      data-cta-style={theme?.templates?.ctaStyle ?? "cta-1"}
+      data-contact-form={theme?.templates?.contactFormStyle ?? "form-1"}
+      data-contact-page={theme?.templates?.contactPageTemplate ?? "contact-1"}
     >
+      <head>
+        {googleFontsUrl && (
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        )}
+        {googleFontsUrl && (
+          <link rel="stylesheet" href={googleFontsUrl} />
+        )}
+      </head>
       <body
-        className="min-h-full flex flex-col bg-white text-gray-900 antialiased"
+        className="min-h-full flex flex-col antialiased"
+        style={{ backgroundColor: "var(--color-page-bg)", fontFamily: "var(--font-body)", fontSize: "var(--font-base-size)" }}
         suppressHydrationWarning
       >
         {!isAdmin && <Header theme={theme} settings={settings} nav={nav} programmes={programmes} />}
@@ -82,7 +131,7 @@ export default async function RootLayout({
           {children}
         </main>
         {!isAdmin && <Footer />}
-        {!isAdmin && <WhatsAppFloat />}
+        {!isAdmin && <FloatingButtons settings={settings} />}
       </body>
     </html>
   );

@@ -158,6 +158,38 @@ export default function SettingsPage() {
           </div>
         </Card>
 
+        {/* Inquiry Routing */}
+        <Card title="Enquiry Routing" subtitle="Choose how contact form submissions are delivered to you.">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Delivery Method">
+              <select
+                value={settings.inquiry?.deliveryMethod ?? "whatsapp"}
+                onChange={(e) => updateNested("inquiry.deliveryMethod", e.target.value)}
+                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400"
+              >
+                <option value="whatsapp">WhatsApp only</option>
+                <option value="email">Email only</option>
+                <option value="both">WhatsApp + Email</option>
+              </select>
+            </Field>
+            <Field label="WhatsApp Number for Enquiries" hint="With country code, digits only. e.g. 918240006007">
+              <Input
+                value={settings.inquiry?.whatsappNumber ?? settings.whatsapp ?? ""}
+                onChange={(e) => updateNested("inquiry.whatsappNumber", e.target.value)}
+                placeholder="918240006007"
+              />
+            </Field>
+            <Field label="Email for Enquiries (when email mode)" className="sm:col-span-2">
+              <Input
+                type="email"
+                value={settings.inquiry?.emailTo ?? settings.email ?? ""}
+                onChange={(e) => updateNested("inquiry.emailTo", e.target.value)}
+                placeholder="info@cybera1academy.com"
+              />
+            </Field>
+          </div>
+        </Card>
+
         {/* Scripts */}
         <Card title="Custom Scripts" subtitle="Add tracking codes, chat widgets, or analytics scripts.">
           <div className="grid gap-4">

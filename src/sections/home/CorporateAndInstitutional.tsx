@@ -35,60 +35,108 @@ interface CardProps {
 
 function TrainingCard({ sectionLabel, title, highlight, services, ctaText, ctaHref, bgImage }: CardProps) {
   return (
-    <div className="relative overflow-hidden min-h-[30vh] flex items-stretch">
-      {/* Background image — right portion only */}
-      {bgImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        />
-      )}
-      {/* Gradient overlay: solid dark on left, fades to semi-transparent on right */}
+    /* Gradient-border wrapper — creates the glowing neon edge */
+    <div
+      className="transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01]"
+      style={{
+        borderRadius: "18px",
+        padding: "2px",
+        background: "linear-gradient(135deg, #6b6b6b 0%, #2a2a2a 35%, #4a4a4a 60%, #1a1a1a 100%)",
+        boxShadow:
+          "0 0 6px rgba(180,180,180,0.12), 0 0 18px rgba(80,80,80,0.10), 0 20px 50px rgba(0,0,0,0.55)",
+      }}
+    >
+      {/* Inner metallic card */}
       <div
-        className="absolute inset-0"
+        className="relative overflow-hidden flex items-stretch min-h-[21vh]"
         style={{
-          background: bgImage
-            ? "linear-gradient(to right, #050505 42%, rgba(5,5,5,0.82) 62%, rgba(5,5,5,0.45) 100%)"
-            : "#050505",
+          borderRadius: "16px",
+          background: "linear-gradient(160deg, #2c2c3e 0%, #3a3b52 18%, #22233a 40%, #32334c 62%, #1e1f34 100%)",
         }}
-      />
+      >
+        {/* Metallic sheen — diagonal highlight strip */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            inset: 0,
+            background: "linear-gradient(115deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 30%, transparent 55%)",
+          }}
+        />
 
-      {/* Content */}
-      <div className="relative z-10 py-6 px-8 flex flex-col justify-center w-full max-w-[62%]">
-        <span className="text-red-500 text-[10px] font-bold uppercase tracking-[0.18em] mb-2 block">
-          {sectionLabel}
-        </span>
+        {/* Top-edge metallic reflection */}
+        <div
+          className="absolute inset-x-0 top-0 h-px"
+          style={{ background: "linear-gradient(to right, rgba(200,200,200,0.5), rgba(120,120,120,0.3), rgba(255,255,255,0.12) 60%, transparent)" }}
+        />
 
-        <h2 className="text-xl lg:text-2xl font-black text-white leading-tight mb-4">
-          {highlight ? (
-            <>
-              {title}
-              <br />
-              <span className="text-red-500">{highlight}</span>
-            </>
-          ) : title}
-        </h2>
+        {/* Background image */}
+        {bgImage && (
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-50"
+            style={{ backgroundImage: `url(${bgImage})` }}
+          />
+        )}
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-5">
-          {services.map(({ icon, label }) => {
-            const Icon = ICON_MAP[icon] ?? Shield;
-            return (
-              <div key={label} className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center flex-shrink-0">
-                  <Icon className="text-white" style={{ width: 13, height: 13 }} />
+        {/* Overlay for text readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: bgImage
+              ? "linear-gradient(to right, rgba(30,31,52,0.92) 28%, rgba(30,31,52,0.60) 58%, rgba(30,31,52,0.10) 100%)"
+              : "transparent",
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 py-5 px-6 sm:px-8 flex flex-col justify-center w-full max-w-full lg:max-w-[65%]">
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5 block"
+            style={{ color: "#ff6a00" }}
+          >
+            {sectionLabel}
+          </span>
+
+          <h2 className="text-lg lg:text-xl font-black text-white leading-tight mb-3">
+            {highlight ? (
+              <>
+                {title}
+                <br />
+                <span style={{ color: "#ff4500" }}>{highlight}</span>
+              </>
+            ) : title}
+          </h2>
+
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
+            {services.map(({ icon, label }) => {
+              const Icon = ICON_MAP[icon] ?? Shield;
+              return (
+                <div key={label} className="flex items-center gap-2">
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "linear-gradient(135deg, #cc3300, #880000)",
+                      boxShadow: "0 0 6px rgba(200,50,0,0.35)",
+                    }}
+                  >
+                    <Icon className="text-white" style={{ width: 11, height: 11 }} />
+                  </div>
+                  <span className="text-gray-200 text-[11px] font-medium leading-snug">{label}</span>
                 </div>
-                <span className="text-gray-200 text-xs font-medium leading-snug">{label}</span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <Link
-          href={ctaHref}
-          className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-6 py-2.5 rounded transition-colors self-start"
-        >
-          {ctaText} <ArrowRight className="w-4 h-4" />
-        </Link>
+          <Link
+            href={ctaHref}
+            className="inline-flex items-center gap-2 text-white font-bold text-xs px-5 py-2 rounded-lg transition-all self-start hover:opacity-90"
+            style={{
+              background: "linear-gradient(135deg, #e63000, #cc0000)",
+              boxShadow: "0 0 8px rgba(220,60,0,0.30), 0 3px 8px rgba(0,0,0,0.25)",
+            }}
+          >
+            {ctaText} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
     </div>
   );

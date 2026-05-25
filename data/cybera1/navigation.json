@@ -1,9 +1,9 @@
 {
   "announcementBar": {
-    "enabled": true,
-    "text": "🎓 Admissions Open for 2026 Batch | Corporate Training Available | Free Career Counseling|||",
+    "enabled": false,
+    "text": "🎓 Admissions Open for 2026 Batch | Corporate Training Available | Free Career Counseling",
     "whatsappLabel": "WhatsApp",
-    "phone": "+91 8240 006 007",
+    "phone": "+91 8388812126",
     "ctaText": "Book Counseling",
     "ctaLink": "/contact"
   },
@@ -91,8 +91,8 @@
     }
   ],
   "headerCta": {
-    "text": "Contactb ",
-    "href": "/courses"
+    "text": "Contact",
+    "href": "/contact"
   },
   "footerQuickLinks": [],
   "footerProgramLinks": [],
@@ -126,5 +126,5 @@
       "children": []
     }
   ],
-  "updatedAt": "2026-05-24T03:27:29.530Z"
+  "updatedAt": "2026-05-24T20:56:02.947Z"
 }

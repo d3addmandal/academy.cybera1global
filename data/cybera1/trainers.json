@@ -1,0 +1,191 @@
+[
+  {
+    "id": "t-001",
+    "companySlug": "cybera1",
+    "slug": "rahul-sharma",
+    "name": "Rahul Sharma",
+    "designation": "Senior Penetration Tester & Lead Trainer",
+    "specialization": "VAPT & Red Teaming",
+    "bio": "Rahul is a seasoned cybersecurity professional with 8+ years of experience in offensive security, VAPT, and red teaming engagements. He has worked with enterprise clients across BFSI, IT, and government sectors, helping them identify and remediate critical security vulnerabilities. At Cyber A1 Academy, he leads the CCSE and VAPT programmes with a practical, lab-focused approach.",
+    "experience": "8+ Years",
+    "certifications": [
+      "OSCP",
+      "CEH",
+      "CRTP"
+    ],
+    "certBadges": [
+      {
+        "name": "OSCP",
+        "logoUrl": "/uploads/cybera1/trainerscertbadges/1779734783369-9ec8b16d101245fd.png"
+      },
+      {
+        "name": "CEH",
+        "logoUrl": ""
+      },
+      {
+        "name": "CRTP",
+        "logoUrl": ""
+      }
+    ],
+    "expertise": [
+      "Penetration Testing",
+      "Red Teaming",
+      "VAPT",
+      "Network Security"
+    ],
+    "imageUrl": "/uploads/cybera1/trainers/1779733559805-ade44a74d96e49fb.jpg",
+    "linkedIn": "",
+    "github": "",
+    "twitter": "",
+    "courses": [
+      "cceh-certified-ethical-hacker",
+      "ccse-certified-cyber-security-expert"
+    ],
+    "isFeatured": true,
+    "status": "published",
+    "order": 0,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2026-05-25T18:46:57.982Z"
+  },
+  {
+    "id": "t-002",
+    "companySlug": "cybera1",
+    "slug": "priya-singh",
+    "name": "Priya Singh",
+    "designation": "SOC Team Lead & Security Trainer",
+    "specialization": "SOC Operations & SIEM",
+    "bio": "Priya brings 6+ years of blue team experience to the classroom, having led SOC operations for financial and healthcare organizations. Her expertise in SIEM tools, threat detection, and incident response gives students a real-world perspective on defensive security. She heads the SOC Analyst Programme at Cyber A1 Academy.",
+    "experience": "6+ Years",
+    "certifications": [
+      "GCIH",
+      "CySA+",
+      "Security+"
+    ],
+    "certBadges": [
+      {
+        "name": "GCIH",
+        "logoUrl": ""
+      },
+      {
+        "name": "CySA+",
+        "logoUrl": ""
+      },
+      {
+        "name": "Security+",
+        "logoUrl": ""
+      }
+    ],
+    "expertise": [
+      "SOC Operations",
+      "SIEM Tools",
+      "Threat Detection",
+      "Incident Response"
+    ],
+    "imageUrl": "/uploads/cybera1/trainers/1779657963293-667e1d3132aa4cd4.png",
+    "linkedIn": "",
+    "github": "",
+    "twitter": "",
+    "courses": [
+      "soc-analyst-program"
+    ],
+    "isFeatured": true,
+    "status": "published",
+    "order": 1,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2026-05-24T21:26:04.683Z"
+  },
+  {
+    "id": "t-003",
+    "companySlug": "cybera1",
+    "slug": "arijit-das",
+    "name": "Arijit Das",
+    "designation": "Cloud Security Architect & Trainer",
+    "specialization": "AWS & Azure Security",
+    "bio": "Arijit is a cloud security architect with 7+ years of experience securing cloud infrastructure across AWS and Azure environments. He specializes in cloud misconfiguration assessments, IAM security, and cloud-native threat modeling. He trains students on real-world cloud VAPT methodologies and DevSecOps practices.",
+    "experience": "7+ Years",
+    "certifications": [
+      "AWS Security Specialty",
+      "CCSP",
+      "AZ-500"
+    ],
+    "certBadges": [
+      {
+        "name": "AWS Security",
+        "logoUrl": ""
+      },
+      {
+        "name": "CCSP",
+        "logoUrl": ""
+      },
+      {
+        "name": "AZ-500",
+        "logoUrl": ""
+      }
+    ],
+    "expertise": [
+      "Cloud Security",
+      "AWS & Azure VAPT",
+      "IAM Security",
+      "DevSecOps"
+    ],
+    "imageUrl": "",
+    "linkedIn": "#",
+    "github": "",
+    "twitter": "",
+    "courses": [
+      "ccse-certified-cyber-security-expert"
+    ],
+    "isFeatured": true,
+    "status": "published",
+    "order": 2,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "t-004",
+    "companySlug": "cybera1",
+    "slug": "neha-roy",
+    "name": "Neha Roy",
+    "designation": "Application Security Engineer & Trainer",
+    "specialization": "Web Application Security & Bug Bounty",
+    "bio": "Neha is an application security engineer with 5+ years of experience in web and mobile security assessments, code reviews, and bug bounty programs. Her hands-on approach to OWASP Top 10, API security, and secure coding practices has helped hundreds of students break into the AppSec domain.",
+    "experience": "5+ Years",
+    "certifications": [
+      "OSWE",
+      "CEH",
+      "BSCP"
+    ],
+    "certBadges": [
+      {
+        "name": "OSWE",
+        "logoUrl": ""
+      },
+      {
+        "name": "CEH",
+        "logoUrl": ""
+      },
+      {
+        "name": "BSCP",
+        "logoUrl": ""
+      }
+    ],
+    "expertise": [
+      "Web App Security",
+      "API Security",
+      "Bug Bounty",
+      "OWASP Top 10"
+    ],
+    "imageUrl": "",
+    "linkedIn": "#",
+    "github": "#",
+    "twitter": "",
+    "courses": [
+      "ccse-certified-cyber-security-expert"
+    ],
+    "isFeatured": true,
+    "status": "published",
+    "order": 3,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
