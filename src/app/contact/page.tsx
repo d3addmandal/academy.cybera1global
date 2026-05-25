@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
-// Use static contact FAQs (these are not CRM-controlled; only home FAQs are)
+import ContactFormClient from "./ContactFormClient";
+import { getSiteSettings } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
+
 const contactFaqs = [
   { id: "cf1", question: "What are your office hours?", answer: "Our office is open Monday to Saturday, 9:30 AM to 7:00 PM IST.", category: "contact" },
   { id: "cf2", question: "Do you have multiple locations?", answer: "Yes, we have centers in Durgapur (Head Office), Delhi, and Kolkata.", category: "contact" },
   { id: "cf3", question: "How can I book a free counseling session?", answer: "You can book via our website, WhatsApp, or by calling our helpline.", category: "contact" },
 ];
-import ContactFormClient from "./ContactFormClient";
 
 export const metadata: Metadata = {
   title: "Contact Us — Cyber A1 Academy",
@@ -15,34 +18,19 @@ export const metadata: Metadata = {
     "Get in touch with Cyber A1 Academy. Book a free counseling session, enquire about programs, or reach out to our team in Durgapur, Delhi, or Kolkata.",
 };
 
-const offices = [
-  {
-    city: "Durgapur (Head Office)",
-    address: "Cyber A1 Academy, Durgapur, West Bengal",
-    phone: "+91 8240 006 007",
-    email: "info@cybera1academy.com",
-    hours: "Mon–Sat: 9:30 AM – 7:00 PM",
-    isPrimary: true,
-  },
-  {
-    city: "Delhi",
-    address: "Delhi Office — Contact for exact address",
-    phone: "+91 8240 006 007",
-    email: "info@cybera1academy.com",
-    hours: "Mon–Sat: 9:30 AM – 7:00 PM",
-    isPrimary: false,
-  },
-  {
-    city: "Kolkata",
-    address: "Kolkata Office — Contact for exact address",
-    phone: "+91 8240 006 007",
-    email: "info@cybera1academy.com",
-    hours: "Mon–Sat: 9:30 AM – 7:00 PM",
-    isPrimary: false,
-  },
-];
-
 export default function ContactPage() {
+  const settings = getSiteSettings();
+  const phone = settings?.phone ?? "+91 8240 006 007";
+  const email = settings?.email ?? "info@cybera1academy.com";
+  const hours = settings?.hours ?? "Mon–Sat: 9:30 AM – 7:00 PM";
+  const whatsapp = (settings?.whatsapp ?? "918240006007").replace(/\D/g, "");
+  const telHref = `tel:${phone.replace(/\s/g, "")}`;
+
+  const offices = [
+    { city: "Durgapur (Head Office)", address: "Cyber A1 Academy, Durgapur, West Bengal", isPrimary: true },
+    { city: "Delhi", address: "Delhi Office — Contact for exact address", isPrimary: false },
+    { city: "Kolkata", address: "Kolkata Office — Contact for exact address", isPrimary: false },
+  ];
   return (
     <div className="pt-24">
       {/* Hero */}
@@ -65,14 +53,14 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div className="site-container py-20">
-        <div className="grid lg:grid-cols-5 gap-12">
+      <div className="site-container py-12 lg:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Contact form */}
           <div className="lg:col-span-3">
-            <div className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm">
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 sm:p-8 shadow-sm">
               <h2 className="text-2xl font-black text-gray-900 mb-2">Send Us a Message</h2>
               <p className="text-gray-500 text-sm mb-6">Fill in the form below and our team will get back to you within 2 hours.</p>
-              <ContactFormClient />
+              <ContactFormClient phone={phone} />
             </div>
           </div>
 
@@ -82,25 +70,25 @@ export default function ContactPage() {
             <div className="bg-[#080b10] border border-gray-800 rounded-2xl p-6">
               <h3 className="text-white font-bold text-lg mb-5">Quick Contact</h3>
               <div className="space-y-4">
-                <a href="tel:+918240006007" className="flex items-center gap-4 group">
+                <a href={telHref} className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center flex-shrink-0 group-hover:bg-red-600 group-hover:border-red-600 transition-colors">
                     <Phone className="w-5 h-5 text-red-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Call Us</p>
-                    <p className="text-white font-semibold">+91 8240 006 007</p>
+                    <p className="text-white font-semibold">{phone}</p>
                   </div>
                 </a>
-                <a href="mailto:info@cybera1academy.com" className="flex items-center gap-4 group">
+                <a href={`mailto:${email}`} className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-red-600/20 border border-red-600/30 flex items-center justify-center flex-shrink-0 group-hover:bg-red-600 group-hover:border-red-600 transition-colors">
                     <Mail className="w-5 h-5 text-red-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Email Us</p>
-                    <p className="text-white font-semibold text-sm">info@cybera1academy.com</p>
+                    <p className="text-white font-semibold text-sm">{email}</p>
                   </div>
                 </a>
-                <a href="https://wa.me/918240006007" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
+                <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-green-600/20 border border-green-600/30 flex items-center justify-center flex-shrink-0 group-hover:bg-green-600 group-hover:border-green-600 transition-colors">
                     <MessageCircle className="w-5 h-5 text-green-500 group-hover:text-white transition-colors" />
                   </div>
@@ -115,7 +103,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-xs">Office Hours</p>
-                    <p className="text-white font-semibold text-sm">Mon–Sat: 9:30 AM – 7:00 PM</p>
+                    <p className="text-white font-semibold text-sm">{hours}</p>
                   </div>
                 </div>
               </div>

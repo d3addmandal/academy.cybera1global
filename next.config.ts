@@ -1,10 +1,6 @@
-import type { NextConfig } from "next";
+﻿import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // React 18.3 + Next.js 16 dev mode throws hydration mismatches for STRUCTURAL
-  // differences (e.g. extra child elements injected by browser extensions) even
-  // when suppressHydrationWarning is set. Disabling StrictMode stops this.
-  // StrictMode is development-only; no effect on production builds.
   reactStrictMode: false,
 
   images: {
@@ -12,7 +8,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
 
-  // Allow dev HMR from LAN / VM hosts
   allowedDevOrigins: [
     "192.168.56.1",
     "192.168.1.0/24",
@@ -23,20 +18,35 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Admin web app: comprehensive security headers
         source: "/webapplication/:path*",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Referrer-Policy", value: "no-referrer" },
           { key: "Cache-Control", value: "no-store, no-cache, must-revalidate, private" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
         ],
       },
       {
+        // Admin API: cache prevention + content sniff protection
         source: "/api/admin/:path*",
         headers: [
           { key: "Cache-Control", value: "no-store, private" },
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        // Public site: basic security headers as fallback
+        source: "/((?!webapplication|api/admin).*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
     ];

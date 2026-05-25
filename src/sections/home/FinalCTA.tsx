@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowRight, Download } from "lucide-react";
+﻿import Link from "next/link";
+import { ArrowRight, Phone } from "lucide-react";
 import type { CTASection } from "@/types/cms";
 
 interface Props {
@@ -12,7 +12,7 @@ export default function FinalCTA({ cta }: Props) {
   const headline  = cta?.headline       ?? "Start Your Cybersecurity Journey With Real Industry-Focused Training";
   const subtext   = cta?.subtext        ?? "Practical Learning | Career Guidance | Industry Exposure | Placement Support";
   const primary   = cta?.primaryButton  ?? { text: "Book Free Counseling", href: "/contact" };
-  const secondary = cta?.secondaryButton ?? { text: "Download Brochure",    href: "/courses" };
+  const secondary = cta?.secondaryButton ?? { text: "Contact Us",           href: "/contact" };
   const bgImage   = cta?.bgImage ?? "";
 
   return (
@@ -20,7 +20,7 @@ export default function FinalCTA({ cta }: Props) {
       <div className="w-full px-[2%]">
         {/* ── Banner card ── */}
         <div
-          className="relative overflow-hidden rounded-2xl py-10 px-8 lg:px-12"
+          className="relative overflow-hidden rounded-2xl py-10 px-5 sm:px-8 lg:px-12"
           style={{
             background: bgImage
               ? `url(${bgImage}) center/cover no-repeat`
@@ -89,7 +89,7 @@ export default function FinalCTA({ cta }: Props) {
                 href={secondary.href}
                 className="inline-flex items-center justify-center gap-2 border border-gray-500 text-gray-200 font-semibold px-6 py-2.5 rounded-lg hover:border-red-500 hover:text-red-400 transition-all text-sm whitespace-nowrap"
               >
-                <Download className="w-3.5 h-3.5" /> {secondary.text}
+                <Phone className="w-3.5 h-3.5" /> {secondary.text}
               </Link>
             </div>
 

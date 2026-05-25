@@ -1,12 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { usersDb, sessionsDb, companyExists } from "@/lib/db";
 import { signToken, setAuthCookie, adminDashboardUrl } from "@/lib/auth";
-import { seedCompany } from "@/lib/seed";
+import { sanitizeEmail, sanitizeText } from "@/lib/sanitize";
+import { checkRateLimit, recordFailedLogin, resetFailedLogin } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, companySlug } = await req.json();
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+
+    // Rate limit: 10 requests per minute per IP
+    const rateResult = checkRateLimit(`login:${ip}`, 10, 60_000);
+    if (!rateResult.allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(rateResult.retryAfterSeconds) } }
+      );
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const email = sanitizeEmail(body.email);
+    const password = sanitizeText(body.password, 128);
+    const companySlug = sanitizeText(body.companySlug, 64);
 
     if (!email || !password || !companySlug) {
       return NextResponse.json(
@@ -15,14 +30,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auto-seed on first visit
     if (!companyExists(companySlug)) {
-      await seedCompany(companySlug);
+      return NextResponse.json(
+        { success: false, error: "Invalid email or password." },
+        { status: 401 }
+      );
+    }
+
+    // Account lockout: 5 failed attempts per 15 minutes per IP+email key
+    const lockKey = `lockout:${ip}:${email}`;
+    const lockResult = recordFailedLogin(lockKey, false);
+    if (lockResult.locked) {
+      return NextResponse.json(
+        { success: false, error: "Account temporarily locked. Try again in 15 minutes." },
+        { status: 429 }
+      );
     }
 
     const user = usersDb.getByEmail(companySlug, email);
     if (!user || !user.isActive) {
-      // Same error for both "not found" and "inactive" — no enumeration
+      recordFailedLogin(lockKey, true);
       return NextResponse.json(
         { success: false, error: "Invalid email or password." },
         { status: 401 }
@@ -31,13 +58,16 @@ export async function POST(req: NextRequest) {
 
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
+      recordFailedLogin(lockKey, true);
       return NextResponse.json(
         { success: false, error: "Invalid email or password." },
         { status: 401 }
       );
     }
 
-    // Generate a new sessionId — this REPLACES any existing session (no concurrent login)
+    resetFailedLogin(lockKey);
+
+    // Generate a new sessionId — REPLACES any existing session (no concurrent login)
     const sessionId = crypto.randomUUID();
     sessionsDb.create(companySlug, user.id, sessionId, {
       userAgent: req.headers.get("user-agent") ?? undefined,

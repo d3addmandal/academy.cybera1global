@@ -35,5 +35,177 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+1. Check Current Changes
+git status
+
+Shows:
+
+modified files
+deleted files
+untracked files
+2. Add Updated Files
+Add all files
+git add .
+Add specific file
+git add src/app/page.tsx
+3. Commit Changes
+git commit -m "updated homepage ui"
+
+Examples:
+
+git commit -m "fixed navbar issue"
+git commit -m "added upload functionality"
+4. Push Updates to GitHub
+git push
+
+This automatically triggers:
+
+GitHub update
+Vercel rebuild
+Production deployment
+Full Daily Workflow
+git status
+git add .
+git commit -m "updated ui"
+git push
+Common Error Fix Commands
+Error 1 — Remote Already Exists
+
+Error:
+
+remote origin already exists
+
+Fix:
+
+git remote remove origin
+
+Re-add:
+
+git remote add origin https://github.com/d3addmandal/academy.cybera1global.git
+Error 2 — Nothing To Commit
+
+Error:
+
+nothing to commit, working tree clean
+
+Meaning:
+
+no file changes exist
+
+Fix:
+
+modify files first
+then commit again
+Error 3 — Authentication Failed
+
+Fix:
+
+git config --global user.name "d3addmandal"
+git config --global user.email "YOUR_GITHUB_EMAIL"
+
+Then:
+
+git push
+Error 4 — Deployment Blocked in Vercel
+
+Fix Git email mismatch:
+
+git config --global user.email "YOUR_GITHUB_EMAIL"
+
+Then make new commit:
+
+git add .
+git commit -m "fixed deployment author"
+git push
+Error 5 — Push Rejected
+
+Error:
+
+failed to push some refs
+
+Fix:
+
+git pull origin main --rebase
+
+Then:
+
+git push
+Error 6 — Large node_modules Upload
+
+Fix .gitignore
+
+Create/update:
+
+.gitignore
+
+Add:
+
+node_modules
+.next
+.env.local
+.vercel
+
+Then remove cached files:
+
+git rm -r --cached node_modules
+
+Commit:
+
+git commit -m "removed node_modules"
+
+Push:
+
+git push
+Error 7 — Wrong Branch
+
+Check branch:
+
+git branch
+
+Rename:
+
+git branch -M main
+Error 8 — Undo Last Commit
+
+Keep files:
+
+git reset --soft HEAD~1
+
+Delete commit completely:
+
+git reset --hard HEAD~1
+Error 9 — Pull Latest GitHub Changes
+git pull
+Error 10 — Clone Project on Another System
+git clone https://github.com/d3addmandal/academy.cybera1global.git
+Verify Remote Repository
+git remote -v
+
+Expected:
+
+origin  https://github.com/d3addmandal/academy.cybera1global.git
+Verify Commit History
+git log --oneline
+Verify Current Git User
+git config --global user.name
+git config --global user.email
+Production Deployment Flow
+VS Code
+   ↓
+git add .
+   ↓
+git commit
+   ↓
+git push
+   ↓
+GitHub Updated
+   ↓
+Vercel Auto Build
+   ↓
+academy.cybera1global.in Updated
+
+
+
+
 
 http://localhost:3000/webapplication/cybera1/admin-edu-cybera1/login

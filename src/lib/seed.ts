@@ -1,13 +1,19 @@
 import bcrypt from "bcryptjs";
-import { usersDb, settingsDb, themeDb, navDb, homeDb, programmesDb, blogDb, eventsDb, testimonialsDb, companyExists } from "./db";
+import crypto from "crypto";
+import { usersDb, settingsDb, themeDb, navDb, homeDb, programmesDb, blogDb, eventsDb, testimonialsDb, trainersDb, companyExists } from "./db";
 
-export async function seedCompany(slug: string): Promise<{ email: string; password: string }> {
-  if (companyExists(slug)) return { email: "", password: "" };
+export async function seedCompany(slug: string): Promise<{ email: string }> {
+  if (companyExists(slug)) return { email: "" };
 
-  // Create default admin user
-  const defaultPassword = "Admin@123";
-  const passwordHash = await bcrypt.hash(defaultPassword, 12);
-  const defaultEmail = `admin@${slug}academy.com`;
+  // Generate a cryptographically random password — NEVER hardcoded
+  const tempPassword = [
+    crypto.randomBytes(4).toString("hex"),
+    crypto.randomBytes(4).toString("hex"),
+    crypto.randomBytes(4).toString("hex"),
+  ].join("-");
+
+  const passwordHash = await bcrypt.hash(tempPassword, 12);
+  const defaultEmail = `admin@${slug}.local`;
 
   usersDb.create(slug, {
     companySlug: slug,
@@ -17,6 +23,14 @@ export async function seedCompany(slug: string): Promise<{ email: string; passwo
     role: "admin",
     isActive: true,
   });
+
+  // Log once to server console — check Vercel logs or local terminal for credentials
+  console.log(
+    `[SETUP] Company "${slug}" initialized.\n` +
+    `  Email: ${defaultEmail}\n` +
+    `  Password: ${tempPassword}\n` +
+    `  !! Change this password immediately after first login !!`
+  );
 
   // Initialize all defaults
   settingsDb.save(slug, {});
@@ -29,8 +43,9 @@ export async function seedCompany(slug: string): Promise<{ email: string; passwo
   seedBlogPosts(slug);
   seedEvents(slug);
   seedTestimonials(slug);
+  seedTrainers(slug);
 
-  return { email: defaultEmail, password: defaultPassword };
+  return { email: defaultEmail };
 }
 
 function seedProgrammes(slug: string) {
@@ -298,4 +313,72 @@ function seedTestimonials(slug: string) {
     },
   ];
   testimonials.forEach((t) => testimonialsDb.create(slug, t));
+}
+
+function seedTrainers(slug: string) {
+  const trainers = [
+    {
+      slug: "rahul-sharma",
+      name: "Rahul Sharma",
+      designation: "Senior Penetration Tester & Lead Trainer",
+      specialization: "VAPT & Red Teaming",
+      bio: "Rahul is a seasoned cybersecurity professional with 8+ years of experience in offensive security, VAPT, and red teaming engagements. He has worked with enterprise clients across BFSI, IT, and government sectors, helping them identify and remediate critical security vulnerabilities. At Cyber A1 Academy, he leads the CCSE and VAPT programmes with a practical, lab-focused approach.",
+      experience: "8+ Years",
+      certifications: ["OSCP", "CEH", "CRTP"],
+      imageUrl: "",
+      linkedIn: "#",
+      github: "#",
+      courses: ["cceh-certified-ethical-hacker", "ccse-certified-cyber-security-expert"],
+      isFeatured: true,
+      status: "published" as const,
+      order: 0,
+    },
+    {
+      slug: "priya-singh",
+      name: "Priya Singh",
+      designation: "SOC Team Lead & Security Trainer",
+      specialization: "SOC Operations & SIEM",
+      bio: "Priya brings 6+ years of blue team experience to the classroom, having led SOC operations for financial and healthcare organizations. Her expertise in SIEM tools, threat detection, and incident response gives students a real-world perspective on defensive security. She heads the SOC Analyst Programme at Cyber A1 Academy.",
+      experience: "6+ Years",
+      certifications: ["GCIH", "CySA+", "Security+"],
+      imageUrl: "",
+      linkedIn: "#",
+      courses: ["soc-analyst-program"],
+      isFeatured: true,
+      status: "published" as const,
+      order: 1,
+    },
+    {
+      slug: "arijit-das",
+      name: "Arijit Das",
+      designation: "Cloud Security Architect & Trainer",
+      specialization: "AWS & Azure Security",
+      bio: "Arijit is a cloud security architect with 7+ years of experience securing cloud infrastructure across AWS and Azure environments. He specializes in cloud misconfiguration assessments, IAM security, and cloud-native threat modeling. He trains students on real-world cloud VAPT methodologies and DevSecOps practices.",
+      experience: "7+ Years",
+      certifications: ["AWS Security Specialty", "CCSP", "AZ-500"],
+      imageUrl: "",
+      linkedIn: "#",
+      courses: ["ccse-certified-cyber-security-expert"],
+      isFeatured: true,
+      status: "published" as const,
+      order: 2,
+    },
+    {
+      slug: "neha-roy",
+      name: "Neha Roy",
+      designation: "Application Security Engineer & Trainer",
+      specialization: "Web Application Security & Bug Bounty",
+      bio: "Neha is an application security engineer with 5+ years of experience in web and mobile security assessments, code reviews, and bug bounty programs. Her hands-on approach to OWASP Top 10, API security, and secure coding practices has helped hundreds of students break into the AppSec domain.",
+      experience: "5+ Years",
+      certifications: ["OSWE", "CEH", "BSCP"],
+      imageUrl: "",
+      linkedIn: "#",
+      github: "#",
+      courses: ["ccse-certified-cyber-security-expert"],
+      isFeatured: true,
+      status: "published" as const,
+      order: 3,
+    },
+  ];
+  trainers.forEach((t) => trainersDb.create(slug, t));
 }

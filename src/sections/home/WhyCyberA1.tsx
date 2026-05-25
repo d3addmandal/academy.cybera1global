@@ -53,7 +53,7 @@ export default function WhyCyberA1() {
   return (
     <section className="py-20 bg-white">
       <div className="site-container">
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Left: Why cards */}
           <div>
             <span className="text-red-600 text-sm font-bold uppercase tracking-widest mb-3 block">

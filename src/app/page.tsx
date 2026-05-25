@@ -6,12 +6,14 @@ import {
   getSiteHome, getSiteSettings,
   getCRMFeaturedProgrammes, getCRMFeaturedBlogs,
   getCRMFeaturedEvents, getCRMFeaturedTestimonials, getCRMFAQs,
+  getCRMFeaturedTrainers,
 } from "@/lib/content";
 import HeroSection from "@/sections/home/HeroSection";
 import TrustStrip from "@/sections/home/TrustStrip";
 import FeaturedPrograms from "@/sections/home/FeaturedPrograms";
 import WhyAndRoadmap from "@/sections/home/WhyAndRoadmap";
 import CareerRoadmap from "@/sections/home/CareerRoadmap";
+import TrainersSection from "@/sections/home/TrainersSection";
 import CorporateAndInstitutional from "@/sections/home/CorporateAndInstitutional";
 import CommunitySection from "@/sections/home/CommunitySection";
 import FAQSection from "@/sections/home/FAQSection";
@@ -34,6 +36,7 @@ export default function HomePage() {
   const events = getCRMFeaturedEvents(home?.events?.featuredEventIds);
   const testimonials = getCRMFeaturedTestimonials(home?.testimonials?.featuredTestimonialIds);
   const faqs = home?.faqs?.filter(f => f.isActive) ?? getCRMFAQs();
+  const trainers = getCRMFeaturedTrainers();
 
   return (
     <>
@@ -44,18 +47,19 @@ export default function HomePage() {
         config={home?.programmes}
       />
       {/* Why + Career Roadmap — side by side */}
-      <section className="py-8 bg-white">
-        <div className="site-container">
-          <div className="grid lg:grid-cols-[3fr_7fr] gap-0 items-start">
-            <div className="lg:pr-8 lg:border-r lg:border-gray-100">
+      <section className="py-12 bg-white">
+        <div className="w-full px-5 lg:px-0 lg:w-[95%] mx-auto">
+          <div className="grid lg:grid-cols-[30%_1fr] gap-0 items-stretch">
+            <div className="lg:pr-10 lg:border-r lg:border-gray-100 pb-8 lg:pb-0 h-full">
               <WhyAndRoadmap why={home?.why} />
             </div>
-            <div className="lg:pl-8">
+            <div className="lg:pl-10">
               <CareerRoadmap roadmap={home?.careerRoadmap} />
             </div>
           </div>
         </div>
       </section>
+      <TrainersSection trainers={trainers} />
       <CorporateAndInstitutional
         corporate={home?.corporate}
         institutional={home?.institutional}

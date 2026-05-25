@@ -14,7 +14,7 @@ const defaultProgramme: Partial<Programme> = {
   level: "Beginner", duration: "3 Months", mode: "Online / Offline", labsType: "Hands-On Practical",
   description: "", overview: "", image: "", heroImage: "", icon: "", color: "#e00000",
   isFeatured: false, status: "draft", bestFor: [], topics: [], modules: [], tools: [], labs: [],
-  certificationTitle: "", careerPaths: [], faqs: [],
+  certificationTitle: "", sampleCertificate: "", careerPaths: [], faqs: [],
 };
 
 export default function EditProgrammePage() {
@@ -204,6 +204,14 @@ export default function EditProgrammePage() {
             <Field label="Certification Title">
               <Input value={form.certificationTitle ?? ""} onChange={(e) => update("certificationTitle", e.target.value)} placeholder="Cyber A1 Certified Ethical Hacker (CCEH)" />
             </Field>
+            <ImageUpload
+              label="Sample Certificate (shown on programme page — non-downloadable)"
+              value={form.sampleCertificate ?? ""}
+              onChange={(url) => update("sampleCertificate", url)}
+              company={company}
+              folder="courses/certificates"
+              aspectClass="aspect-[1.41/1]"
+            />
             <Field label="Best For (one per line)">
               <Textarea value={(form.bestFor ?? []).join("\n")} rows={4} onChange={(e) => update("bestFor", e.target.value.split("\n").filter(Boolean))} placeholder="Students & Freshers&#10;IT Beginners&#10;BCA / B.Tech Students" />
             </Field>

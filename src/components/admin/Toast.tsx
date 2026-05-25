@@ -1,10 +1,10 @@
 "use client";
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { CheckCircle2, XCircle, AlertCircle, X } from "lucide-react";
 
 type ToastType = "success" | "error" | "warning";
 
-interface Toast {
+interface ToastItem {
   id: string;
   type: ToastType;
   message: string;
@@ -16,42 +16,119 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue>({ toast: () => {} });
 
+const CFG = {
+  success: {
+    icon: CheckCircle2,
+    iconBg: "bg-emerald-500",
+    title: "Success",
+    bar: "bg-emerald-500",
+    btn: "bg-slate-900 hover:bg-slate-700",
+  },
+  error: {
+    icon: XCircle,
+    iconBg: "bg-red-600",
+    title: "Error",
+    bar: "bg-red-500",
+    btn: "bg-red-600 hover:bg-red-500",
+  },
+  warning: {
+    icon: AlertCircle,
+    iconBg: "bg-amber-500",
+    title: "Warning",
+    bar: "bg-amber-500",
+    btn: "bg-amber-600 hover:bg-amber-500",
+  },
+};
+
+const AUTO_DISMISS_MS = 4000;
+
+function ConfirmationModal({ item, onDismiss }: { item: ToastItem; onDismiss: () => void }) {
+  const cfg = CFG[item.type];
+  const Icon = cfg.icon;
+
+  // animate the progress bar width from 100→0 over AUTO_DISMISS_MS
+  useEffect(() => {
+    const t = setTimeout(onDismiss, AUTO_DISMISS_MS);
+    return () => clearTimeout(t);
+  }, [item.id, onDismiss]);
+
+  return (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onDismiss}
+      />
+
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm text-center overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* Close */}
+        <button
+          onClick={onDismiss}
+          className="absolute top-4 right-4 w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
+        <div className="px-8 pt-10 pb-7">
+          {/* Icon */}
+          <div className={`w-16 h-16 rounded-full ${cfg.iconBg} mx-auto mb-5 flex items-center justify-center shadow-lg`}>
+            <Icon className="w-8 h-8 text-white" />
+          </div>
+
+          {/* Title */}
+          <h3 className="text-lg font-black text-gray-900 mb-2">{cfg.title}</h3>
+
+          {/* Message */}
+          <p className="text-sm text-gray-500 leading-relaxed mb-7">{item.message}</p>
+
+          {/* OK button */}
+          <button
+            onClick={onDismiss}
+            className={`w-full ${cfg.btn} text-white font-bold py-3 rounded-xl transition-colors text-sm`}
+          >
+            OK
+          </button>
+        </div>
+
+        {/* Auto-dismiss progress bar */}
+        <div className="h-1 bg-gray-100">
+          <div
+            className={`h-full ${cfg.bar} origin-left`}
+            style={{ animation: `shrink-bar ${AUTO_DISMISS_MS}ms linear forwards` }}
+          />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes shrink-bar {
+          from { transform: scaleX(1); }
+          to   { transform: scaleX(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [queue, setQueue] = useState<ToastItem[]>([]);
 
   const toast = useCallback((message: string, type: ToastType = "success") => {
     const id = Math.random().toString(36).slice(2);
-    setToasts((prev) => [...prev, { id, type, message }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
+    setQueue((prev) => [...prev, { id, type, message }]);
   }, []);
 
-  const dismiss = (id: string) => setToasts((prev) => prev.filter((t) => t.id !== id));
+  const dismiss = useCallback(() => {
+    setQueue((prev) => prev.slice(1));
+  }, []);
 
-  const icons = { success: CheckCircle2, error: XCircle, warning: AlertCircle };
-  const colors = {
-    success: "bg-emerald-50 border-emerald-200 text-emerald-800",
-    error: "bg-red-50 border-red-200 text-red-800",
-    warning: "bg-amber-50 border-amber-200 text-amber-800",
-  };
-  const iconColors = { success: "text-emerald-600", error: "text-red-600", warning: "text-amber-600" };
+  // Show only the first queued item; the rest wait
+  const current = queue[0] ?? null;
 
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2 max-w-sm w-full">
-        {toasts.map((t) => {
-          const Icon = icons[t.type];
-          return (
-            <div key={t.id} className={`flex items-start gap-3 p-4 rounded-xl border shadow-lg animate-in slide-in-from-right ${colors[t.type]}`}>
-              <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColors[t.type]}`} />
-              <p className="text-sm font-medium flex-1">{t.message}</p>
-              <button onClick={() => dismiss(t.id)} className="opacity-60 hover:opacity-100 transition-opacity flex-shrink-0">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      {current && <ConfirmationModal key={current.id} item={current} onDismiss={dismiss} />}
     </ToastContext.Provider>
   );
 }

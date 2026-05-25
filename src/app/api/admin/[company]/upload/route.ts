@@ -83,10 +83,17 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // SVG: reject if it contains any script tags (XSS vector)
+    // SVG: reject if it contains any XSS vectors
     if (declaredMime === "image/svg+xml") {
       const svgText = bytes.slice(0, 65536).toString("utf8").toLowerCase();
-      if (svgText.includes("<script") || svgText.includes("javascript:") || svgText.includes("on load=") || svgText.includes("onerror=")) {
+      const svgUnsafePatterns = [
+        "<script", "javascript:", "vbscript:", "data:", "<use",
+        "<foreignobject", "onload=", "onerror=", "onclick=", "onmouseover=",
+        "onfocus=", "onblur=", "onmouseenter=", "onmouseleave=",
+        "onkeydown=", "onkeyup=", "onkeypress=", "onanimation",
+        "ontransition", "href=", "xlink:href=",
+      ];
+      if (svgUnsafePatterns.some((p) => svgText.includes(p))) {
         return NextResponse.json(
           { success: false, error: "File rejected: SVG contains unsafe content." },
           { status: 400 }
@@ -118,9 +125,11 @@ export async function POST(req: NextRequest, { params }: Params) {
       .replace(/[^a-z0-9-]/gi, "")
       .toLowerCase();
 
+    // Strip / and .. to prevent path traversal; only allow alphanum, dash, underscore
     const folder = ((formData.get("folder") as string) ?? "")
-      .replace(/[^a-z0-9-_/]/gi, "")
-      .toLowerCase();
+      .replace(/[^a-z0-9\-_]/gi, "")
+      .toLowerCase()
+      .slice(0, 64);
 
     // Original filename is always stripped; use a random ID to prevent enumeration
     const randomId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);

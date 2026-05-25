@@ -83,7 +83,7 @@ const DEFAULTS: AcademyPageContent = {
   cta: {
     headline: "Start Building Real Cybersecurity Skills With Cyber A1 Academy",
     primaryCta: { text: "Book Free Counseling", href: "/contact" },
-    secondaryCta: { text: "Download Brochure", href: "/courses" },
+    secondaryCta: { text: "Contact Us", href: "/contact" },
   },
   updatedAt: "",
 };
@@ -122,7 +122,7 @@ export default function AcademyPage() {
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { icon: Shield, label: "Industry Exposure", sub: "Real-world security assessments" },
                 { icon: FlaskConical, label: "Practical Learning", sub: "Hands-on labs & simulations" },
@@ -144,7 +144,7 @@ export default function AcademyPage() {
       {/* About / Mission & Vision */}
       <section id="mission" className="py-20 bg-white">
         <div className="site-container">
-          <div className="grid lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div>
               <h2 className="text-2xl font-black text-gray-900 mb-4">{about.title}</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">{about.para1}</p>
@@ -309,7 +309,7 @@ export default function AcademyPage() {
 
       {/* CTA */}
       <section className="py-16 bg-[#080b10]">
-        <div className="max-w-3xl mx-auto px-4 text-center">
+        <div className="site-container text-center max-w-3xl mx-auto">
           <h2 className="text-3xl font-black text-white mb-4">{cta.headline}</h2>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
             <Link href={cta.primaryCta.href} className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-red-500 transition-colors">

@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "env": {
+    "COMPANY_SLUG": "cybera1"
+  }
+}

@@ -99,7 +99,7 @@ export function SaveBar({ onSave, isLoading, isDirty = true, label = "Save Chang
   );
 }
 
-interface CardProps { title: string; subtitle?: string; children: ReactNode; action?: ReactNode; }
+interface CardProps { title: ReactNode; subtitle?: string; children: ReactNode; action?: ReactNode; }
 
 export function Card({ title, subtitle, children, action }: CardProps) {
   return (

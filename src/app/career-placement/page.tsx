@@ -149,7 +149,7 @@ export default function CareerPlacementPage() {
               From Enrollment To <span className="text-red-500">Employment</span>
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {cms.journey.map((step) => {
               const Icon = ICON_MAP[step.icon] ?? Star;
               return (
@@ -197,7 +197,7 @@ export default function CareerPlacementPage() {
               Our Students Work At <span className="text-red-600">Top Organizations</span>
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {partnerCompanies.map((company) => (
               <div key={company.name} className="bg-white border border-gray-100 rounded-xl p-4 flex items-center justify-center aspect-square hover:border-red-200 hover:shadow-sm transition-all">
                 <span className="text-gray-600 font-bold text-xs text-center">{company.name}</span>
@@ -240,7 +240,7 @@ export default function CareerPlacementPage() {
 
       {/* CTA */}
       <section className="py-16 bg-[#080b10]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
+        <div className="site-container max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-black text-white mb-4">
             {cms.cta.headline}
           </h2>

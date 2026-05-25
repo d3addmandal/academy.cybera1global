@@ -1,23 +1,27 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard, FileText, BookOpen, Calendar, Users, Navigation2,
   Palette, Settings, Globe, HelpCircle, MessageSquare, ChevronRight,
   Shield, LogOut, BarChart3, PanelLeftClose, PanelLeft, Star, Menu,
-  GraduationCap, Briefcase, Building2, HeartHandshake
+  GraduationCap, Briefcase, Building2, HeartHandshake, Inbox, UserCheck,
 } from "lucide-react";
-
-interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
+import type { UserRole } from "@/types/cms";
 
 interface NavItem {
   label: string;
   icon: React.ElementType;
   href: string;
   badge?: string;
+  roles?: UserRole[]; // undefined = all roles; array = only these roles
+}
+
+interface NavGroup {
+  label: string;
+  roles?: UserRole[]; // undefined = show to all; array = only these roles
+  items: NavItem[];
 }
 
 function buildNav(base: string): NavGroup[] {
@@ -29,44 +33,63 @@ function buildNav(base: string): NavGroup[] {
       ],
     },
     {
+      label: "CRM",
+      roles: ["admin", "super_admin"],
+      items: [
+        { label: "Contact Submissions", icon: Inbox, href: `${base}/dashboard/contacts` },
+      ],
+    },
+    {
       label: "Content",
       items: [
-        { label: "Home Page", icon: Globe, href: `${base}/dashboard/home-content` },
-        { label: "Programmes", icon: BookOpen, href: `${base}/dashboard/programmes` },
-        { label: "Blog Posts", icon: FileText, href: `${base}/dashboard/blog` },
-        { label: "Events", icon: Calendar, href: `${base}/dashboard/events` },
-        { label: "Testimonials", icon: MessageSquare, href: `${base}/dashboard/testimonials` },
-        { label: "FAQs", icon: HelpCircle, href: `${base}/dashboard/faqs` },
+        { label: "Home Page",    icon: Globe,         href: `${base}/dashboard/home-content`, roles: ["admin", "super_admin"] },
+        { label: "Programmes",  icon: BookOpen,       href: `${base}/dashboard/programmes`,   roles: ["admin", "super_admin", "editor"] },
+        { label: "Blog Posts",  icon: FileText,       href: `${base}/dashboard/blog` },
+        { label: "Trainers",    icon: UserCheck,      href: `${base}/dashboard/trainers`,      roles: ["admin", "super_admin"] },
+        { label: "Events",      icon: Calendar,       href: `${base}/dashboard/events`,        roles: ["admin", "super_admin"] },
+        { label: "Testimonials",icon: MessageSquare,  href: `${base}/dashboard/testimonials`,  roles: ["admin", "super_admin"] },
+        { label: "FAQs",        icon: HelpCircle,     href: `${base}/dashboard/faqs`,          roles: ["admin", "super_admin"] },
       ],
     },
     {
       label: "Static Pages",
+      roles: ["admin", "super_admin"],
       items: [
-        { label: "Academy Page", icon: GraduationCap, href: `${base}/dashboard/academy-page` },
-        { label: "Corporate Training", icon: Briefcase, href: `${base}/dashboard/corporate-page` },
-        { label: "Institutions", icon: Building2, href: `${base}/dashboard/institutions-page` },
-        { label: "Career & Placement", icon: HeartHandshake, href: `${base}/dashboard/career-page` },
+        { label: "Academy Page",        icon: GraduationCap,  href: `${base}/dashboard/academy-page` },
+        { label: "Corporate Training",  icon: Briefcase,      href: `${base}/dashboard/corporate-page` },
+        { label: "Institutions",        icon: Building2,      href: `${base}/dashboard/institutions-page` },
+        { label: "Career & Placement",  icon: HeartHandshake, href: `${base}/dashboard/career-page` },
       ],
     },
     {
       label: "Website",
+      roles: ["admin", "super_admin"],
       items: [
-        { label: "Navigation", icon: Navigation2, href: `${base}/dashboard/navigation` },
-        { label: "Menus", icon: Menu, href: `${base}/dashboard/menus` },
-        { label: "Pages", icon: BarChart3, href: `${base}/dashboard/pages` },
+        { label: "Announcement & CTA", icon: Navigation2, href: `${base}/dashboard/navigation` },
+        { label: "Navigation Menus",   icon: Menu,        href: `${base}/dashboard/menus` },
+        { label: "Custom Pages",       icon: BarChart3,   href: `${base}/dashboard/pages` },
       ],
     },
     {
       label: "Appearance",
+      roles: ["admin", "super_admin"],
       items: [
         { label: "Theme & Branding", icon: Palette, href: `${base}/dashboard/theme` },
       ],
     },
     {
       label: "System",
+      roles: ["admin", "super_admin"],
       items: [
         { label: "Site Settings", icon: Settings, href: `${base}/dashboard/settings` },
-        { label: "Users & Roles", icon: Users, href: `${base}/dashboard/users` },
+        { label: "Users & Roles", icon: Users,    href: `${base}/dashboard/users` },
+      ],
+    },
+    {
+      label: "Account",
+      roles: ["editor", "sales"],
+      items: [
+        { label: "My Profile", icon: Users, href: `${base}/dashboard/users` },
       ],
     },
   ];
@@ -78,12 +101,36 @@ interface Props {
   companyName: string;
   collapsed: boolean;
   onToggle: () => void;
+  role: UserRole;
 }
 
-export default function AdminSidebar({ company, adminSlug, companyName, collapsed, onToggle }: Props) {
+export default function AdminSidebar({ company, adminSlug, companyName, collapsed, onToggle, role }: Props) {
   const pathname = usePathname();
   const base = `/webapplication/${company}/${adminSlug}`;
-  const navGroups = buildNav(base);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await fetch("/api/admin/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch {
+      // Even if the request fails, proceed with redirect — cookie will expire naturally
+    }
+    window.location.href = `${base}/login`;
+  };
+  const allGroups = buildNav(base);
+
+  // Filter groups and items to only those the current role can see
+  const navGroups = allGroups
+    .filter((g) => !g.roles || g.roles.includes(role))
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((item) => !item.roles || item.roles.includes(role)),
+    }))
+    .filter((g) => g.items.length > 0);
 
   const isActive = (href: string) => {
     if (href === `${base}/dashboard`) return pathname === href;
@@ -129,7 +176,7 @@ export default function AdminSidebar({ company, adminSlug, companyName, collapse
                       : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   } ${collapsed ? "justify-center" : ""}`}
                 >
-                  <item.icon className={`w-4.5 h-4.5 flex-shrink-0 ${active ? "text-white" : "text-slate-500 group-hover:text-white"}`} style={{ width: 18, height: 18 }} />
+                  <item.icon className={`flex-shrink-0 ${active ? "text-white" : "text-slate-500 group-hover:text-white"}`} style={{ width: 18, height: 18 }} />
                   {!collapsed && (
                     <>
                       <span className="flex-1 truncate">{item.label}</span>
@@ -151,16 +198,18 @@ export default function AdminSidebar({ company, adminSlug, companyName, collapse
           onClick={onToggle}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors text-sm"
         >
-          {collapsed ? <PanelLeft className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} /> : <PanelLeftClose className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />}
+          {collapsed ? <PanelLeft style={{ width: 18, height: 18 }} /> : <PanelLeftClose style={{ width: 18, height: 18 }} />}
           {!collapsed && <span>Collapse</span>}
         </button>
-        <Link
-          href={`${base}/login`}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-600/10 hover:text-red-400 transition-colors text-sm"
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          title={collapsed ? "Sign Out" : undefined}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-600/10 hover:text-red-400 transition-colors text-sm disabled:opacity-50"
         >
-          <LogOut style={{ width: 18, height: 18 }} />
-          {!collapsed && <span>Sign Out</span>}
-        </Link>
+          <LogOut style={{ width: 18, height: 18 }} className={signingOut ? "animate-pulse" : ""} />
+          {!collapsed && <span>{signingOut ? "Signing out…" : "Sign Out"}</span>}
+        </button>
       </div>
     </aside>
   );

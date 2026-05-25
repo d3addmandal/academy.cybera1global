@@ -7,7 +7,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import EnquiryForm from "./EnquiryForm";
 import type { CorporatePageContent } from "@/types/cms";
-import { getCorporatePageContent } from "@/lib/content";
+import { getCorporatePageContent, getSiteSettings } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +72,9 @@ const DEFAULTS: CorporatePageContent = {
 
 export default function CorporateTrainingPage() {
   const cms = getCorporatePageContent() ?? DEFAULTS;
+  const settings = getSiteSettings();
+  const phone = settings?.phone ?? "+91 8240 006 007";
+  const telHref = `tel:${phone.replace(/\s/g, "")}`;
 
   return (
     <div className="pt-24">
@@ -97,7 +100,7 @@ export default function CorporateTrainingPage() {
               <Link href={cms.hero.primaryCta.href} className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">
                 {cms.hero.primaryCta.text} <ArrowRight className="w-4 h-4" />
               </Link>
-              <a href="tel:+918240006007" className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 font-semibold px-6 py-3 rounded-lg hover:border-red-500 hover:text-red-400 transition-colors">
+              <a href={telHref} className="inline-flex items-center gap-2 border border-gray-700 text-gray-300 font-semibold px-6 py-3 rounded-lg hover:border-red-500 hover:text-red-400 transition-colors">
                 <Phone className="w-4 h-4" /> Call Us
               </a>
             </div>
@@ -168,7 +171,7 @@ export default function CorporateTrainingPage() {
             </div>
             <div>
               <h3 className="text-xl font-black text-gray-900 mb-6">Industries We Train</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {cms.industries.map((ind) => {
                   const Icon = ICON_MAP[ind.icon] ?? Star;
                   return (
@@ -201,7 +204,7 @@ export default function CorporateTrainingPage() {
               Our Training <span className="text-red-500">Process</span>
             </h2>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {cms.process.map((s) => (
               <div key={s.step} className="bg-[#0d1117] border border-gray-800 rounded-xl p-5 text-center hover:border-red-600/40 transition-colors">
                 <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-sm">
@@ -217,14 +220,14 @@ export default function CorporateTrainingPage() {
 
       {/* Contact form */}
       <section className="py-20 bg-white" id="enquire">
-        <div className="max-w-3xl mx-auto px-4 lg:px-6">
+        <div className="site-container max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <span className="text-red-600 text-sm font-bold uppercase tracking-widest mb-3 block">Get In Touch</span>
             <h2 className="text-3xl font-black text-gray-900">
               Request a <span className="text-red-600">Corporate Proposal</span>
             </h2>
           </div>
-          <div className="bg-[#080b10] border border-gray-800 rounded-2xl p-8">
+          <div className="bg-[#080b10] border border-gray-800 rounded-2xl p-5 sm:p-8">
             <EnquiryForm />
           </div>
         </div>

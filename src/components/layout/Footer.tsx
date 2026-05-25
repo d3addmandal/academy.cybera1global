@@ -79,7 +79,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#050505] text-gray-400" suppressHydrationWarning>
+    <footer className="text-gray-400" style={{ backgroundColor: "var(--color-footer-bg, #050505)" }} suppressHydrationWarning>
       <div className="w-full px-5 lg:w-[70%] lg:px-0 lg:mx-auto py-6">
         <div className={`grid grid-cols-2 ${gridCols} gap-x-8 gap-y-6 items-start`}>
 

@@ -3,8 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Menu, X, ChevronDown, Phone, MessageCircle, BookOpen,
-  Shield, Globe, Users, Briefcase, Laptop, FileText,
-  Award, GraduationCap, Building2, Cpu, BookMarked, Calendar,
+  Shield, Globe, Users, Laptop, FileText,
+  Award, GraduationCap, Cpu, BookMarked,
 } from "lucide-react";
 import type { ThemeSettings, SiteSettings, NavigationSettings, Programme } from "@/types/cms";
 
@@ -59,6 +59,8 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
   const announcementText = nav?.announcementBar?.text ??
     "Admissions Open for CCEH & CCSE 2026 Batch | Corporate Training Available | Free Career Counseling";
   const announcementEnabled = nav?.announcementBar?.enabled ?? true;
+  const ctaText = nav?.headerCta?.text ?? "Contact Us";
+  const ctaHref = nav?.headerCta?.href ?? "/contact";
 
   // Build dynamic Courses dropdown from CRM published programmes
   const coursesDropdown = [
@@ -80,6 +82,7 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoImgError, setLogoImgError] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -142,9 +145,10 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
 
       {/* Main Navbar */}
       <nav
-        className={`bg-[#080b10] border-b transition-all duration-300 ${
-          scrolled ? "border-red-900/30 shadow-[0_4px_20px_rgba(0,0,0,0.5)]" : "border-gray-800/50"
+        className={`border-b transition-all duration-300 ${
+          scrolled ? "shadow-[0_4px_20px_rgba(0,0,0,0.5)]" : ""
         }`}
+        style={{ backgroundColor: "var(--color-header-bg, #080b10)", borderColor: scrolled ? "rgba(153,27,27,0.3)" : "rgba(75,85,99,0.3)", fontFamily: "var(--font-body)" }}
         ref={dropdownRef}
       >
         <div className="site-container">
@@ -152,12 +156,12 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
               {/* Icon: uploaded image or gradient shield */}
-              {logoImageUrl ? (
+              {logoImageUrl && !logoImgError ? (
                 <img
                   src={logoImageUrl}
                   alt={logoText}
                   className="w-9 h-9 rounded-lg object-contain bg-black/20 p-0.5 flex-shrink-0"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  onError={() => setLogoImgError(true)}
                 />
               ) : (
                 <div
@@ -192,7 +196,7 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
                       <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === link.label ? "rotate-180" : ""}`} />
                     </button>
                     {activeDropdown === link.label && (
-                      <div className="absolute top-full left-0 mt-1 bg-[#0d1117] border border-gray-700/50 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] min-w-[240px] py-2 z-50 max-h-[70vh] overflow-y-auto">
+                      <div className="absolute top-full left-0 mt-1 border border-gray-700/50 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] min-w-[240px] py-2 z-50 max-h-[70vh] overflow-y-auto" style={{ backgroundColor: "var(--color-semi-dark, #0d1117)" }}>
                         {link.dropdown.map((item) => (
                           <Link
                             key={item.href}
@@ -219,13 +223,13 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
               )}
             </div>
 
-            {/* Desktop CTA — Contact Us */}
+            {/* Desktop CTA */}
             <div className="hidden xl:flex items-center gap-3">
               <Link
-                href="/contact"
+                href={ctaHref}
                 className="flex items-center gap-1.5 text-sm font-semibold text-white bg-gradient-to-r from-red-700 to-red-600 px-5 py-2 rounded-lg hover:from-red-600 hover:to-red-500 hover:shadow-[0_4px_15px_rgba(224,0,0,0.3)] transition-all duration-300"
               >
-                Contact Us
+                {ctaText}
               </Link>
             </div>
 
@@ -242,7 +246,7 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="xl:hidden bg-[#0d1117] border-t border-gray-800 max-h-[80vh] overflow-y-auto">
+          <div className="xl:hidden border-t border-gray-800 max-h-[80vh] overflow-y-auto" style={{ backgroundColor: "var(--color-semi-dark, #0d1117)" }}>
             <div className="px-4 py-4 space-y-1">
               {navLinks.map((link) =>
                 "dropdown" in link && link.dropdown ? (
@@ -283,11 +287,11 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
               )}
               <div className="pt-4 border-t border-gray-800 space-y-2">
                 <Link
-                  href="/contact"
+                  href={ctaHref}
                   className="block w-full text-center bg-gradient-to-r from-red-700 to-red-600 text-white font-semibold py-3 rounded-lg"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Contact Us
+                  {ctaText}
                 </Link>
               </div>
             </div>

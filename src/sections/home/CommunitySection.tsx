@@ -64,8 +64,8 @@ export default function CommunitySection({
 
   return (
     <section className="py-8 bg-white">
-      <div className="w-[98%] mx-auto">
-        <div className="grid lg:grid-cols-3 gap-6">
+      <div className="site-container">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* ── COL 1: Events & Community ─── */}
           <div>

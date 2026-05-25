@@ -5,13 +5,16 @@
       "PowerShell(Head -30)",
       "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\\\\app\\\\webapplication\")",
       "PowerShell(if \\(-not \\(Test-Path -LiteralPath \"c:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\\\\sections\\\\home\\\\CareerRoadmap.tsx\"\\)\\) { \"not found\" } else { \"exists\" })",
-      "PowerShell(ls -R \"c:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\" -Directory)"
+      "PowerShell(ls -R \"c:\\\\Users\\\\Dipanjan\\\\OneDrive - Panacea InfoSec Pvt. Ltd\\\\Documents\\\\Dipanjan RD\\\\Python Projects\\\\a1-academy\\\\src\" -Directory)",
+      "Bash(mkdir -p \"c:/Users/Dipanjan/OneDrive - Panacea InfoSec Pvt. Ltd/Documents/Dipanjan RD/Python Projects/a1-academy/src/app/api/admin/[company]/auth/reset-password\")",
+      "Bash(npx tsc *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\webapplication\\[company]\\[adminSlug]\\dashboard",
       "c:\\Users\\Dipanjan\\.claude\\projects\\c--Users-Dipanjan-OneDrive---Panacea-InfoSec-Pvt--Ltd-Documents-Dipanjan-RD-Python-Projects-a1-academy\\memory",
       "C:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\api\\admin\\[company]",
-      "c:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\webapplication\\[company]\\[adminSlug]\\dashboard"
+      "c:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\webapplication\\[company]\\[adminSlug]\\dashboard",
+      "c:\\Users\\Dipanjan\\OneDrive - Panacea InfoSec Pvt. Ltd\\Documents\\Dipanjan RD\\Python Projects\\a1-academy\\src\\app\\api\\admin\\[company]\\auth"
     ]
   }
 }
