@@ -59,31 +59,26 @@ async function verifyToken(token: string): Promise<TokenPayload | null> {
 }
 
 const PROXY_DATA_DIR = path.join(process.cwd(), "data");
-const PROXY_READ_DIRS = process.env.VERCEL === "1"
-  ? ["/tmp/data", PROXY_DATA_DIR]
-  : [PROXY_DATA_DIR];
 const SESSION_INACTIVITY_MS = 30 * 60 * 1000; // must match db.ts
 
 function isSessionActive(companySlug: string, userId: string, sessionId: string): boolean {
+  // On Vercel, /tmp/ is per-container and the committed sessions.json is always empty [].
+  // Trust the JWT signature + expiry alone; no concurrent-login enforcement on serverless.
+  if (process.env.VERCEL === "1") return true;
+
   try {
-    for (const base of PROXY_READ_DIRS) {
-      const filePath = path.join(base, companySlug, "sessions.json");
-      if (!fs.existsSync(filePath)) continue;
-      const sessions = JSON.parse(fs.readFileSync(filePath, "utf-8")) as Array<{
-        userId: string;
-        sessionId: string;
-        lastActivityAt?: string;
-        createdAt: string;
-      }>;
-      const s = sessions.find((r) => r.userId === userId && r.sessionId === sessionId);
-      if (!s) return false;
-      const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
-      return Date.now() - lastActivity <= SESSION_INACTIVITY_MS;
-    }
-    // No sessions file found in any directory.
-    // On Vercel, /tmp/ is per-container so the file may not exist yet on this
-    // instance — fall back to trusting the JWT signature + expiry alone.
-    return process.env.VERCEL === "1";
+    const filePath = path.join(PROXY_DATA_DIR, companySlug, "sessions.json");
+    if (!fs.existsSync(filePath)) return false;
+    const sessions = JSON.parse(fs.readFileSync(filePath, "utf-8")) as Array<{
+      userId: string;
+      sessionId: string;
+      lastActivityAt?: string;
+      createdAt: string;
+    }>;
+    const s = sessions.find((r) => r.userId === userId && r.sessionId === sessionId);
+    if (!s) return false;
+    const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
+    return Date.now() - lastActivity <= SESSION_INACTIVITY_MS;
   } catch {
     return false;
   }
