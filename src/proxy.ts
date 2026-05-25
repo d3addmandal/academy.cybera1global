@@ -80,7 +80,10 @@ function isSessionActive(companySlug: string, userId: string, sessionId: string)
       const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
       return Date.now() - lastActivity <= SESSION_INACTIVITY_MS;
     }
-    return false;
+    // No sessions file found in any directory.
+    // On Vercel, /tmp/ is per-container so the file may not exist yet on this
+    // instance — fall back to trusting the JWT signature + expiry alone.
+    return process.env.VERCEL === "1";
   } catch {
     return false;
   }
