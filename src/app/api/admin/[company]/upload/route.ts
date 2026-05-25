@@ -10,30 +10,22 @@ const ALLOWED_MIME = new Set([
   "image/gif", "image/svg+xml",
   "image/x-icon", "image/vnd.microsoft.icon",
 ]);
-const MAX_BYTES = 15 * 1024 * 1024; // 15 MB (client crops/compresses before sending)
+const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
 // Magic byte validators
 function validateMagicBytes(buf: Buffer, mime: string): boolean {
-  // SVG is text — validate content instead of magic bytes
   if (mime === "image/svg+xml") return true;
-  // JPEG: FF D8 FF
-  if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return true;
-  // PNG: 89 50 4E 47
-  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return true;
-  // WebP: RIFF????WEBP
+  if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return true; // JPEG
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47) return true; // PNG
   if (buf.length >= 12 &&
     buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
-    buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return true;
-  // GIF87a / GIF89a
-  if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) return true;
-  // ICO: 00 00 01 00
-  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x01 && buf[3] === 0x00) return true;
-  // CUR (cursor, same container as ICO): 00 00 02 00
-  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x02 && buf[3] === 0x00) return true;
+    buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return true; // WebP
+  if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) return true; // GIF
+  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x01 && buf[3] === 0x00) return true; // ICO
+  if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x02 && buf[3] === 0x00) return true; // CUR
   return false;
 }
 
-// Scan file content for embedded malicious patterns
 function containsMaliciousContent(buf: Buffer): boolean {
   const scan = buf.slice(0, 8192).toString("latin1").toLowerCase();
   const patterns = [
@@ -43,6 +35,16 @@ function containsMaliciousContent(buf: Buffer): boolean {
   ];
   return patterns.some((p) => scan.includes(p));
 }
+
+const EXT_MAP: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/svg+xml": "svg",
+  "image/x-icon": "ico",
+  "image/vnd.microsoft.icon": "ico",
+};
 
 export async function POST(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
@@ -63,7 +65,6 @@ export async function POST(req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "File too large. Maximum 15 MB." }, { status: 400 });
     }
 
-    // MIME type whitelist
     const declaredMime = file.type.toLowerCase();
     if (!ALLOWED_MIME.has(declaredMime)) {
       return NextResponse.json(
@@ -72,10 +73,8 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // Read buffer for magic byte + content validation
     const bytes = Buffer.from(await file.arrayBuffer());
 
-    // Magic bytes must match declared MIME
     if (!validateMagicBytes(bytes, declaredMime)) {
       return NextResponse.json(
         { success: false, error: "File rejected: magic bytes do not match declared type." },
@@ -83,7 +82,6 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // SVG: reject if it contains any XSS vectors
     if (declaredMime === "image/svg+xml") {
       const svgText = bytes.slice(0, 65536).toString("utf8").toLowerCase();
       const svgUnsafePatterns = [
@@ -101,7 +99,6 @@ export async function POST(req: NextRequest, { params }: Params) {
       }
     }
 
-    // Scan for embedded malicious content
     if (containsMaliciousContent(bytes)) {
       return NextResponse.json(
         { success: false, error: "File rejected: suspicious content detected." },
@@ -109,37 +106,32 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    // Safe extension from MIME
-    const extMap: Record<string, string> = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/webp": "webp",
-      "image/gif": "gif",
-      "image/svg+xml": "svg",
-      "image/x-icon": "ico",
-      "image/vnd.microsoft.icon": "ico",
-    };
-    const ext = extMap[declaredMime] ?? "jpg";
-
+    const ext = EXT_MAP[declaredMime] ?? "jpg";
     const uploadType = ((formData.get("type") as string) ?? "image")
-      .replace(/[^a-z0-9-]/gi, "")
-      .toLowerCase();
-
-    // Strip / and .. to prevent path traversal; only allow alphanum, dash, underscore
+      .replace(/[^a-z0-9-]/gi, "").toLowerCase();
     const folder = ((formData.get("folder") as string) ?? "")
-      .replace(/[^a-z0-9\-_]/gi, "")
-      .toLowerCase()
-      .slice(0, 64);
-
-    // Original filename is always stripped; use a random ID to prevent enumeration
+      .replace(/[^a-z0-9\-_/]/gi, "").toLowerCase().slice(0, 64);
     const randomId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
     const prefix = folder ? "" : `${uploadType}-`;
     const filename = `${prefix}${Date.now()}-${randomId}.${ext}`;
 
+    // On Vercel: use Blob storage (writable); locally: write to public/uploads/
+    if (process.env.VERCEL === "1") {
+      const { put } = await import("@vercel/blob");
+      const blobPath = folder
+        ? `uploads/${company}/${folder}/${filename}`
+        : `uploads/${company}/${filename}`;
+      const blob = await put(blobPath, bytes, {
+        access: "public",
+        contentType: declaredMime,
+      });
+      return NextResponse.json({ success: true, url: blob.url, filename });
+    }
+
+    // Local dev: write to public/uploads/
     const uploadDir = path.join(process.cwd(), "public", "uploads", company, folder);
     fs.mkdirSync(uploadDir, { recursive: true });
     fs.writeFileSync(path.join(uploadDir, filename), bytes);
-
     const url = folder
       ? `/uploads/${company}/${folder}/${filename}`
       : `/uploads/${company}/${filename}`;
