@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
+import { put } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
@@ -12,7 +13,6 @@ const ALLOWED_MIME = new Set([
 ]);
 const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
-// Magic byte validators
 function validateMagicBytes(buf: Buffer, mime: string): boolean {
   if (mime === "image/svg+xml") return true;
   if (buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF) return true; // JPEG
@@ -115,22 +115,27 @@ export async function POST(req: NextRequest, { params }: Params) {
     const prefix = folder ? "" : `${uploadType}-`;
     const filename = `${prefix}${Date.now()}-${randomId}.${ext}`;
 
-    // On Vercel: use Blob storage (writable); locally: write to public/uploads/
+    // On Vercel: public/ is read-only — use Vercel Blob CDN storage
     if (process.env.VERCEL === "1") {
-      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      const token = process.env.BLOB_READ_WRITE_TOKEN;
+      if (!token) {
+        console.error("[upload] BLOB_READ_WRITE_TOKEN is not set");
         return NextResponse.json(
-          { success: false, error: "Blob storage not configured. Go to Vercel Dashboard → Storage → Create Blob store → Connect to this project." },
+          { success: false, error: "Storage not configured. Please connect a Vercel Blob store to this project in the Vercel dashboard under Storage." },
           { status: 500 }
         );
       }
-      const { put } = await import("@vercel/blob");
+
       const blobPath = folder
         ? `uploads/${company}/${folder}/${filename}`
         : `uploads/${company}/${filename}`;
+
       const blob = await put(blobPath, bytes, {
         access: "public",
         contentType: declaredMime,
+        token,
       });
+
       return NextResponse.json({ success: true, url: blob.url, filename });
     }
 
@@ -144,8 +149,8 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     return NextResponse.json({ success: true, url, filename });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Upload failed.";
-    console.error("[upload]", err);
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[upload]", message);
+    return NextResponse.json({ success: false, error: `Upload failed: ${message}` }, { status: 500 });
   }
 }
