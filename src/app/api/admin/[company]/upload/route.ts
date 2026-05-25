@@ -130,9 +130,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         ? `uploads/${company}/${folder}/${filename}`
         : `uploads/${company}/${filename}`;
 
-      const blob = await put(blobPath, bytes, {
+      const blob = await put(blobPath, new Blob([bytes], { type: declaredMime }), {
         access: "public",
-        contentType: declaredMime,
         token,
       });
 
