@@ -91,7 +91,7 @@ function TrainingCard({ sectionLabel, title, highlight, services, ctaText, ctaHr
         <div className="relative z-10 py-5 px-6 sm:px-8 flex flex-col justify-center w-full max-w-full lg:max-w-[65%]">
           <span
             className="text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5 block"
-            style={{ color: "#ff6a00" }}
+            style={{ color: "#e00000" }}
           >
             {sectionLabel}
           </span>
@@ -101,7 +101,7 @@ function TrainingCard({ sectionLabel, title, highlight, services, ctaText, ctaHr
               <>
                 {title}
                 <br />
-                <span style={{ color: "#ff4500" }}>{highlight}</span>
+                <span style={{ color: "#e00000" }}>{highlight}</span>
               </>
             ) : title}
           </h2>
