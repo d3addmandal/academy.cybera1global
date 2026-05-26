@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { Shield, Target, Eye, Award, CheckCircle2, ArrowRight, Users, TrendingUp, Globe } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About Cyber A1 Academy",
-  description: "Cyber A1 Academy is the training division of Cyber A1 Global Solutions LLP — India's premier industry-focused cybersecurity training platform.",
+  description: "Cyber A1 Academy is the training division of Cyber A1 Global Solutions LLP â€” India's premier industry-focused cybersecurity training platform.",
 };
 
 export default function AboutPage() {
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       <section className="bg-[#080b10] py-20">
         <div className="site-container">
           <div className="max-w-3xl mx-auto text-center">
@@ -74,7 +74,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-black text-white mb-4">
             Join Us On This <span className="text-red-500">Journey</span>
           </h2>
-          <p className="text-gray-400 mb-8">Whether you&apos;re a student, professional, or organization — we have a path for you.</p>
+          <p className="text-gray-400 mb-8">Whether you&apos;re a student, professional, or organization â€” we have a path for you.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/courses" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">
               Explore Programs <ArrowRight className="w-4 h-4" />
@@ -88,4 +88,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
 

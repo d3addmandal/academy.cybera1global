@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { getCRMBlogPosts } from "@/lib/content";
 import BlogCard from "@/components/shared/BlogCard";
 
 export const metadata: Metadata = {
-  title: "Blog — Cybersecurity Insights, Tips & Career Guides",
+  title: "Blog â€” Cybersecurity Insights, Tips & Career Guides",
   description: "Read expert articles on cybersecurity, ethical hacking, VAPT, cloud security, SOC operations, and career development.",
 };
 
@@ -19,7 +19,7 @@ export default function BlogPage() {
   const categories = ["All", ...Array.from(new Set(posts.map(p => p.category)))];
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       <section className="bg-[#080b10] py-16">
         <div className="site-container">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
@@ -102,4 +102,5 @@ export default function BlogPage() {
     </div>
   );
 }
+
 

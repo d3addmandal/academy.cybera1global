@@ -39,7 +39,7 @@ export default async function CourseDetailPage({ params }: Props) {
   ];
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       {/* ── Hero ── */}
       <section className="relative bg-[#080b10] min-h-[calc(100vh-6rem)] flex items-center overflow-hidden">
 

@@ -83,7 +83,7 @@ export default function CareerPlacementPage() {
     : [{ name: "Deloitte", logo: "" }, { name: "TCS", logo: "" }, { name: "Wipro", logo: "" }, { name: "Infosys", logo: "" }, { name: "Accenture", logo: "" }];
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       {/* Hero */}
       <section className="relative bg-[#080b10] py-20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

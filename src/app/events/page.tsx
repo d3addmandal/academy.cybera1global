@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -6,8 +6,8 @@ import { Calendar, MapPin, Clock, ArrowRight, ExternalLink } from "lucide-react"
 import { getCRMEvents } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Events & Community — Workshops, Bootcamps, CTF & More",
-  description: "Join Cyber A1 Academy cybersecurity events — workshops, bootcamps, CTF competitions, hackathons, webinars, and community meetups.",
+  title: "Events & Community â€” Workshops, Bootcamps, CTF & More",
+  description: "Join Cyber A1 Academy cybersecurity events â€” workshops, bootcamps, CTF competitions, hackathons, webinars, and community meetups.",
 };
 
 const eventTypeStyle: Record<string, string> = {
@@ -23,7 +23,7 @@ export default function EventsPage() {
   const events = getCRMEvents();
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       <section className="relative bg-[#080b10] py-16 overflow-hidden">
         <div className="relative site-container">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
@@ -123,4 +123,5 @@ export default function EventsPage() {
     </div>
   );
 }
+
 
