@@ -11,7 +11,7 @@ import { getAcademyPageContent } from "@/lib/content";
 import type { AcademyPageContent } from "@/types/cms";
 
 export const metadata: Metadata = {
-  title: “Academy - Building Cybersecurity Professionals Through Practical Industry-Focused Training”,
+  title: "Academy - Building Cybersecurity Professionals Through Practical Industry-Focused Training",
   description: "Cyber A1 Academy combines practical cybersecurity education, enterprise security exposure, and community-driven learning to help students and professionals build real-world security skills.",
 };
 
