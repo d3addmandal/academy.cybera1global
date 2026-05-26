@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { after } from "next/server";
 import { blobWrite } from "@/lib/blob-db";
 import type {
   AdminUser, SiteSettings, ThemeSettings, NavigationSettings,
@@ -43,8 +44,18 @@ function writeFile<T>(companySlug: string, filename: string, data: T): void {
   ensureDir(companySlug);
   const filePath = path.join(WRITE_DIR, companySlug, filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-  // Persist to Vercel Blob so data survives container recycling (fire-and-forget)
-  if (IS_VERCEL) blobWrite(companySlug, filename, data).catch(console.error);
+  if (IS_VERCEL) {
+    // Use after() so Vercel guarantees the blob write completes before
+    // terminating the serverless function — prevents data loss on container recycle.
+    const task = blobWrite(companySlug, filename, data).catch(err =>
+      console.error("[db] blobWrite failed:", filename, err)
+    );
+    try {
+      after(task);
+    } catch {
+      // after() unavailable outside a request context (e.g. build time) — ignore
+    }
+  }
 }
 
 function generateId(): string {
