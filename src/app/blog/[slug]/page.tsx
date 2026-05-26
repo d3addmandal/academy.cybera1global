@@ -29,7 +29,7 @@ export default async function BlogPostPage({ params }: Props) {
   const displayRelated = related.length > 0 ? related : fallbackRelated;
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       <section className="bg-[#080b10] py-16">
         <div className="site-container">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">

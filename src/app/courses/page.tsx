@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { getCRMProgrammes } from "@/lib/content";
 import ProgramCard from "@/components/shared/ProgramCard";
 
 export const metadata: Metadata = {
-  title: "Explore Cybersecurity Programs — All Courses",
+  title: "Explore Cybersecurity Programs â€” All Courses",
   description: "From beginner-friendly cybersecurity foundations to advanced enterprise security training.",
 };
 
@@ -26,7 +26,7 @@ export default function CoursesPage() {
   const specialized = allProgrammes.filter(p => p.category === "specialized");
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       {/* Hero */}
       <section className="relative bg-[#080b10] py-20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -45,7 +45,7 @@ export default function CoursesPage() {
               <span className="text-red-500">Every Career Stage</span>
             </h1>
             <p className="text-gray-400 mb-8">
-              From beginner-friendly foundations to advanced enterprise training — choose the right program based on your goal.
+              From beginner-friendly foundations to advanced enterprise training â€” choose the right program based on your goal.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-500 transition-colors">
@@ -126,4 +126,5 @@ export default function CoursesPage() {
     </div>
   );
 }
+
 

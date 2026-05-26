@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { getAcademyPageContent } from "@/lib/content";
 import type { AcademyPageContent } from "@/types/cms";
 
 export const metadata: Metadata = {
-  title: "Academy — Building Cybersecurity Professionals Through Practical Industry-Focused Training",
+  title: "Academy â€” Building Cybersecurity Professionals Through Practical Industry-Focused Training",
   description: "Cyber A1 Academy combines practical cybersecurity education, enterprise security exposure, and community-driven learning to help students and professionals build real-world security skills.",
 };
 
@@ -93,7 +93,7 @@ export default function AcademyPage() {
   const { hero, about, why, methodology, domains, labs, trainers, cta } = cms;
 
   return (
-    <div className="pt-24">
+    <div className="pt-16">
       {/* Hero */}
       <section className="relative bg-[#080b10] py-20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -324,3 +324,4 @@ export default function AcademyPage() {
     </div>
   );
 }
+
