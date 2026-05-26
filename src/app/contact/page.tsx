@@ -13,7 +13,7 @@ const contactFaqs = [
 ];
 
 export const metadata: Metadata = {
-  title: “Contact Us - Cyber A1 Academy”,
+  title: "Contact Us - Cyber A1 Academy",
   description:
     "Get in touch with Cyber A1 Academy. Book a free counseling session, enquire about programs, or reach out to our team in Durgapur, Delhi, or Kolkata.",
 };
@@ -22,14 +22,14 @@ export default function ContactPage() {
   const settings = getSiteSettings();
   const phone = settings?.phone ?? "+91 8240 006 007";
   const email = settings?.email ?? "info@cybera1academy.com";
-  const hours = settings?.hours ?? “Mon-Sat: 9:30 AM - 7:00 PM”;
+  const hours = settings?.hours ?? "Mon-Sat: 9:30 AM - 7:00 PM";
   const whatsapp = (settings?.whatsapp ?? "918240006007").replace(/\D/g, "");
   const telHref = `tel:${phone.replace(/\s/g, "")}`;
 
   const offices = [
     { city: "Durgapur (Head Office)", address: "Cyber A1 Academy, Durgapur, West Bengal", isPrimary: true },
-    { city: “Delhi”, address: “Delhi Office - Contact for exact address”, isPrimary: false },
-    { city: “Kolkata”, address: “Kolkata Office - Contact for exact address”, isPrimary: false },
+    { city: "Delhi", address: "Delhi Office - Contact for exact address", isPrimary: false },
+    { city: "Kolkata", address: "Kolkata Office - Contact for exact address", isPrimary: false },
   ];
   return (
     <div className="pt-16">
