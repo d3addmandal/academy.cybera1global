@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import {
   Shield, Phone, Mail, MapPin, Linkedin, Instagram,
@@ -127,11 +128,17 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* CRM menus */}
+          {/* Pipe */}
+          <div className="hidden lg:block w-px self-stretch bg-gray-700 flex-shrink-0" />
+
+          {/* CRM menus — each followed by a pipe */}
           {cappedMenus.map(menu => (
-            <div key={menu.id} className="w-[47%] sm:w-36 flex-shrink-0">
-              <FooterMenuColumn menu={menu} />
-            </div>
+            <Fragment key={menu.id}>
+              <div className="w-[47%] sm:w-36 flex-shrink-0">
+                <FooterMenuColumn menu={menu} />
+              </div>
+              <div className="hidden lg:block w-px self-stretch bg-gray-700 flex-shrink-0" />
+            </Fragment>
           ))}
 
           {/* Contact Us */}
@@ -168,6 +175,9 @@ export default function Footer() {
               )}
             </ul>
           </div>
+
+          {/* Pipe */}
+          <div className="hidden lg:block w-px self-stretch bg-gray-700 flex-shrink-0" />
 
           {/* Last section */}
           <div className="w-[47%] sm:w-44 flex-shrink-0">
