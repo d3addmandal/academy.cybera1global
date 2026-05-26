@@ -73,7 +73,7 @@ export default function HomePage() {
         blogConfig={home?.blog}
       />
       <FAQSection faqs={faqs} cardBgImage={home?.faqCardBgImage} />
-      <FinalCTA cta={home?.cta} companyName={settings?.companyName} />
+      <FinalCTA cta={home?.cta} companyName={settings?.companyName} phone={settings?.phone} />
     </>
   );
 }
