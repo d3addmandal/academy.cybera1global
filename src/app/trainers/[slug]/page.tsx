@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!trainer || trainer.status !== "published") return {};
   const settings = getSiteSettings();
   return {
-    title: `${trainer.name} — ${trainer.designation} | ${settings?.companyName ?? "Cyber A1 Academy"}`,
+    title: `${trainer.name} - ${trainer.designation} | ${settings?.companyName ?? "Cyber A1 Academy"}`,
     description: trainer.bio.slice(0, 160),
   };
 }

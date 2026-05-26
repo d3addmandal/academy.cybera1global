@@ -5,7 +5,7 @@ import { Plus, Minus, ArrowRight } from "lucide-react";
 import type { FAQ } from "@/types/cms";
 
 const DEFAULT_FAQS: FAQ[] = [
-  { id: "f1", question: "Who can join Cyber A1 Academy programs?", answer: "Anyone interested in cybersecurity — students, freshers, IT professionals, working professionals, and career switchers. We have programs for every level.", order: 0, isActive: true },
+  { id: "f1", question: "Who can join Cyber A1 Academy programs?", answer: "Anyone interested in cybersecurity - students, freshers, IT professionals, working professionals, and career switchers. We have programs for every level.", order: 0, isActive: true },
   { id: "f2", question: "Do I need coding knowledge to start?", answer: "No coding knowledge is required for our foundation programs like CCEH.", order: 1, isActive: true },
   { id: "f3", question: "Is this program beginner friendly?", answer: "Absolutely! Our programs are structured from the ground up so anyone can start, even without a technical background.", order: 2, isActive: true },
   { id: "f4", question: "Do you provide practical labs?", answer: "Yes, we have dedicated lab environments including virtual machines, attack ranges, and SIEM environments.", order: 3, isActive: true },

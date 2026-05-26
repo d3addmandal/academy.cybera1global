@@ -7,7 +7,7 @@ import { getCRMBlogPosts } from "@/lib/content";
 import BlogCard from "@/components/shared/BlogCard";
 
 export const metadata: Metadata = {
-  title: "Blog â€” Cybersecurity Insights, Tips & Career Guides",
+  title: “Blog - Cybersecurity Insights, Tips & Career Guides”,
   description: "Read expert articles on cybersecurity, ethical hacking, VAPT, cloud security, SOC operations, and career development.",
 };
 

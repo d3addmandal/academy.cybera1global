@@ -12,7 +12,7 @@ import { getCorporatePageContent, getSiteSettings } from "@/lib/content";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Corporate Training — Cybersecurity Solutions for Organizations",
+  title: "Corporate Training - Cybersecurity Solutions for Organizations",
   description:
     "Custom cybersecurity training programs for organizations. Security awareness, VAPT workshops, SOC training, phishing simulations, compliance, and red team awareness.",
 };
