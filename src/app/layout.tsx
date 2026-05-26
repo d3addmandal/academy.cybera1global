@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingButtons from "@/components/shared/FloatingButtons";
 import { getSiteTheme, getSiteSettings, getSiteNav, getCRMPublishedProgrammes } from "@/lib/content";
+import { blobHydrate } from "@/lib/blob-db";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,9 @@ export default async function RootLayout({
   // The proxy injects x-is-admin:true for all /webapplication/** routes.
   const h = await headers();
   const isAdmin = h.get("x-is-admin") === "true";
+
+  // On Vercel, hydrate /tmp/ from Blob CDN on cold containers (no-op if already warm)
+  if (!isAdmin) await blobHydrate(process.env.COMPANY_SLUG ?? "cybera1");
 
   // Read CRM content for website pages (skipped for admin to avoid unnecessary reads)
   const theme = isAdmin ? null : getSiteTheme();

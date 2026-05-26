@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { blobWrite } from "@/lib/blob-db";
 import type {
   AdminUser, SiteSettings, ThemeSettings, NavigationSettings,
   HomePageContent, Programme, BlogPost, Event, Testimonial, Trainer,
@@ -42,6 +43,8 @@ function writeFile<T>(companySlug: string, filename: string, data: T): void {
   ensureDir(companySlug);
   const filePath = path.join(WRITE_DIR, companySlug, filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+  // Persist to Vercel Blob so data survives container recycling (fire-and-forget)
+  if (IS_VERCEL) blobWrite(companySlug, filename, data).catch(console.error);
 }
 
 function generateId(): string {
