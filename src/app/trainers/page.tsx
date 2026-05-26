@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = getSiteSettings();
   return {
     title: `Our Trainers | ${settings?.companyName ?? "Cyber A1 Academy"}`,
-    description: "Meet our expert trainers — experienced cybersecurity professionals with real-world industry backgrounds in VAPT, SOC operations, cloud security, and application security.",
+    description: "Meet our expert trainers - experienced cybersecurity professionals with real-world industry backgrounds in VAPT, SOC operations, cloud security, and application security.",
   };
 }
 
@@ -32,7 +32,7 @@ export default function TrainersPage() {
             Our Industry-Expert <span className="text-red-500">Trainers</span>
           </h1>
           <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto">
-            Every trainer at Cyber A1 Academy is a practising security professional — not just educators. They bring real field experience into every session.
+            Every trainer at Cyber A1 Academy is a practising security professional, not just educators. They bring real field experience into every session.
           </p>
         </div>
       </section>

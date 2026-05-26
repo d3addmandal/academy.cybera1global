@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL("https://cybera1academy.com"),
     title: {
-      default: "Cyber A1 Academy — Industry-Focused Cybersecurity Training",
+      default: "Cyber A1 Academy - Industry-Focused Cybersecurity Training",
       template: "%s | Cyber A1 Academy",
     },
     description:
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: "Cyber A1 Academy" }],
     openGraph: {
       type: "website", locale: "en_IN", siteName: "Cyber A1 Academy",
-      title: "Cyber A1 Academy — Industry-Focused Cybersecurity Training",
+      title: "Cyber A1 Academy - Industry-Focused Cybersecurity Training",
       description: "Build real cybersecurity skills with hands-on programs designed by security professionals.",
       images: [{ url: "/images/og-image.jpg", width: 1200, height: 630 }],
     },

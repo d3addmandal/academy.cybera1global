@@ -12,9 +12,9 @@ import type { CareerPageContent } from "@/types/cms";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Career & Placement — Build Your Cybersecurity Career",
+  title: "Career & Placement - Build Your Cybersecurity Career",
   description:
-    "Comprehensive career support at Cyber A1 Academy — resume building, LinkedIn optimization, mock interviews, portfolio development, and direct company referrals.",
+    "Comprehensive career support at Cyber A1 Academy - resume building, LinkedIn optimization, mock interviews, portfolio development, and direct company referrals.",
 };
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -26,7 +26,7 @@ const DEFAULTS: CareerPageContent = {
   hero: {
     headline: "Build Your Cybersecurity Career With",
     headlineAccent: "100% Practical Support",
-    description: "From your first day to your first job — we provide comprehensive career support including resume building, mock interviews, portfolio development, and direct placement assistance.",
+    description: "From your first day to your first job - we provide comprehensive career support including resume building, mock interviews, portfolio development, and direct placement assistance.",
     stats: [
       { value: "100%", label: "Placement Support" },
       { value: "500+", label: "Students Placed" },

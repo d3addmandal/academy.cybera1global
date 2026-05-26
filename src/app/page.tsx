@@ -20,7 +20,7 @@ import FAQSection from "@/sections/home/FAQSection";
 import FinalCTA from "@/sections/home/FinalCTA";
 
 export const metadata: Metadata = {
-  title: "Cyber A1 Academy — Build Real Cybersecurity Skills For Industry & Enterprise",
+  title: "Cyber A1 Academy - Build Real Cybersecurity Skills For Industry & Enterprise",
   description:
     "Hands-on cybersecurity programs designed by security professionals. VAPT, cloud security, SOC operations, ethical hacking, and enterprise security workflows.",
   alternates: { canonical: "/" },

@@ -12,7 +12,7 @@ import { getInstitutionsPageContent, getSiteSettings } from "@/lib/content";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Institutional Collaboration — Partner With Cyber A1 Academy",
+  title: "Institutional Collaboration - Partner With Cyber A1 Academy",
   description:
     "Partner with Cyber A1 Academy for cybersecurity workshops, bootcamps, faculty development, internship programs, and placement support for your institution.",
 };

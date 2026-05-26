@@ -16,7 +16,7 @@ function FooterMenuColumn({ menu }: { menu: NavigationMenu }) {
       <ul className="space-y-1">
         {menu.items.map((link) => (
           <li key={link.id}>
-            <Link href={link.href} className="text-[13px] text-gray-300 hover:text-red-400 transition-colors leading-snug block">
+            <Link href={link.href} className="text-[13px] text-gray-500 hover:text-red-400 transition-colors leading-snug block">
               {link.label}
             </Link>
           </li>
@@ -46,7 +46,7 @@ export default function Footer() {
   const whatsapp = footer?.contactWhatsapp || settings?.whatsapp || "";
   const email = footer?.contactEmail || settings?.email || "info@cybera1academy.com";
   const address = footer?.contactAddress || settings?.address || "Durgapur | Delhi | Kolkata";
-  const hours = footer?.contactHours || settings?.hours || "Mon–Sat: 9:30 AM – 7:00 PM";
+  const hours = footer?.contactHours || settings?.hours || "Mon-Sat: 9:30 AM - 7:00 PM";
 
   const logoImageUrl = theme?.logo?.imageUrl ?? "";
   const logoText = theme?.logo?.text ?? "Cyber A1";
@@ -68,14 +68,7 @@ export default function Footer() {
   const newsletterDesc = footer?.newsletter?.description ?? "Subscribe to get updates on new courses, events and more.";
   const achievements = footer?.achievements ?? [];
 
-  // Cap menus so total cols never exceeds 7 (brand + menus + contact + newsletter)
   const cappedMenus = activeMenus.slice(0, 4);
-  const totalCols = Math.min(1 + cappedMenus.length + 2, 7);
-  const gridColsMap: Record<number, string> = {
-    3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5",
-    6: "lg:grid-cols-6", 7: "lg:grid-cols-7",
-  };
-  const gridCols = gridColsMap[totalCols] ?? "lg:grid-cols-5";
 
   const socialItems = [
     { icon: Linkedin, href: sl.linkedin ?? "#", label: "LinkedIn" },
@@ -85,12 +78,19 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="text-gray-300" style={{ backgroundColor: "var(--color-footer-bg, #050505)" }} suppressHydrationWarning>
+    <footer
+      className="text-gray-500 overflow-hidden"
+      style={{ backgroundColor: "var(--color-footer-bg, #050505)" }}
+      suppressHydrationWarning
+    >
       <div className="w-full px-[1%] py-4">
-        <div className={`grid grid-cols-2 ${gridCols} items-start`} style={{ columnGap: "1.5%", rowGap: "1rem" }}>
-
-          {/* Col 1: Brand */}
-          <div className="col-span-2 lg:col-span-1 flex flex-col gap-2">
+        {/* Flex layout — columns centered, wrap on smaller screens */}
+        <div
+          className="flex flex-wrap justify-center items-start"
+          style={{ columnGap: "2%", rowGap: "1rem" }}
+        >
+          {/* Brand */}
+          <div className="w-full sm:w-44 flex-shrink-0 flex flex-col gap-2">
             <Link href="/" className="flex items-center gap-2">
               {logoImageUrl ? (
                 <img src={logoImageUrl} alt={companyName} className="h-7 w-auto object-contain" />
@@ -107,19 +107,19 @@ export default function Footer() {
                       {logoText.replace(logoHighlight, "")}
                       <span style={{ color: primaryColor }}>{logoHighlight}</span>
                     </span>
-                    <span className="text-gray-400 text-[11px] uppercase tracking-wider block">Academy</span>
+                    <span className="text-gray-500 text-[11px] uppercase tracking-wider block">Academy</span>
                   </div>
                 </>
               )}
             </Link>
-            <p className="text-[13px] text-gray-400 leading-relaxed line-clamp-3">{description}</p>
+            <p className="text-[13px] text-gray-500 leading-relaxed line-clamp-3">{description}</p>
             <div className="flex items-center gap-1.5">
               {socialItems.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label} href={href}
                   target={href !== "#" ? "_blank" : undefined}
                   rel="noopener noreferrer" aria-label={label}
-                  className="w-6 h-6 rounded bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-all"
+                  className="w-6 h-6 rounded bg-gray-800/80 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white transition-all"
                 >
                   <Icon style={{ width: 12, height: 12 }} />
                 </a>
@@ -127,30 +127,32 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* CRM menus — max 4 shown (total cols capped at 7) */}
+          {/* CRM menus */}
           {cappedMenus.map(menu => (
-            <FooterMenuColumn key={menu.id} menu={menu} />
+            <div key={menu.id} className="w-[47%] sm:w-36 flex-shrink-0">
+              <FooterMenuColumn menu={menu} />
+            </div>
           ))}
 
           {/* Contact Us */}
-          <div>
+          <div className="w-[47%] sm:w-40 flex-shrink-0">
             <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">Contact Us</h3>
             <ul className="space-y-1">
               <li className="flex items-center gap-1.5">
                 <Phone style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-[13px] text-gray-300 hover:text-white transition-colors">{phone}</a>
+                <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-[13px] text-gray-500 hover:text-white transition-colors">{phone}</a>
               </li>
               <li className="flex items-center gap-1.5">
                 <Mail style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <a href={`mailto:${email}`} className="text-[13px] text-gray-300 hover:text-white transition-colors truncate">{email}</a>
+                <a href={`mailto:${email}`} className="text-[13px] text-gray-500 hover:text-white transition-colors truncate">{email}</a>
               </li>
               <li className="flex items-center gap-1.5">
                 <MapPin style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <span className="text-[13px] text-gray-300">{address}</span>
+                <span className="text-[13px] text-gray-500">{address}</span>
               </li>
               <li className="flex items-center gap-1.5">
                 <Clock style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <span className="text-[13px] text-gray-300">{hours}</span>
+                <span className="text-[13px] text-gray-500">{hours}</span>
               </li>
               {whatsapp && (
                 <li className="pt-0.5">
@@ -168,7 +170,7 @@ export default function Footer() {
           </div>
 
           {/* Last section */}
-          <div>
+          <div className="w-[47%] sm:w-44 flex-shrink-0">
             {lastSection === "achievements" && achievements.length > 0 ? (
               <>
                 <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">Achievements</h3>
@@ -177,7 +179,7 @@ export default function Footer() {
                     <div key={i} className="bg-gray-800/60 rounded p-1.5 flex items-center justify-center">
                       {a.logoUrl
                         ? <img src={a.logoUrl} alt={a.name} className="h-7 w-auto object-contain grayscale hover:grayscale-0 transition-all" />
-                        : <span className="text-[11px] text-gray-400 text-center leading-tight">{a.name}</span>
+                        : <span className="text-[11px] text-gray-500 text-center leading-tight">{a.name}</span>
                       }
                     </div>
                   ))}
@@ -186,7 +188,7 @@ export default function Footer() {
             ) : (
               <>
                 <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">{newsletterTitle}</h3>
-                <p className="text-[13px] text-gray-400 mb-2 leading-snug">{newsletterDesc}</p>
+                <p className="text-[13px] text-gray-500 mb-2 leading-snug">{newsletterDesc}</p>
                 <NewsletterForm />
               </>
             )}
@@ -197,10 +199,10 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-gray-800/40">
         <div className="w-full px-[1%] py-2 flex flex-col sm:flex-row items-center justify-between gap-1">
-          <p className="text-[12px] text-gray-500">{copyright}</p>
+          <p className="text-[12px] text-gray-600">{copyright}</p>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             {bottomLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="text-[12px] text-gray-500 hover:text-red-400 transition-colors">
+              <Link key={link.label} href={link.href} className="text-[12px] text-gray-600 hover:text-red-400 transition-colors">
                 {link.label}
               </Link>
             ))}
