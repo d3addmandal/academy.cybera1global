@@ -68,8 +68,14 @@ export default function Footer() {
   const newsletterDesc = footer?.newsletter?.description ?? "Subscribe to get updates on new courses, events and more.";
   const achievements = footer?.achievements ?? [];
 
-  const totalCols = 1 + activeMenus.length + 2;
-  const gridCols = totalCols <= 3 ? "lg:grid-cols-3" : totalCols === 4 ? "lg:grid-cols-4" : "lg:grid-cols-5";
+  // Cap menus so total cols never exceeds 7 (brand + menus + contact + newsletter)
+  const cappedMenus = activeMenus.slice(0, 4);
+  const totalCols = Math.min(1 + cappedMenus.length + 2, 7);
+  const gridColsMap: Record<number, string> = {
+    3: "lg:grid-cols-3", 4: "lg:grid-cols-4", 5: "lg:grid-cols-5",
+    6: "lg:grid-cols-6", 7: "lg:grid-cols-7",
+  };
+  const gridCols = gridColsMap[totalCols] ?? "lg:grid-cols-5";
 
   const socialItems = [
     { icon: Linkedin, href: sl.linkedin ?? "#", label: "LinkedIn" },
@@ -81,7 +87,7 @@ export default function Footer() {
   return (
     <footer className="text-gray-400" style={{ backgroundColor: "var(--color-footer-bg, #050505)" }} suppressHydrationWarning>
       <div className="w-full px-[1%] py-6">
-        <div className={`grid grid-cols-2 ${gridCols} gap-x-8 gap-y-6 items-start`}>
+        <div className={`grid grid-cols-2 ${gridCols} gap-y-6 items-start justify-between`} style={{ columnGap: "2%" }}>
 
           {/* Col 1: Brand */}
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-2.5">
@@ -121,8 +127,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* CRM menus */}
-          {activeMenus.map(menu => (
+          {/* CRM menus — max 4 shown (total cols capped at 7) */}
+          {cappedMenus.map(menu => (
             <FooterMenuColumn key={menu.id} menu={menu} />
           ))}
 
