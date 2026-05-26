@@ -10,13 +10,13 @@ import type { NavigationMenu } from "@/types/cms";
 function FooterMenuColumn({ menu }: { menu: NavigationMenu }) {
   return (
     <div>
-      <h3 className="text-white font-semibold text-[13px] mb-2.5 uppercase tracking-widest">
+      <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">
         {menu.header}
       </h3>
-      <ul className="space-y-1.5">
+      <ul className="space-y-1">
         {menu.items.map((link) => (
           <li key={link.id}>
-            <Link href={link.href} className="text-[13px] text-gray-500 hover:text-red-400 transition-colors leading-snug block">
+            <Link href={link.href} className="text-[13px] text-gray-300 hover:text-red-400 transition-colors leading-snug block">
               {link.label}
             </Link>
           </li>
@@ -85,12 +85,12 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="text-gray-400" style={{ backgroundColor: "var(--color-footer-bg, #050505)" }} suppressHydrationWarning>
-      <div className="w-full px-[1%] py-6">
-        <div className={`grid grid-cols-2 ${gridCols} gap-y-6 items-start justify-between`} style={{ columnGap: "2%" }}>
+    <footer className="text-gray-300" style={{ backgroundColor: "var(--color-footer-bg, #050505)" }} suppressHydrationWarning>
+      <div className="w-full px-[1%] py-4">
+        <div className={`grid grid-cols-2 ${gridCols} items-start`} style={{ columnGap: "1.5%", rowGap: "1rem" }}>
 
           {/* Col 1: Brand */}
-          <div className="col-span-2 lg:col-span-1 flex flex-col gap-2.5">
+          <div className="col-span-2 lg:col-span-1 flex flex-col gap-2">
             <Link href="/" className="flex items-center gap-2">
               {logoImageUrl ? (
                 <img src={logoImageUrl} alt={companyName} className="h-7 w-auto object-contain" />
@@ -107,19 +107,19 @@ export default function Footer() {
                       {logoText.replace(logoHighlight, "")}
                       <span style={{ color: primaryColor }}>{logoHighlight}</span>
                     </span>
-                    <span className="text-gray-600 text-[11px] uppercase tracking-wider block">Academy</span>
+                    <span className="text-gray-400 text-[11px] uppercase tracking-wider block">Academy</span>
                   </div>
                 </>
               )}
             </Link>
-            <p className="text-[13px] text-gray-600 leading-relaxed line-clamp-3">{description}</p>
+            <p className="text-[13px] text-gray-400 leading-relaxed line-clamp-3">{description}</p>
             <div className="flex items-center gap-1.5">
               {socialItems.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label} href={href}
                   target={href !== "#" ? "_blank" : undefined}
                   rel="noopener noreferrer" aria-label={label}
-                  className="w-6 h-6 rounded bg-gray-800/80 flex items-center justify-center text-gray-500 hover:bg-red-600 hover:text-white transition-all"
+                  className="w-6 h-6 rounded bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-all"
                 >
                   <Icon style={{ width: 12, height: 12 }} />
                 </a>
@@ -134,26 +134,26 @@ export default function Footer() {
 
           {/* Contact Us */}
           <div>
-            <h3 className="text-white font-semibold text-[13px] mb-2.5 uppercase tracking-widest">Contact Us</h3>
-            <ul className="space-y-1.5">
+            <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">Contact Us</h3>
+            <ul className="space-y-1">
               <li className="flex items-center gap-1.5">
                 <Phone style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-[13px] text-gray-500 hover:text-white transition-colors">{phone}</a>
+                <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-[13px] text-gray-300 hover:text-white transition-colors">{phone}</a>
               </li>
               <li className="flex items-center gap-1.5">
                 <Mail style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <a href={`mailto:${email}`} className="text-[13px] text-gray-500 hover:text-white transition-colors truncate">{email}</a>
+                <a href={`mailto:${email}`} className="text-[13px] text-gray-300 hover:text-white transition-colors truncate">{email}</a>
               </li>
               <li className="flex items-center gap-1.5">
                 <MapPin style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <span className="text-[13px] text-gray-500">{address}</span>
+                <span className="text-[13px] text-gray-300">{address}</span>
               </li>
               <li className="flex items-center gap-1.5">
                 <Clock style={{ width: 13, height: 13 }} className="text-red-500 flex-shrink-0" />
-                <span className="text-[13px] text-gray-500">{hours}</span>
+                <span className="text-[13px] text-gray-300">{hours}</span>
               </li>
               {whatsapp && (
-                <li className="pt-1">
+                <li className="pt-0.5">
                   <a
                     href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
                     target="_blank" rel="noopener noreferrer"
@@ -171,13 +171,13 @@ export default function Footer() {
           <div>
             {lastSection === "achievements" && achievements.length > 0 ? (
               <>
-                <h3 className="text-white font-semibold text-[13px] mb-2.5 uppercase tracking-widest">Achievements</h3>
+                <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">Achievements</h3>
                 <div className="grid grid-cols-3 gap-1.5">
                   {achievements.map((a, i) => (
                     <div key={i} className="bg-gray-800/60 rounded p-1.5 flex items-center justify-center">
                       {a.logoUrl
                         ? <img src={a.logoUrl} alt={a.name} className="h-7 w-auto object-contain grayscale hover:grayscale-0 transition-all" />
-                        : <span className="text-[11px] text-gray-500 text-center leading-tight">{a.name}</span>
+                        : <span className="text-[11px] text-gray-400 text-center leading-tight">{a.name}</span>
                       }
                     </div>
                   ))}
@@ -185,8 +185,8 @@ export default function Footer() {
               </>
             ) : (
               <>
-                <h3 className="text-white font-semibold text-[13px] mb-2.5 uppercase tracking-widest">{newsletterTitle}</h3>
-                <p className="text-[13px] text-gray-600 mb-2 leading-snug">{newsletterDesc}</p>
+                <h3 className="text-white font-semibold text-[13px] mb-2 uppercase tracking-widest">{newsletterTitle}</h3>
+                <p className="text-[13px] text-gray-400 mb-2 leading-snug">{newsletterDesc}</p>
                 <NewsletterForm />
               </>
             )}
@@ -195,12 +195,12 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-gray-800/50">
-        <div className="w-full px-[1%] py-2.5 flex flex-col sm:flex-row items-center justify-between gap-1.5">
-          <p className="text-[12px] text-gray-700">{copyright}</p>
+      <div className="border-t border-gray-800/40">
+        <div className="w-full px-[1%] py-2 flex flex-col sm:flex-row items-center justify-between gap-1">
+          <p className="text-[12px] text-gray-500">{copyright}</p>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             {bottomLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="text-[12px] text-gray-700 hover:text-red-400 transition-colors">
+              <Link key={link.label} href={link.href} className="text-[12px] text-gray-500 hover:text-red-400 transition-colors">
                 {link.label}
               </Link>
             ))}
