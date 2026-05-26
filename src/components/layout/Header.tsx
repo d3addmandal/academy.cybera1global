@@ -154,30 +154,30 @@ export default function Header({ theme, settings, nav, programmes = [] }: Header
         <div className="site-container">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
+            <Link href="/" className="flex items-center gap-3 flex-shrink-0">
               {/* Icon: uploaded image or gradient shield */}
               {logoImageUrl && !logoImgError ? (
                 <img
                   src={logoImageUrl}
                   alt={logoText}
-                  className="w-9 h-9 rounded-lg object-contain bg-black/20 p-0.5 flex-shrink-0"
+                  className="w-12 h-12 rounded-xl object-contain bg-black/20 p-0.5 flex-shrink-0"
                   onError={() => setLogoImgError(true)}
                 />
               ) : (
                 <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(224,0,0,0.4)] flex-shrink-0"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shadow-[0_0_18px_rgba(224,0,0,0.4)] flex-shrink-0"
                   style={{ background: `linear-gradient(135deg, ${primaryColor}, ${theme?.colors?.primaryDark ?? "#8b0000"})` }}
                 >
-                  <Shield className="w-5 h-5 text-white" />
+                  <Shield className="w-6 h-6 text-white" />
                 </div>
               )}
               {/* Company name text — always shown */}
               <div>
-                <span className="text-white font-bold text-base leading-tight block">
+                <span className="text-white font-bold text-lg leading-tight block">
                   {logoText.replace(logoHighlight, "")}
                   <span style={{ color: primaryColor }}>{logoHighlight}</span>
                 </span>
-                <span className="text-gray-400 text-[10px] font-medium leading-tight block">ACADEMY</span>
+                <span className="text-gray-400 text-[11px] font-medium leading-tight block tracking-widest">ACADEMY</span>
               </div>
             </Link>
 
