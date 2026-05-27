@@ -203,7 +203,16 @@ function ImageUpload({ label, hint, value, onChange, uploadType, company }: {
                 </div>
                 <p className="text-[11px] font-semibold text-slate-700 truncate flex-1 min-w-0">{filename}</p>
                 <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                <button type="button" onClick={() => onChange("")} className="text-slate-300 hover:text-red-500 transition-colors shrink-0">
+                <button type="button" onClick={() => {
+                  if (value.includes(".public.blob.vercel-storage.com/")) {
+                    fetch(`/api/admin/${company}/upload`, {
+                      method: "DELETE", credentials: "same-origin",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ url: value }),
+                    }).catch(() => {});
+                  }
+                  onChange("");
+                }} className="text-slate-300 hover:text-red-500 transition-colors shrink-0">
                   <X className="w-4 h-4" />
                 </button>
               </div>

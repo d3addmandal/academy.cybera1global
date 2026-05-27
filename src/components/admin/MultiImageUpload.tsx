@@ -135,6 +135,13 @@ export default function MultiImageUpload({
 
   function removeItem(url: string) {
     onChange(values.filter((v) => v !== url));
+    if (url.includes(".public.blob.vercel-storage.com/")) {
+      fetch(`/api/admin/${company}/upload`, {
+        method: "DELETE", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      }).catch(() => {});
+    }
   }
 
   const canUploadMore = values.filter(Boolean).length < maxFiles;
