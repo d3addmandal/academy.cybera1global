@@ -66,8 +66,9 @@ export default async function RootLayout({
   const h = await headers();
   const isAdmin = h.get("x-is-admin") === "true";
 
-  // On Vercel, hydrate /tmp/ from Blob CDN on cold containers (no-op if already warm)
-  if (!isAdmin) await blobHydrate(process.env.COMPANY_SLUG ?? "cybera1");
+  // On Vercel, hydrate /tmp/ from Blob CDN on cold containers (no-op if already warm).
+  // Always hydrate — admin routes need up-to-date data too (uploaded images, saved settings).
+  await blobHydrate(process.env.COMPANY_SLUG ?? "cybera1");
 
   // Read CRM content for website pages (skipped for admin to avoid unnecessary reads)
   const theme = isAdmin ? null : getSiteTheme();

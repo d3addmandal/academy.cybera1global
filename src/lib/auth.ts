@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 import type { AuthPayload } from "@/types/cms";
 import { sessionsDb } from "@/lib/db";
+import { blobHydrate } from "@/lib/blob-db";
 
 let _secret: Uint8Array | null = null;
 function getSecret(): Uint8Array {
@@ -48,6 +49,8 @@ export async function getAuthFromCookies(): Promise<AuthPayload | null> {
     if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
     try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
   }
+  // Ensure Blob data is in /tmp/ for this container (no-op on warm containers or local dev)
+  await blobHydrate(payload.companySlug);
   return payload;
 }
 
@@ -61,6 +64,8 @@ export async function getAuthFromRequest(req: NextRequest): Promise<AuthPayload 
     if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
     try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
   }
+  // Ensure Blob data is in /tmp/ for this container (no-op on warm containers or local dev)
+  await blobHydrate(payload.companySlug);
   return payload;
 }
 
