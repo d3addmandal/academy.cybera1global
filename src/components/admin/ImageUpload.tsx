@@ -52,6 +52,15 @@ function filenameFromUrl(url: string): string {
   catch { return url.split("/").pop() ?? url; }
 }
 
+function deleteBlobImage(url: string, company: string) {
+  if (!url || !url.includes(".public.blob.vercel-storage.com/")) return;
+  fetch(`/api/admin/${company}/upload`, {
+    method: "DELETE", credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  }).catch(() => {});
+}
+
 export default function ImageUpload({
   value, onChange, company, folder = "courses", label, aspectClass = "aspect-video",
 }: Props) {
@@ -263,7 +272,7 @@ export default function ImageUpload({
                 <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                 <button
                   type="button"
-                  onClick={() => { onChange(""); setFileInfo(null); setPreviewDims(null); }}
+                  onClick={() => { deleteBlobImage(value, company); onChange(""); setFileInfo(null); setPreviewDims(null); }}
                   className="text-slate-300 hover:text-red-500 transition-colors shrink-0"
                   title="Remove image"
                 >

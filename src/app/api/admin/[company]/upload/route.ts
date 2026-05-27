@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
@@ -151,5 +151,40 @@ export async function POST(req: NextRequest, { params }: Params) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[upload]", message);
     return NextResponse.json({ success: false, error: `Upload failed: ${message}` }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: Params) {
+  const auth = await getAuthFromRequest(req);
+  if (!auth) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { company } = await params;
+
+  try {
+    const body = await req.json();
+    const url = typeof body?.url === "string" ? body.url : "";
+
+    if (!url) {
+      return NextResponse.json({ success: false, error: "url is required." }, { status: 400 });
+    }
+
+    // Only delete Vercel Blob CDN URLs belonging to this company's uploads
+    if (!url.includes(".public.blob.vercel-storage.com/") || !url.includes(`/uploads/${company}/`)) {
+      return NextResponse.json({ success: false, error: "Invalid or unauthorized blob URL." }, { status: 403 });
+    }
+
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      return NextResponse.json({ success: true }); // local dev — nothing to delete
+    }
+
+    await del(url, { token });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[upload delete]", message);
+    return NextResponse.json({ success: false, error: `Delete failed: ${message}` }, { status: 500 });
   }
 }
