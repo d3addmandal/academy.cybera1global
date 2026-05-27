@@ -45,15 +45,16 @@ function writeFile<T>(companySlug: string, filename: string, data: T): void {
   const filePath = path.join(WRITE_DIR, companySlug, filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
   if (IS_VERCEL) {
-    // Use after() so Vercel guarantees the blob write completes before
-    // terminating the serverless function — prevents data loss on container recycle.
+    // Use after() so Vercel keeps the function alive until the blob write completes.
     const task = blobWrite(companySlug, filename, data).catch(err =>
       console.error("[db] blobWrite failed:", filename, err)
     );
     try {
       after(task);
-    } catch {
-      // after() unavailable outside a request context (e.g. build time) — ignore
+    } catch (e) {
+      // after() throws outside a request context (e.g. build time) — log so
+      // it's visible in Vercel function logs if it fires unexpectedly at runtime.
+      console.warn("[db] after() unavailable for blobWrite:", filename, e);
     }
   }
 }

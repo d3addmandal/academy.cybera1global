@@ -4,7 +4,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
 
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "cybera1academy.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "cybera1academy.com" },
+      // Vercel Blob CDN — required for uploaded images to render
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "*.blob.vercel-storage.com" },
+    ],
     unoptimized: true,
   },
 
