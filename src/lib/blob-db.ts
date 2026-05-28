@@ -10,11 +10,26 @@ import { put, list } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
-// Strip any image path under a /images/ subdirectory (e.g. /images/courses/ccse.jpg)
-// since those directories don't exist in public/. Only /images/home-hero.jpg (root-level) is valid.
+// Only sanitize strings that look like image file paths (not hrefs, labels, etc.)
+const IMAGE_EXT_RE = /\.(jpg|jpeg|png|webp|gif|svg|ico)$/i;
+
+function isPublicFileAccessible(relativePath: string): boolean {
+  try {
+    return fs.existsSync(path.join(process.cwd(), "public", relativePath));
+  } catch {
+    return false;
+  }
+}
+
+// Strip broken image paths:
+//   - /images/subdir/... paths (those subdirectories don't exist in public/)
+//   - relative /uploads/... paths where the file was deleted from the git repo
 function fixBrokenImagePaths(value: unknown): unknown {
   if (typeof value === "string") {
-    return /^\/images\/.+\/.+/.test(value) ? "" : value;
+    if (!IMAGE_EXT_RE.test(value)) return value; // not an image path — skip
+    if (/^\/images\/.+\/.+/.test(value)) return ""; // /images/subdir/ paths don't exist
+    if (value.startsWith("/") && !isPublicFileAccessible(value)) return ""; // deleted local file
+    return value;
   }
   if (Array.isArray(value)) return value.map(fixBrokenImagePaths);
   if (value !== null && typeof value === "object") {
@@ -25,7 +40,11 @@ function fixBrokenImagePaths(value: unknown): unknown {
   return value;
 }
 
-const FILES_NEEDING_IMAGE_SANITIZE = new Set(["programmes.json", "blog.json", "events.json"]);
+// Apply to all files that may contain image references
+const FILES_NEEDING_IMAGE_SANITIZE = new Set([
+  "programmes.json", "blog.json", "events.json",
+  "home.json", "testimonials.json", "trainers.json", "theme.json",
+]);
 
 const IS_VERCEL = process.env.VERCEL === "1";
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;

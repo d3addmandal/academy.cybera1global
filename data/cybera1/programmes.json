@@ -11,7 +11,7 @@
     "labsType": "Hands-On Practical",
     "description": "A practical cybersecurity foundation program designed to help students and beginners build real-world skills in networking, ethical hacking, reconnaissance, vulnerability assessment, Linux, wireless security, and modern cyber threats.",
     "overview": "CCEH is a 3-month foundation program that covers everything a beginner needs to start a career in cybersecurity. From networking basics to ethical hacking, scanning, enumeration, system hacking, malware, social engineering, and AI-based threats.",
-    "image": "/uploads/cybera1/courses/1779590050125-image.jpg",
+    "image": "",
     "heroImage": "",
     "color": "#e00000",
     "isFeatured": true,
@@ -382,8 +382,8 @@
     "labsType": "Hands-On Practical",
     "description": "Cyber A1 Certified Digital Forensic and Incident Response is a professional cybersecurity course focused on Digital Forensics and Incident Response (DFIR). The course provides practical knowledge on identifying, analyzing, investigating, and responding to cyber incidents such as malware attacks, ransomware, insider threats, and system compromises.",
     "overview": "It covers topics including evidence collection, memory forensics, log analysis, network forensics, malware investigation, incident handling procedures, threat hunting, and forensic reporting using industry-standard tools and methodologies. The course is designed for SOC analysts, incident responders, cybersecurity professionals, and forensic investigators who want hands-on DFIR skills for real-world investigations.",
-    "image": "/uploads/cybera1/courses/1779569081196-pexels-divinetechygirl-1181354.jpg",
-    "heroImage": "/uploads/cybera1/courses/1779569088493-pexels-cookiecutter-17323801.jpg",
+    "image": "",
+    "heroImage": "",
     "color": "#e00000",
     "isFeatured": true,
     "status": "published",
@@ -699,6 +699,6 @@
     "order": 4,
     "createdAt": "2026-05-25T17:37:51.992Z",
     "updatedAt": "2026-05-25T19:08:45.007Z",
-    "sampleCertificate": "/uploads/cybera1/coursescertificates/1779736122409-a27252b37c5f40f7.jpg"
+    "sampleCertificate": ""
   }
 ]
