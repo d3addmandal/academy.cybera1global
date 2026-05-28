@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PageHeader } from "@/components/admin/FormField";
 import { useToast } from "@/components/admin/Toast";
-import { MessageCircle, Phone, Mail, MapPin, Trash2, RefreshCw, Inbox } from "lucide-react";
+import { MessageCircle, Phone, Mail, MapPin, Trash2, RefreshCw, Inbox, FileSpreadsheet } from "lucide-react";
 import type { ContactSubmission } from "@/types/cms";
 
 const BADGE: Record<string, string> = {
@@ -85,10 +85,20 @@ export default function ContactsPage() {
             </button>
           ))}
         </div>
-        <button onClick={load} className="ml-auto flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors">
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-          Refresh
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <a
+            href={`/api/admin/${company}/contacts/export`}
+            download
+            className="flex items-center gap-1.5 text-xs bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            Export Excel
+          </a>
+          <button onClick={load} className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors">
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {loading ? (
