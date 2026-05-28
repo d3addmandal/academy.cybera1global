@@ -10,6 +10,23 @@ import { put, list } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
+// Strip any image path under a /images/ subdirectory (e.g. /images/courses/ccse.jpg)
+// since those directories don't exist in public/. Only /images/home-hero.jpg (root-level) is valid.
+function fixBrokenImagePaths(value: unknown): unknown {
+  if (typeof value === "string") {
+    return /^\/images\/.+\/.+/.test(value) ? "" : value;
+  }
+  if (Array.isArray(value)) return value.map(fixBrokenImagePaths);
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, fixBrokenImagePaths(v)])
+    );
+  }
+  return value;
+}
+
+const FILES_NEEDING_IMAGE_SANITIZE = new Set(["programmes.json", "blog.json", "events.json"]);
+
 const IS_VERCEL = process.env.VERCEL === "1";
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const TMP_DATA = "/tmp/data";
@@ -72,7 +89,29 @@ export async function blobHydrate(company: string): Promise<void> {
         try {
           const res = await fetch(blob.url, { cache: "no-store" });
           if (!res.ok) return;
-          fs.writeFileSync(dest, await res.text(), "utf-8");
+          const original = await res.text();
+
+          // Fix broken /images/subdir/ paths that were seeded from committed defaults
+          if (FILES_NEEDING_IMAGE_SANITIZE.has(filename)) {
+            try {
+              const parsed = JSON.parse(original);
+              const fixed = fixBrokenImagePaths(parsed);
+              const fixedText = JSON.stringify(fixed, null, 2);
+              fs.writeFileSync(dest, fixedText, "utf-8");
+              // Write clean version back to Blob so future cold starts skip the sanitizer work
+              if (fixedText !== original) {
+                put(`crm-db/${company}/${filename}`, fixedText, {
+                  access: "public", contentType: "application/json",
+                  addRandomSuffix: false, allowOverwrite: true, token: TOKEN!,
+                }).catch(err => console.warn("[blob-db] sanitize write-back failed:", filename, err));
+              }
+              return;
+            } catch {
+              // JSON parse failed — fall through to write original
+            }
+          }
+
+          fs.writeFileSync(dest, original, "utf-8");
         } catch (err) {
           console.error("[blob-db] failed to fetch blob:", filename, err);
         }
