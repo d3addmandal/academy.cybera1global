@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [fetchError, setFetchError] = useState("");
   const [notifStatus, setNotifStatus] = useState<{ configured: boolean; active: string | null } | null>(null);
+  const [sheetsStatus, setSheetsStatus] = useState<{ configured: boolean } | null>(null);
 
   function load() {
     setIsLoading(true);
@@ -40,6 +41,10 @@ export default function SettingsPage() {
     fetch(`/api/admin/${company}/notification-status`, { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => { if (d.success) setNotifStatus(d.data); })
+      .catch(() => {});
+    fetch(`/api/admin/${company}/google-sheets-status`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setSheetsStatus(d.data); })
       .catch(() => {});
   }, [company]);
 
@@ -269,6 +274,69 @@ export default function SettingsPage() {
             </div>
 
             <p className="text-xs text-slate-400">After adding env vars, redeploy on Vercel for the changes to take effect. The notification status above will update automatically.</p>
+          </div>
+        </Card>
+
+        {/* Google Sheets */}
+        <Card title="Google Sheets Auto-Sync" subtitle="Every form submission is instantly appended as a new row in your Google Sheet.">
+          <div className="space-y-4">
+            {/* Status badge */}
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+              {sheetsStatus === null ? (
+                <div className="w-4 h-4 rounded-full bg-slate-300 animate-pulse" />
+              ) : sheetsStatus.configured ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-amber-500 shrink-0" />
+              )}
+              <div>
+                {sheetsStatus === null ? (
+                  <p className="text-sm text-slate-500">Checking status…</p>
+                ) : sheetsStatus.configured ? (
+                  <>
+                    <p className="text-sm font-semibold text-green-700">Active — submissions are syncing to Google Sheets</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Every form submission appends a new row instantly.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-amber-700">Not configured — Google Sheets sync is inactive</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Follow the setup guide below to activate instant sync.</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Setup guide */}
+            <div className="rounded-lg border border-slate-200 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-slate-800">Setup — Google Service Account</p>
+                <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                  Cloud Console <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <ol className="text-xs text-slate-600 space-y-1.5 list-decimal list-inside">
+                <li>Go to <span className="font-mono bg-slate-100 px-1 rounded">console.cloud.google.com</span> → select or create a project</li>
+                <li>APIs &amp; Services → Library → search <strong>Google Sheets API</strong> → Enable</li>
+                <li>IAM &amp; Admin → Service Accounts → Create Service Account (any name)</li>
+                <li>Open the service account → Keys tab → Add Key → Create new key → <strong>JSON</strong> → Download</li>
+                <li>Open your Google Sheet → Share → paste the <strong>client_email</strong> from the JSON → set role to <strong>Editor</strong></li>
+                <li>Add these to Vercel → Project → Environment Variables:</li>
+              </ol>
+              <div className="font-mono text-[11px] bg-slate-900 text-green-400 rounded-lg px-3 py-2 space-y-1">
+                <p>GOOGLE_SHEETS_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com</p>
+                <p>GOOGLE_SHEETS_PRIVATE_KEY=-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----</p>
+                <p>GOOGLE_SHEET_ID=1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</p>
+                <p className="text-slate-500"># Optional — defaults to "Sheet1"</p>
+                <p>GOOGLE_SHEET_NAME=Enquiries</p>
+              </div>
+              <p className="text-xs text-slate-500">The Sheet ID is the long string in your Google Sheet URL between <span className="font-mono bg-slate-100 px-1 rounded">/d/</span> and <span className="font-mono bg-slate-100 px-1 rounded">/edit</span>.</p>
+              <div className="rounded-md bg-blue-50 border border-blue-100 px-3 py-2">
+                <p className="text-xs font-semibold text-blue-700 mb-1">Column headers to put in row 1 of your sheet:</p>
+                <p className="font-mono text-[11px] text-blue-800">Name | Phone | Email | City | Program/Course | Organisation | Enquiry Type | Message | Submitted At</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400">After adding env vars, redeploy on Vercel. The status above will update automatically.</p>
           </div>
         </Card>
 
