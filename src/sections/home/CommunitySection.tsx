@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight, Linkedin } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Linkedin, X } from "lucide-react";
 import type { Event, Testimonial, BlogPost, EventsSectionConfig, BlogSectionConfig } from "@/types/cms";
 import { formatDate } from "@/lib/utils";
 
@@ -25,26 +25,90 @@ const PARTNER_COLORS = [
   "bg-amber-100 text-amber-700",
 ];
 
-function EventGallery({ images }: { images: string[] }) {
-  const slots = [...images, "", "", "", "", ""].slice(0, 5);
+function GalleryModal({ images, onClose }: { images: string[]; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
   return (
     <div
-      className="rounded-xl overflow-hidden mb-4"
-      style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gridTemplateRows: "1fr 1fr", gap: "6px", height: "224px" }}
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
     >
-      {slots.map((src, i) => (
-        <div
-          key={i}
-          className={`overflow-hidden bg-gray-100 ${i === 0 ? "row-span-2 rounded-lg" : "rounded-md"}`}
-        >
-          {src ? (
-            <img src={src} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
-          )}
+      <div
+        className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 flex-shrink-0">
+          <h3 className="font-bold text-gray-900 text-sm">Event Gallery <span className="text-gray-400 font-normal">({images.length} photos)</span></h3>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-      ))}
+        <div className="overflow-y-auto p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {images.map((src, i) => (
+              <div key={i} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
+                <img
+                  src={src}
+                  alt={`Event photo ${i + 1}`}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function EventGallery({ images }: { images: string[] }) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const slots = [...images, "", "", "", "", ""].slice(0, 5);
+  const extraCount = images.length > 5 ? images.length - 5 : 0;
+
+  return (
+    <>
+      <div
+        className="rounded-xl overflow-hidden mb-4"
+        style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gridTemplateRows: "1fr 1fr", gap: "6px", height: "224px" }}
+      >
+        {slots.map((src, i) => {
+          const showOverlay = i === 4 && extraCount > 0;
+          return (
+            <div
+              key={i}
+              className={`overflow-hidden bg-gray-100 relative ${i === 0 ? "row-span-2 rounded-lg" : "rounded-md"} ${showOverlay ? "cursor-pointer" : ""}`}
+              onClick={showOverlay ? () => setModalOpen(true) : undefined}
+            >
+              {src ? (
+                <img src={src} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
+              )}
+              {showOverlay && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center hover:bg-black/70 transition-colors">
+                  <span className="text-white font-black text-2xl">+{extraCount}</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {modalOpen && <GalleryModal images={images} onClose={() => setModalOpen(false)} />}
+    </>
   );
 }
 
@@ -58,9 +122,10 @@ export default function CommunitySection({
   const t = testimonials[current] ?? null;
 
   // Events gallery: prefer explicit gallery images, fall back to event images
+  // Pass ALL images — EventGallery handles the 5-cap and +N overflow modal itself
   const galleryImages = (eventsConfig?.galleryImages ?? []).filter(Boolean);
   const fallbackImages = events.map((ev) => ev.image).filter(Boolean);
-  const displayImages = galleryImages.length ? galleryImages.slice(0, 5) : fallbackImages.slice(0, 5);
+  const displayImages = galleryImages.length ? galleryImages : fallbackImages;
 
   return (
     <section className="py-8 bg-white">
