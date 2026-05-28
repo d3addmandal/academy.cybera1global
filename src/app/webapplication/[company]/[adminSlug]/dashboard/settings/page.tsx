@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PageHeader, Field, Input, Textarea, SaveBar, Card } from "@/components/admin/FormField";
 import { useToast } from "@/components/admin/Toast";
+import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
 import type { SiteSettings } from "@/types/cms";
 
 export default function SettingsPage() {
@@ -16,6 +17,7 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [fetchError, setFetchError] = useState("");
+  const [notifStatus, setNotifStatus] = useState<{ configured: boolean; active: string | null } | null>(null);
 
   function load() {
     setIsLoading(true);
@@ -33,7 +35,13 @@ export default function SettingsPage() {
       .finally(() => setIsLoading(false));
   }
 
-  useEffect(() => { load(); }, [company]);
+  useEffect(() => {
+    load();
+    fetch(`/api/admin/${company}/notification-status`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setNotifStatus(d.data); })
+      .catch(() => {});
+  }, [company]);
 
   function update(key: string, value: unknown) {
     setSettings((p) => p ? { ...p, [key]: value } : p);
@@ -187,6 +195,80 @@ export default function SettingsPage() {
                 placeholder="info@cybera1academy.com"
               />
             </Field>
+          </div>
+        </Card>
+
+        {/* WhatsApp Notification Status */}
+        <Card title="WhatsApp Auto-Notifications" subtitle="Automatically send enquiry details to your WhatsApp when a visitor submits any form.">
+          <div className="space-y-4">
+            {/* Status badge */}
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200">
+              {notifStatus === null ? (
+                <div className="w-4 h-4 rounded-full bg-slate-300 animate-pulse" />
+              ) : notifStatus.configured ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-amber-500 shrink-0" />
+              )}
+              <div>
+                {notifStatus === null ? (
+                  <p className="text-sm text-slate-500">Checking status…</p>
+                ) : notifStatus.configured ? (
+                  <>
+                    <p className="text-sm font-semibold text-green-700">Active — using <span className="uppercase">{notifStatus.active}</span> provider</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Every form submission sends an instant WhatsApp message to your number.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-amber-700">Not configured — no auto-notification active</p>
+                    <p className="text-xs text-slate-500 mt-0.5">Follow the setup guide below to activate WhatsApp notifications.</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Setup guides */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Setup — choose one provider</p>
+
+              {/* Option A: CallMeBot (recommended for quick setup) */}
+              <div className="rounded-lg border border-slate-200 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-slate-800">Option A — CallMeBot <span className="text-[11px] font-normal text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full ml-1">Free · No business account</span></p>
+                  <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1">Guide <ExternalLink className="w-3 h-3" /></a>
+                </div>
+                <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                  <li>Save <span className="font-mono bg-slate-100 px-1 rounded">+34 644 52 08 35</span> in your phone contacts as <strong>CallMeBot</strong></li>
+                  <li>Send this message on WhatsApp to that number: <span className="font-mono bg-slate-100 px-1 rounded">I allow callmebot to send me messages</span></li>
+                  <li>You will receive your API key by WhatsApp within a few minutes</li>
+                  <li>Add these to Vercel → Project → Environment Variables:</li>
+                </ol>
+                <div className="font-mono text-[11px] bg-slate-900 text-green-400 rounded-lg px-3 py-2 space-y-1">
+                  <p>CALLMEBOT_PHONE=+918240006007</p>
+                  <p>CALLMEBOT_APIKEY=your_api_key_here</p>
+                </div>
+              </div>
+
+              {/* Option B: Meta Cloud API */}
+              <div className="rounded-lg border border-slate-200 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-slate-800">Option B — Meta WhatsApp Business API <span className="text-[11px] font-normal text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full ml-1">Official · 1 000 free/month</span></p>
+                  <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center gap-1">Docs <ExternalLink className="w-3 h-3" /></a>
+                </div>
+                <ol className="text-xs text-slate-600 space-y-1 list-decimal list-inside">
+                  <li>Create a Meta App at <span className="font-mono bg-slate-100 px-1 rounded">developers.facebook.com</span> → Add WhatsApp product</li>
+                  <li>Get your Phone Number ID and generate a permanent access token</li>
+                  <li>Add these to Vercel → Project → Environment Variables:</li>
+                </ol>
+                <div className="font-mono text-[11px] bg-slate-900 text-green-400 rounded-lg px-3 py-2 space-y-1">
+                  <p>WHATSAPP_TOKEN=your_meta_access_token</p>
+                  <p>WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id</p>
+                  <p>WHATSAPP_TO_NUMBER=918240006007</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400">After adding env vars, redeploy on Vercel for the changes to take effect. The notification status above will update automatically.</p>
           </div>
         </Card>
 
