@@ -50,8 +50,10 @@ const IS_VERCEL = process.env.VERCEL === "1";
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const TMP_DATA = "/tmp/data";
 
-// In-memory flag — avoids redundant Blob list calls within the same container lifetime.
-const hydratedCompanies = new Set<string>();
+// Tracks in-flight and completed hydration per company.
+// Storing the Promise itself means concurrent calls join the same work instead of
+// fast-pathing with a "done" flag that's set before downloads actually finish.
+const hydrationPromises = new Map<string, Promise<void>>();
 
 if (IS_VERCEL && !TOKEN) {
   console.error(
@@ -75,68 +77,73 @@ export async function blobWrite(company: string, filename: string, data: unknown
 
 /**
  * Hydrate /tmp/data/ from Vercel Blob on cold-start containers.
- * Uses a module-level in-memory flag to skip on warm containers.
- * Only runs when VERCEL=1 and BLOB_READ_WRITE_TOKEN is set.
+ *
+ * The Promise is stored in the Map BEFORE any async work starts so that
+ * concurrent calls (e.g. layout + page rendering in the same cold boot) all
+ * await the same in-flight download — no caller ever reads /tmp/ before the
+ * files are actually written.
  */
-export async function blobHydrate(company: string): Promise<void> {
-  if (!IS_VERCEL || !TOKEN) return;
+export function blobHydrate(company: string): Promise<void> {
+  if (!IS_VERCEL || !TOKEN) return Promise.resolve();
 
-  // Fast-path: already hydrated this container instance
-  if (hydratedCompanies.has(company)) return;
+  const existing = hydrationPromises.get(company);
+  if (existing) return existing;
 
-  try {
-    const { blobs } = await list({
-      prefix: `crm-db/${company}/`,
-      token: TOKEN,
-      limit: 100,
-    });
-
-    // Mark hydrated regardless — prevents repeated list calls even when Blob is empty
-    hydratedCompanies.add(company);
-
-    if (!blobs.length) return; // nothing saved yet — committed defaults will be used
-
-    const dir = path.join(TMP_DATA, company);
-    fs.mkdirSync(dir, { recursive: true });
-
-    await Promise.all(
-      blobs.map(async (blob) => {
-        const filename = blob.pathname.split("/").pop();
-        if (!filename) return;
-        const dest = path.join(dir, filename);
-        if (fs.existsSync(dest)) return; // already present from a previous write this container
-        try {
-          const res = await fetch(blob.url, { cache: "no-store" });
-          if (!res.ok) return;
-          const original = await res.text();
-
-          // Fix broken /images/subdir/ paths that were seeded from committed defaults
-          if (FILES_NEEDING_IMAGE_SANITIZE.has(filename)) {
-            try {
-              const parsed = JSON.parse(original);
-              const fixed = fixBrokenImagePaths(parsed);
-              const fixedText = JSON.stringify(fixed, null, 2);
-              fs.writeFileSync(dest, fixedText, "utf-8");
-              // Write clean version back to Blob so future cold starts skip the sanitizer work
-              if (fixedText !== original) {
-                put(`crm-db/${company}/${filename}`, fixedText, {
-                  access: "public", contentType: "application/json",
-                  addRandomSuffix: false, allowOverwrite: true, token: TOKEN!,
-                }).catch(err => console.warn("[blob-db] sanitize write-back failed:", filename, err));
-              }
-              return;
-            } catch {
-              // JSON parse failed — fall through to write original
-            }
-          }
-
-          fs.writeFileSync(dest, original, "utf-8");
-        } catch (err) {
-          console.error("[blob-db] failed to fetch blob:", filename, err);
-        }
-      })
-    );
-  } catch (err) {
+  const promise = _doHydrate(company).catch((err) => {
     console.error("[blob-db] hydrate failed:", err);
-  }
+    hydrationPromises.delete(company); // allow retry on the next request
+  });
+  hydrationPromises.set(company, promise);
+  return promise;
+}
+
+async function _doHydrate(company: string): Promise<void> {
+  const { blobs } = await list({
+    prefix: `crm-db/${company}/`,
+    token: TOKEN!,
+    limit: 100,
+  });
+
+  if (!blobs.length) return; // nothing saved yet — committed defaults will be used
+
+  const dir = path.join(TMP_DATA, company);
+  fs.mkdirSync(dir, { recursive: true });
+
+  await Promise.all(
+    blobs.map(async (blob) => {
+      const filename = blob.pathname.split("/").pop();
+      if (!filename) return;
+      const dest = path.join(dir, filename);
+      if (fs.existsSync(dest)) return; // already present from a previous write this container
+      try {
+        const res = await fetch(blob.url, { cache: "no-store" });
+        if (!res.ok) return;
+        const original = await res.text();
+
+        // Fix broken /images/subdir/ paths that were seeded from committed defaults
+        if (FILES_NEEDING_IMAGE_SANITIZE.has(filename)) {
+          try {
+            const parsed = JSON.parse(original);
+            const fixed = fixBrokenImagePaths(parsed);
+            const fixedText = JSON.stringify(fixed, null, 2);
+            fs.writeFileSync(dest, fixedText, "utf-8");
+            // Write clean version back to Blob so future cold starts skip the sanitizer work
+            if (fixedText !== original) {
+              put(`crm-db/${company}/${filename}`, fixedText, {
+                access: "public", contentType: "application/json",
+                addRandomSuffix: false, allowOverwrite: true, token: TOKEN!,
+              }).catch(err => console.warn("[blob-db] sanitize write-back failed:", filename, err));
+            }
+            return;
+          } catch {
+            // JSON parse failed — fall through to write original
+          }
+        }
+
+        fs.writeFileSync(dest, original, "utf-8");
+      } catch (err) {
+        console.error("[blob-db] failed to fetch blob:", filename, err);
+      }
+    })
+  );
 }
