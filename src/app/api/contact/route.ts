@@ -1,7 +1,9 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import { settingsDb, contactsDb } from "@/lib/db";
 import { sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/sanitize";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { notifyWhatsApp } from "@/lib/whatsapp";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 
@@ -18,13 +20,13 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
 
-    const name = sanitizeText(body.name, 100);
-    const email = sanitizeEmail(body.email);
-    const phone = sanitizePhone(body.phone);
-    const city = sanitizeText(body.city, 50);
-    const program = sanitizeText(body.program, 200);
-    const company = sanitizeText(body.company, 100);
-    const message = sanitizeText(body.message, 1000);
+    const name        = sanitizeText(body.name, 100);
+    const email       = sanitizeEmail(body.email);
+    const phone       = sanitizePhone(body.phone);
+    const city        = sanitizeText(body.city, 50);
+    const program     = sanitizeText(body.program, 200);
+    const company     = sanitizeText(body.company, 100);
+    const message     = sanitizeText(body.message, 1000);
     const inquiryType = sanitizeText(body.inquiryType, 50) || "general";
 
     if (!name || !phone) {
@@ -41,20 +43,34 @@ export async function POST(req: NextRequest) {
     const rawNumber = settings?.inquiry?.whatsappNumber || settings?.whatsapp || "918240006007";
     const whatsappNumber = rawNumber.replace(/\D/g, "");
 
+    // Build wa.me URL so the visitor can also reach out directly
     let whatsappUrl: string | null = null;
     if (deliveryMethod === "whatsapp" || deliveryMethod === "both") {
       const lines = [
         `New Enquiry - ${settings?.companyName ?? "Cyber A1 Academy"}`,
         ``,
         `Name: ${name}`,
-        phone ? `Phone: ${phone}` : null,
-        email ? `Email: ${email}` : null,
-        program ? `Program: ${program}` : null,
-        company ? `Organisation: ${company}` : null,
-        city ? `City: ${city}` : null,
-        message ? `Message: ${message}` : null,
+        phone   ? `Phone: ${phone}`         : null,
+        email   ? `Email: ${email}`         : null,
+        program ? `Program: ${program}`     : null,
+        company ? `Organisation: ${company}`: null,
+        city    ? `City: ${city}`           : null,
+        message ? `Message: ${message}`     : null,
       ].filter((l): l is string => l !== null);
       whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
+    }
+
+    // Auto-notify the admin via WhatsApp API (fire-and-forget, does not block response)
+    const notify = notifyWhatsApp({
+      name, email, phone, city, program, company, message, inquiryType,
+      submittedAt: submission.submittedAt,
+      companyName: settings?.companyName,
+    }).catch((err) => console.error("[contact] WhatsApp notify error:", err));
+
+    try {
+      after(notify);
+    } catch {
+      // after() unavailable outside request context — notification still fires normally
     }
 
     return NextResponse.json({ success: true, data: { id: submission.id, whatsappUrl } });
