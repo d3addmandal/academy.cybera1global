@@ -4,6 +4,7 @@ import { settingsDb, contactsDb } from "@/lib/db";
 import { sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/sanitize";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { notifyWhatsApp } from "@/lib/whatsapp";
+import { appendToGoogleSheet } from "@/lib/google-sheets";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 
@@ -60,17 +61,22 @@ export async function POST(req: NextRequest) {
       whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
     }
 
-    // Auto-notify the admin via WhatsApp API (fire-and-forget, does not block response)
-    const notify = notifyWhatsApp({
+    // Fire-and-forget side effects: WhatsApp notification + Google Sheets append
+    const notifyPayload = {
       name, email, phone, city, program, company, message, inquiryType,
       submittedAt: submission.submittedAt,
       companyName: settings?.companyName,
-    }).catch((err) => console.error("[contact] WhatsApp notify error:", err));
+    };
+
+    const sideEffects = Promise.all([
+      notifyWhatsApp(notifyPayload).catch((err) => console.error("[contact] WhatsApp notify error:", err)),
+      appendToGoogleSheet(notifyPayload).catch((err) => console.error("[contact] Google Sheets error:", err)),
+    ]);
 
     try {
-      after(notify);
+      after(sideEffects);
     } catch {
-      // after() unavailable outside request context — notification still fires normally
+      // after() unavailable outside request context — side effects still fire normally
     }
 
     return NextResponse.json({ success: true, data: { id: submission.id, whatsappUrl } });
