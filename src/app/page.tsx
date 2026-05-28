@@ -10,6 +10,7 @@ import {
 } from "@/lib/content";
 import HeroSection from "@/sections/home/HeroSection";
 import TrustStrip from "@/sections/home/TrustStrip";
+import StatsStrip from "@/sections/home/StatsStrip";
 import FeaturedPrograms from "@/sections/home/FeaturedPrograms";
 import WhyAndRoadmap from "@/sections/home/WhyAndRoadmap";
 import CareerRoadmap from "@/sections/home/CareerRoadmap";
@@ -42,6 +43,7 @@ export default function HomePage() {
     <>
       <HeroSection content={home?.hero} />
       <TrustStrip items={home?.trustStrip} />
+      <StatsStrip stats={home?.stats} />
       <FeaturedPrograms
         programmes={programmes}
         config={home?.programmes}
