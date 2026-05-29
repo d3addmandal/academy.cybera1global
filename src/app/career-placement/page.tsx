@@ -78,9 +78,22 @@ const DEFAULTS: CareerPageContent = {
 export default function CareerPlacementPage() {
   const cms = getCareerPageContent() ?? DEFAULTS;
   const testimonials = getCRMTestimonials();
-  const partnerCompanies = testimonials.length > 0
-    ? testimonials.map((t) => ({ name: t.company, logo: t.companyLogoUrl }))
-    : [{ name: "Deloitte", logo: "" }, { name: "TCS", logo: "" }, { name: "Wipro", logo: "" }, { name: "Infosys", logo: "" }, { name: "Accenture", logo: "" }];
+  const seenNames = new Set<string>();
+  const partnerCompanies = (
+    testimonials.length > 0
+      ? testimonials.map((t) => ({ name: t.company ?? "", logo: t.companyLogoUrl ?? "" }))
+      : [
+          { name: "Deloitte",  logo: "" },
+          { name: "TCS",       logo: "" },
+          { name: "Wipro",     logo: "" },
+          { name: "Infosys",   logo: "" },
+          { name: "Accenture", logo: "" },
+        ]
+  ).filter(({ name }) => {
+    if (!name || seenNames.has(name)) return false;
+    seenNames.add(name);
+    return true;
+  });
 
   return (
     <div className="pt-16">
@@ -197,10 +210,19 @@ export default function CareerPlacementPage() {
               Our Students Work At <span className="text-red-600">Top Organizations</span>
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {partnerCompanies.map((company) => (
-              <div key={company.name} className="bg-white border border-gray-100 rounded-xl p-4 flex items-center justify-center aspect-square hover:border-red-200 hover:shadow-sm transition-all">
-                <span className="text-gray-600 font-bold text-xs text-center">{company.name}</span>
+              <div key={company.name} className="bg-white border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center aspect-square hover:border-red-200 hover:shadow-sm transition-all gap-2">
+                {company.logo ? (
+                  <img
+                    src={company.logo}
+                    alt={company.name}
+                    className="w-full h-full object-contain p-2"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <span className="text-gray-600 font-bold text-xs text-center leading-tight">{company.name}</span>
+                )}
               </div>
             ))}
           </div>
