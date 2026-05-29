@@ -14,7 +14,6 @@ const programOptions = [
   "General Enquiry",
 ];
 
-const cityOptions = ["Durgapur", "Delhi", "Kolkata", "Online", "Other"];
 
 type State = { name: string; email: string; phone: string; city: string; program: string; message: string };
 
@@ -125,14 +124,13 @@ export default function ContactFormClient({ phone = "+91 8240 006 007" }: { phon
         </div>
         <div>
           <label className="text-sm font-semibold text-gray-700 mb-1.5 block">Preferred City</label>
-          <select
+          <input
+            type="text"
             value={form.city}
             onChange={(e) => set("city", e.target.value)}
-            className="w-full border border-gray-200 text-gray-600 text-sm px-4 py-3 rounded-lg focus:outline-none focus:border-red-500 bg-white"
-          >
-            <option value="">Select City</option>
-            {cityOptions.map((c) => <option key={c}>{c}</option>)}
-          </select>
+            placeholder="Enter your city"
+            className="w-full border border-gray-200 text-gray-900 text-sm px-4 py-3 rounded-lg focus:outline-none focus:border-red-500 placeholder-gray-400"
+          />
         </div>
       </div>
       <div>

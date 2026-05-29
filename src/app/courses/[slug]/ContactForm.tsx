@@ -9,7 +9,6 @@ const trustPoints = [
   "Placement & Career Support",
 ];
 
-const cityOptions = ["Durgapur", "Delhi", "Kolkata", "Online", "Other"];
 
 export default function ContactForm({ courseName }: { courseName?: string }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "" });
@@ -88,14 +87,13 @@ export default function ContactForm({ courseName }: { courseName?: string }) {
             required
             className="w-full bg-[#080b10] border border-gray-700 text-white text-sm px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:border-red-600 transition-colors"
           />
-          <select
+          <input
+            type="text"
             value={form.city}
             onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
-            className="w-full bg-[#080b10] border border-gray-700 text-gray-400 text-sm px-4 py-3 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
-          >
-            <option value="">Select City</option>
-            {cityOptions.map((c) => <option key={c}>{c}</option>)}
-          </select>
+            placeholder="Enter your city"
+            className="w-full bg-[#080b10] border border-gray-700 text-white text-sm px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:border-red-600 transition-colors"
+          />
           <button
             type="submit"
             disabled={saving}
