@@ -5,6 +5,7 @@ import { sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/sanitize";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { notifyWhatsApp } from "@/lib/whatsapp";
 import { appendToGoogleSheet } from "@/lib/google-sheets";
+import { blobHydrate } from "@/lib/blob-db";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
         { status: 429, headers: { "Retry-After": String(rateResult.retryAfterSeconds) } }
       );
     }
+
+    // Ensure existing contacts are loaded from Blob before reading/writing.
+    // API routes don't go through layout.tsx so blobHydrate must be called here.
+    await blobHydrate(COMPANY);
 
     const body = await req.json().catch(() => ({}));
 
