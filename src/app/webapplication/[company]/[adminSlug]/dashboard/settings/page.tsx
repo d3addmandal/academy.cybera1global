@@ -306,32 +306,31 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Setup guide */}
+            {/* Step 1: Apps Script deploy */}
             <div className="rounded-lg border border-slate-200 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-slate-800">Setup — Google Apps Script <span className="text-[11px] font-normal text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full ml-1">No API keys needed</span></p>
-              </div>
+              <p className="text-sm font-bold text-slate-800">Step 1 — Deploy the Apps Script Web App</p>
               <ol className="text-xs text-slate-600 space-y-1.5 list-decimal list-inside">
                 <li>Open your Google Sheet → <strong>Extensions → Apps Script</strong></li>
-                <li>Delete any existing code and paste the script below, then <strong>Save</strong></li>
-                <li>Click <strong>Deploy → New deployment</strong> → type: <strong>Web App</strong></li>
-                <li>Set <em>Execute as</em>: <strong>Me</strong> — <em>Who has access</em>: <strong>Anyone</strong> → Deploy → copy the <strong>/exec</strong> URL</li>
-                <li>Add to Vercel → Project → Environment Variables:</li>
+                <li>Delete any existing code, paste the script below → <strong>Save</strong></li>
+                <li><strong>Deploy → New deployment</strong> → type: <strong>Web App</strong></li>
+                <li><em>Execute as</em>: <strong>Me</strong> · <em>Who has access</em>: <strong>Anyone</strong> → Deploy → copy the <strong>/exec</strong> URL</li>
+                <li>Add to Vercel → Environment Variables → Redeploy:</li>
               </ol>
               <div className="font-mono text-[11px] bg-slate-900 text-green-400 rounded-lg px-3 py-2">
-                <p>GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec</p>
+                <p>GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_ID/exec</p>
               </div>
 
-              {/* Apps Script code block */}
               <div>
-                <p className="text-xs font-bold text-slate-600 mb-1.5">Apps Script code to paste:</p>
+                <p className="text-xs font-bold text-slate-600 mb-1.5">Apps Script code (includes Google Sheets + Telegram):</p>
                 <pre className="font-mono text-[10.5px] bg-slate-900 text-green-300 rounded-lg px-3 py-3 overflow-x-auto leading-relaxed whitespace-pre">{`function doPost(e) {
   try {
+    var data = JSON.parse(e.postData.contents);
+
+    // ── 1. Append row to Google Sheet ──────────────────
     var sheet = SpreadsheetApp.getActiveSpreadsheet()
                   .getSheetByName("Sheet1") ||
                 SpreadsheetApp.getActiveSpreadsheet()
                   .getActiveSheet();
-    var data = JSON.parse(e.postData.contents);
     sheet.appendRow([
       data.name        || "",
       data.phone       || "",
@@ -343,6 +342,10 @@ export default function SettingsPage() {
       data.message     || "",
       data.submittedAt || new Date().toLocaleString("en-IN"),
     ]);
+
+    // ── 2. Send Telegram notification ──────────────────
+    sendTelegram(data);
+
     return ContentService
       .createTextOutput(JSON.stringify({ ok: true }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -351,16 +354,66 @@ export default function SettingsPage() {
       .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function sendTelegram(data) {
+  var props  = PropertiesService.getScriptProperties();
+  var token  = props.getProperty("TELEGRAM_BOT_TOKEN");
+  var chatId = props.getProperty("TELEGRAM_CHAT_ID");
+  if (!token || !chatId) return;
+
+  var lines = [
+    "\\u{1F514} *New Enquiry*",
+    "",
+    "\\u{1F464} *Name:* "  + (data.name        || "\\u2014"),
+    "\\u{1F4DE} *Phone:* " + (data.phone       || "\\u2014"),
+  ];
+  if (data.email)       lines.push("\\u{1F4E7} *Email:* "    + data.email);
+  if (data.program)     lines.push("\\u{1F393} *Program:* "  + data.program);
+  if (data.company)     lines.push("\\u{1F3E2} *Org:* "      + data.company);
+  if (data.city)        lines.push("\\u{1F3D9} *City:* "     + data.city);
+  if (data.inquiryType) lines.push("\\u{1F4CB} *Type:* "     + data.inquiryType);
+  if (data.message)     lines.push("\\u{1F4DD} *Message:* "  + data.message);
+  lines.push("", "\\u{1F550} " + (data.submittedAt || new Date().toLocaleString("en-IN")));
+
+  UrlFetchApp.fetch(
+    "https://api.telegram.org/bot" + token + "/sendMessage",
+    {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify({
+        chat_id:    chatId,
+        text:       lines.join("\\n"),
+        parse_mode: "Markdown",
+      }),
+    }
+  );
 }`}</pre>
               </div>
 
               <div className="rounded-md bg-blue-50 border border-blue-100 px-3 py-2">
-                <p className="text-xs font-semibold text-blue-700 mb-1">Add these column headers in Row 1 of your sheet:</p>
+                <p className="text-xs font-semibold text-blue-700 mb-1">Row 1 headers in your sheet:</p>
                 <p className="font-mono text-[11px] text-blue-800">Name | Phone | Email | City | Program/Course | Organisation | Enquiry Type | Message | Submitted At</p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400">After adding the env var, redeploy on Vercel. The status above will update automatically.</p>
+            {/* Step 2: Telegram bot */}
+            <div className="rounded-lg border border-slate-200 p-4 space-y-3">
+              <p className="text-sm font-bold text-slate-800">Step 2 — Connect your Telegram Bot</p>
+              <ol className="text-xs text-slate-600 space-y-1.5 list-decimal list-inside">
+                <li>Open Telegram → search <strong>@BotFather</strong> → send <span className="font-mono bg-slate-100 px-1 rounded">/newbot</span> → follow prompts → copy the <strong>bot token</strong></li>
+                <li>Start a chat with your new bot (search its username → Send Message)</li>
+                <li>Visit this URL to get your Chat ID: <span className="font-mono bg-slate-100 px-1 rounded">https://api.telegram.org/bot&#123;TOKEN&#125;/getUpdates</span> → look for <span className="font-mono bg-slate-100 px-1 rounded">"id"</span> inside <span className="font-mono bg-slate-100 px-1 rounded">chat</span></li>
+                <li>In Apps Script → <strong>Project Settings → Script Properties</strong> → Add property:</li>
+              </ol>
+              <div className="font-mono text-[11px] bg-slate-900 text-green-400 rounded-lg px-3 py-2 space-y-1">
+                <p>TELEGRAM_BOT_TOKEN = 123456789:ABCdef...</p>
+                <p>TELEGRAM_CHAT_ID   = 987654321</p>
+              </div>
+              <p className="text-xs text-slate-500">For a group or channel: add the bot as admin, then use the group&apos;s chat ID (starts with <span className="font-mono bg-slate-100 px-1 rounded">-100...</span>).</p>
+            </div>
+
+            <p className="text-xs text-slate-400">Telegram is optional — if Script Properties are not set, only the Sheet append runs. No redeploy needed after adding Script Properties.</p>
           </div>
         </Card>
 
