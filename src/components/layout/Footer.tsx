@@ -5,7 +5,7 @@ import {
   Clock, Youtube, Facebook, MessageCircle
 } from "lucide-react";
 import NewsletterForm from "@/components/shared/NewsletterForm";
-import { getSiteSettings, getSiteTheme, getSiteHome, getCRMMenus } from "@/lib/content";
+import { getSiteSettings, getSiteTheme, getSiteHome, getCRMMenus, getCRMPublishedProgrammes } from "@/lib/content";
 import type { NavigationMenu } from "@/types/cms";
 
 function FooterMenuColumn({ menu }: { menu: NavigationMenu }) {
@@ -32,6 +32,7 @@ export default function Footer() {
   const theme = getSiteTheme();
   const home = getSiteHome();
   const allMenus = getCRMMenus();
+  const publishedProgrammes = getCRMPublishedProgrammes();
 
   const companyName = settings?.companyName ?? "Cyber A1 Academy";
   const footer = home?.footer;
@@ -61,7 +62,21 @@ export default function Footer() {
   const menuSections = footer?.menuSections ?? [];
   const activeMenus: NavigationMenu[] = menuSections
     .filter(s => s.enabled && s.menuId)
-    .map(s => allMenus.find(m => m.id === s.menuId))
+    .map(s => {
+      const menu = allMenus.find(m => m.id === s.menuId);
+      if (!menu) return null;
+      if (menu.header.toLowerCase().includes("program")) {
+        return {
+          ...menu,
+          items: publishedProgrammes.map(p => ({
+            id: p.id,
+            label: p.title,
+            href: `/courses/${p.slug}`,
+          })),
+        };
+      }
+      return menu;
+    })
     .filter(Boolean) as NavigationMenu[];
 
   const lastSection = footer?.lastSection ?? "newsletter";

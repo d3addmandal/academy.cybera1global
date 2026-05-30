@@ -4,8 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { PageHeader, Field, Input, Textarea, Select, Toggle, SaveBar, Card } from "@/components/admin/FormField";
 import { useToast } from "@/components/admin/Toast";
 import ImageUpload from "@/components/admin/ImageUpload";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { ConfirmModal } from "@/components/admin/Modal";
 import type { BlogPost } from "@/types/cms";
 
 const defaults: Partial<BlogPost> = {
@@ -30,6 +31,8 @@ export default function EditBlogPage() {
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(isNew);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!isNew) {
@@ -59,6 +62,26 @@ export default function EditBlogPage() {
     finally { setIsSaving(false); }
   }
 
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/${company}/blog/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        toast("Post deleted.", "success");
+        router.push(`${base}/blog`);
+      } else {
+        toast(data.error || "Delete failed.", "error");
+        setShowDeleteModal(false);
+      }
+    } catch {
+      toast("Network error.", "error");
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   if (isLoading) return <div className="flex items-center justify-center h-64 text-slate-400">Loading…</div>;
 
   return (
@@ -66,7 +89,23 @@ export default function EditBlogPage() {
       <div className="flex items-center gap-3 mb-6">
         <Link href={`${base}/blog`} className="text-slate-400 hover:text-slate-700"><ArrowLeft className="w-5 h-5" /></Link>
         <PageHeader title={isNew ? "New Blog Post" : "Edit Post"} subtitle={form.slug} />
+        {!isNew && (
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="ml-auto flex items-center gap-1.5 text-sm font-semibold text-red-600 border border-red-200 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            <Trash2 className="w-4 h-4" /> Delete Post
+          </button>
+        )}
       </div>
+      <ConfirmModal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Post"
+        message={`Are you sure you want to delete "${form.title}"? This cannot be undone.`}
+        isLoading={isDeleting}
+      />
       <div className="space-y-5">
         <Card title="Post Details">
           <div className="grid gap-4">
