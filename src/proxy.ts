@@ -1,14 +1,113 @@
+// proxy.ts  (replaces middleware.ts — delete middleware.ts after applying this)
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import fs from "fs";
 import path from "path";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 1 — Scanner / bot blocking  (formerly middleware.ts)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SCANNER_UA: RegExp[] = [
+  /netsparker/i,
+  /acunetix/i,
+  /appscan/i,
+  /\bZAP\b/,
+  /nikto/i,
+  /sqlmap/i,
+  /nuclei/i,
+  /masscan/i,
+  /openvas/i,
+  /w3af/i,
+  /arachni/i,
+  /wapiti/i,
+  /skipfish/i,
+  /dirbuster/i,
+  /gobuster/i,
+  /ffuf/i,
+  /wfuzz/i,
+  /hydra/i,
+  /medusa/i,
+  /python-requests\/[0-9]/i,
+  /go-http-client/i,
+  /curl\/[0-9]/i,
+  /java\/[0-9]/i,
+  /libwww-perl/i,
+  /scrapy/i,
+];
+
+const PROBE_PATHS: RegExp[] = [
+  /\/\.(env|git|svn|hg|bzr|DS_Store|htaccess|htpasswd|npmrc|dockerignore)/i,
+  /\/(wp-admin|wp-login|wp-config|xmlrpc|phpmyadmin|adminer|phpinfo)/i,
+  /\/(cgi-bin|server-status|server-info|admin\.php|setup\.php)/i,
+  /\.(bak|backup|old|orig|swp|sql|dump|tar\.gz|zip|7z|rar)$/i,
+  /\/(debug|console|trace|diagnostic)$/i,
+  /\.(log|conf|config|cfg|ini|yaml|yml|toml|json\.bak)$/i,
+  /\/actuator(\/|$)/,
+  /\/(solr|jenkins|jira|confluence)\//i,
+  /\.\.[\/\\]/,
+  /%2e%2e[%2f%5c]/i,
+  /\.\.(\/|%2f)/i,
+];
+
+const MALICIOUS_URL: RegExp[] = [
+  /<script[\s>]/i,
+  /javascript:/i,
+  /vbscript:/i,
+  /on(error|load|click|mouse\w+)\s*=/i,
+  /\b(union\s+select|select\s+\*\s+from|drop\s+table|insert\s+into|delete\s+from)\b/i,
+  /\$\{.*\}|\{\{.*\}\}|#\{.*\}/,
+  /\$\{jndi:/i,
+  /169\.254\.169\.254/,
+  /fd00:|::1|0\.0\.0\.0/,
+  /;(wget|curl|nc|bash|sh|python|perl|ruby)\s/i,
+  /%00/,
+];
+
+function hasScannerHeaders(req: NextRequest): boolean {
+  if (req.headers.get("x-scanner") || req.headers.get("x-scan-memo")) return true;
+  if (req.headers.get("acunetix-header")) return true;
+  return false;
+}
+
+const DENY = (status = 403) =>
+  new NextResponse(null, { status, headers: { "Cache-Control": "no-store" } });
+
+function runBotBlocking(req: NextRequest): NextResponse | null {
+  const { pathname, search } = req.nextUrl;
+  const ua = req.headers.get("user-agent") ?? "";
+  const fullUrl = pathname + search;
+
+  if (SCANNER_UA.some((p) => p.test(ua))) return DENY();
+  if (hasScannerHeaders(req)) return DENY();
+  if (PROBE_PATHS.some((p) => p.test(pathname))) return DENY();
+
+  let decoded = fullUrl;
+  try { decoded = decodeURIComponent(fullUrl); } catch { /* leave as-is */ }
+  if (MALICIOUS_URL.some((p) => p.test(decoded))) return DENY();
+
+  if (
+    pathname.startsWith("/api/") &&
+    !ua.trim() &&
+    pathname !== "/api/contact/token"
+  ) {
+    return DENY();
+  }
+
+  if (/^\/\./.test(pathname)) return DENY();
+
+  return null; // no block — continue
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 2 — Auth / session enforcement  (formerly proxy.ts)
+// ─────────────────────────────────────────────────────────────────────────────
 
 const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "dev-only-DO-NOT-USE-IN-PROD"
 );
 const COOKIE_NAME = "crm_admin_token";
 
-// Allowed HTTP methods
 const PUBLIC_ALLOWED = new Set(["GET", "POST", "HEAD"]);
 const ADMIN_ALLOWED  = new Set(["GET", "POST", "PUT", "DELETE", "HEAD"]);
 
@@ -31,12 +130,18 @@ function applySecurityHeaders(res: NextResponse): NextResponse {
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-XSS-Protection", "1; mode=block");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()");
+  res.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  );
   res.headers.set("Content-Security-Policy", CSP);
   res.headers.set("Cross-Origin-Opener-Policy", "same-origin");
   res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
   if (process.env.NODE_ENV === "production") {
-    res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+    res.headers.set(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains; preload"
+    );
   }
   return res;
 }
@@ -59,13 +164,14 @@ async function verifyToken(token: string): Promise<TokenPayload | null> {
 }
 
 const PROXY_DATA_DIR = path.join(process.cwd(), "data");
-const SESSION_INACTIVITY_MS = 30 * 60 * 1000; // must match db.ts
+const SESSION_INACTIVITY_MS = 30 * 60 * 1000;
 
-function isSessionActive(companySlug: string, userId: string, sessionId: string): boolean {
-  // On Vercel, /tmp/ is per-container and the committed sessions.json is always empty [].
-  // Trust the JWT signature + expiry alone; no concurrent-login enforcement on serverless.
+function isSessionActive(
+  companySlug: string,
+  userId: string,
+  sessionId: string
+): boolean {
   if (process.env.VERCEL === "1") return true;
-
   try {
     const filePath = path.join(PROXY_DATA_DIR, companySlug, "sessions.json");
     if (!fs.existsSync(filePath)) return false;
@@ -75,7 +181,9 @@ function isSessionActive(companySlug: string, userId: string, sessionId: string)
       lastActivityAt?: string;
       createdAt: string;
     }>;
-    const s = sessions.find((r) => r.userId === userId && r.sessionId === sessionId);
+    const s = sessions.find(
+      (r) => r.userId === userId && r.sessionId === sessionId
+    );
     if (!s) return false;
     const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
     return Date.now() - lastActivity <= SESSION_INACTIVITY_MS;
@@ -86,17 +194,25 @@ function isSessionActive(companySlug: string, userId: string, sessionId: string)
 
 function clearCookie(res: NextResponse) {
   res.cookies.set({
-    name: COOKIE_NAME, value: "", maxAge: 0, path: "/",
-    httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production",
+    name: COOKIE_NAME,
+    value: "",
+    maxAge: 0,
+    path: "/",
+    httpOnly: true,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
   });
   return res;
 }
 
 function redirectToLogin(req: NextRequest, pathname: string): NextResponse {
   const parts = pathname.split("/");
-  const company = parts[2] ?? "cybera1";
+  const company  = parts[2] ?? "cybera1";
   const adminSlug = parts[3] ?? `admin-edu-${company}`;
-  const loginUrl = new URL(`/webapplication/${company}/${adminSlug}/login`, req.url);
+  const loginUrl = new URL(
+    `/webapplication/${company}/${adminSlug}/login`,
+    req.url
+  );
   loginUrl.searchParams.set("from", pathname);
   return clearCookie(NextResponse.redirect(loginUrl));
 }
@@ -107,7 +223,15 @@ function withAdminHeader(req: NextRequest): NextResponse {
   return NextResponse.next({ request: { headers: reqHeaders } });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 3 — Unified export  (Next.js calls `proxy` instead of `middleware`)
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function proxy(req: NextRequest) {
+  // 1. Run scanner / bot blocking FIRST — cheapest, no async needed
+  const blocked = runBotBlocking(req);
+  if (blocked) return applySecurityHeaders(blocked);
+
   const { pathname } = req.nextUrl;
   const method = req.method;
 
@@ -118,7 +242,7 @@ export async function proxy(req: NextRequest) {
     !pathname.startsWith("/api/admin/init");
   const isDashboard = pathname.includes("/dashboard");
 
-  // ── HTTP Method restriction ──────────────────────────────────────────────────
+  // 2. HTTP method restriction
   const isAdminRoute = isAdminPage || isAdminApi;
   const allowed = isAdminRoute ? ADMIN_ALLOWED : PUBLIC_ALLOWED;
   if (!allowed.has(method)) {
@@ -130,60 +254,73 @@ export async function proxy(req: NextRequest) {
     );
   }
 
-  // ── Tag admin-domain pages so root layout hides Header/Footer ────────────────
+  // 3. Tag admin-domain pages so root layout hides Header/Footer
   if (isAdminPage && !isDashboard && !isAdminApi) {
     return applySecurityHeaders(withAdminHeader(req));
   }
 
-  // Pass-through for non-admin routes (security headers only)
+  // 4. Pass-through for non-admin, non-dashboard routes
   if (!isDashboard && !isAdminApi) {
     return applySecurityHeaders(NextResponse.next());
   }
 
-  // ── Auth enforcement for dashboard pages and API routes ──────────────────────
+  // 5. Auth enforcement for dashboard pages and API routes
   const token = req.cookies.get(COOKIE_NAME)?.value;
   const auth  = token ? await verifyToken(token) : null;
 
   if (!auth) {
     if (isAdminApi) {
       return applySecurityHeaders(
-        NextResponse.json({ success: false, error: "Unauthorised. Please sign in." }, { status: 401 })
+        NextResponse.json(
+          { success: false, error: "Unauthorised. Please sign in." },
+          { status: 401 }
+        )
       );
     }
     return applySecurityHeaders(redirectToLogin(req, pathname));
   }
 
-  // Old tokens (pre-session-tracking) have no sessionId — force re-login
   if (!auth.sessionId) {
     if (isAdminApi) {
       return applySecurityHeaders(
-        NextResponse.json({ success: false, error: "Session expired. Please sign in again." }, { status: 401 })
+        NextResponse.json(
+          { success: false, error: "Session expired. Please sign in again." },
+          { status: 401 }
+        )
       );
     }
     return applySecurityHeaders(redirectToLogin(req, pathname));
   }
 
-  // Session check — enforces no-concurrent-login
   if (!isSessionActive(auth.companySlug, auth.userId, auth.sessionId)) {
     if (isAdminApi) {
       return applySecurityHeaders(
-        NextResponse.json({ success: false, error: "Session superseded. Sign in again." }, { status: 401 })
+        NextResponse.json(
+          { success: false, error: "Session superseded. Sign in again." },
+          { status: 401 }
+        )
       );
     }
     return applySecurityHeaders(redirectToLogin(req, pathname));
   }
 
-  // Company isolation for API routes
+  // 6. Company isolation for API routes
   if (isAdminApi) {
     const apiCompany = pathname.split("/")[3];
-    if (apiCompany && apiCompany !== auth.companySlug && auth.role !== "super_admin") {
+    if (
+      apiCompany &&
+      apiCompany !== auth.companySlug &&
+      auth.role !== "super_admin"
+    ) {
       return applySecurityHeaders(
-        NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 })
+        NextResponse.json(
+          { success: false, error: "Forbidden" },
+          { status: 403 }
+        )
       );
     }
   }
 
-  // Inject x-is-admin header so root layout hides Header/Footer
   return applySecurityHeaders(withAdminHeader(req));
 }
 
