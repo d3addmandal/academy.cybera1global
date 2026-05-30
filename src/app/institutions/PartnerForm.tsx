@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import { CheckCircle2, MessageCircle } from "lucide-react";
+import { useFormToken } from "@/hooks/useFormToken";
 
 const serviceOptions = [
   "Workshops & Seminars",
@@ -21,6 +22,7 @@ export default function PartnerForm() {
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const { token, renderedAt } = useFormToken();
 
   function set(key: keyof State, value: string) {
     setForm((p) => ({ ...p, [key]: value }));
@@ -34,7 +36,7 @@ export default function PartnerForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, inquiryType: "institutional" }),
+        body: JSON.stringify({ ...form, inquiryType: "institutional", _token: token, _t: renderedAt, _hp: "" }),
       });
       const data = await res.json();
       if (data.success) {
@@ -74,6 +76,8 @@ export default function PartnerForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* Honeypot — invisible to humans, crawlers/bots will fill it */}
+      <input type="text" name="_hp" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: "none" }} />
       {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">{error}</p>}
       <div className="grid sm:grid-cols-2 gap-4">
         <input type="text" placeholder="Contact Person Name *" value={form.name} onChange={(e) => set("name", e.target.value)} required className="w-full bg-[#080b10] border border-gray-700 text-white text-sm px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:border-red-600" />
@@ -88,7 +92,7 @@ export default function PartnerForm() {
         {serviceOptions.map((s) => <option key={s}>{s}</option>)}
       </select>
       <textarea rows={4} placeholder="Tell us about your institution and collaboration requirements..." value={form.message} onChange={(e) => set("message", e.target.value)} className="w-full bg-[#080b10] border border-gray-700 text-white text-sm px-4 py-3 rounded-lg placeholder-gray-500 focus:outline-none focus:border-red-600 resize-none" />
-      <button type="submit" disabled={saving} className="w-full bg-red-600 text-white font-bold py-3.5 rounded-lg hover:bg-red-500 transition-colors disabled:opacity-60">
+      <button type="submit" disabled={saving || !token} className="w-full bg-red-600 text-white font-bold py-3.5 rounded-lg hover:bg-red-500 transition-colors disabled:opacity-60">
         {saving ? "Sending..." : "Send Partnership Request"}
       </button>
     </form>

@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
+import { useFormToken } from "@/hooks/useFormToken";
 
 const programOptions = [
   "CCEH (3 Months)",
@@ -23,6 +24,7 @@ export default function ContactFormClient({ phone = "+91 8240 006 007" }: { phon
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const { token, renderedAt } = useFormToken();
 
   function set(key: keyof State, value: string) {
     setForm((p) => ({ ...p, [key]: value }));
@@ -36,7 +38,7 @@ export default function ContactFormClient({ phone = "+91 8240 006 007" }: { phon
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, inquiryType: "counseling" }),
+        body: JSON.stringify({ ...form, inquiryType: "counseling", _token: token, _t: renderedAt, _hp: "" }),
       });
       const data = await res.json();
       if (data.success) {
@@ -84,6 +86,8 @@ export default function ContactFormClient({ phone = "+91 8240 006 007" }: { phon
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* Honeypot — invisible to humans, crawlers/bots will fill it */}
+      <input type="text" name="_hp" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: "none" }} />
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>
       )}
@@ -156,7 +160,7 @@ export default function ContactFormClient({ phone = "+91 8240 006 007" }: { phon
       </div>
       <button
         type="submit"
-        disabled={saving}
+        disabled={saving || !token}
         className="w-full bg-red-600 text-white font-bold py-3.5 rounded-xl hover:bg-red-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
       >
         {saving ? "Sending..." : <><span>Send Message</span> <ArrowRight className="w-4 h-4" /></>}

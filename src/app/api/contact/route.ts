@@ -6,17 +6,23 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { notifyWhatsApp } from "@/lib/whatsapp";
 import { appendToGoogleSheet } from "@/lib/google-sheets";
 import { blobHydrate } from "@/lib/blob-db";
+import { consumeFormToken } from "@/lib/form-tokens";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
+
+// Generic rejection — same message for all bot/security checks to avoid leaking info
+const REJECTED = NextResponse.json({ success: false, error: "Submission rejected. Please refresh the page and try again." }, { status: 403 });
 
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-    const rateResult = checkRateLimit(`contact:${ip}`, 5, 60_000);
+
+    // Rate limit: 3 submissions per 5 minutes per IP (no Retry-After header to avoid leaking timing)
+    const rateResult = checkRateLimit(`contact:${ip}`, 3, 5 * 60_000);
     if (!rateResult.allowed) {
       return NextResponse.json(
-        { success: false, error: "Too many requests. Please wait before submitting again." },
-        { status: 429, headers: { "Retry-After": String(rateResult.retryAfterSeconds) } }
+        { success: false, error: "Too many requests. Please wait a few minutes before submitting again." },
+        { status: 429 }
       );
     }
 
@@ -26,6 +32,20 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
 
+    // ── Bot / abuse guards ────────────────────────────────────────────────────
+
+    // 1. Honeypot: hidden field bots fill, legitimate browsers leave empty
+    if (body._hp) return REJECTED;
+
+    // 2. One-time HMAC token — prevents replay attacks and scripted submissions
+    const tokenResult = consumeFormToken(sanitizeText(body._token, 80) ?? "");
+    if (!tokenResult.valid) return REJECTED;
+
+    // 3. Timing: reject submissions faster than 3 seconds (instant-bot speed)
+    const formTs = typeof body._t === "number" ? body._t : parseInt(body._t, 10);
+    if (!formTs || Date.now() - formTs < 3_000) return REJECTED;
+
+    // ── Sanitise fields ───────────────────────────────────────────────────────
     const name        = sanitizeText(body.name, 100);
     const email       = sanitizeEmail(body.email);
     const phone       = sanitizePhone(body.phone);
@@ -41,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     const submission = contactsDb.create(COMPANY, {
       name, email, phone, city, program, company, message, inquiryType,
-      ipAddress: req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? undefined,
+      ipAddress: ip,
     });
 
     const settings = settingsDb.get(COMPANY);

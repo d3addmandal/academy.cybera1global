@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import { CheckCircle2, MessageCircle } from "lucide-react";
+import { useFormToken } from "@/hooks/useFormToken";
 
 const trustPoints = [
   "100% Practical Learning",
@@ -16,6 +17,7 @@ export default function ContactForm({ courseName }: { courseName?: string }) {
   const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const { token, renderedAt } = useFormToken();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,7 +27,7 @@ export default function ContactForm({ courseName }: { courseName?: string }) {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, program: courseName ?? "", inquiryType: "course" }),
+        body: JSON.stringify({ ...form, program: courseName ?? "", inquiryType: "course", _token: token, _t: renderedAt, _hp: "" }),
       });
       const data = await res.json();
       if (data.success) {
@@ -63,6 +65,8 @@ export default function ContactForm({ courseName }: { courseName?: string }) {
         </div>
       ) : (
         <form className="space-y-3" onSubmit={handleSubmit}>
+          {/* Honeypot — invisible to humans, crawlers/bots will fill it */}
+          <input type="text" name="_hp" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: "none" }} />
           {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">{error}</p>}
           <input
             type="text"
@@ -96,7 +100,7 @@ export default function ContactForm({ courseName }: { courseName?: string }) {
           />
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || !token}
             className="w-full bg-red-600 text-white font-bold py-3.5 rounded-lg hover:bg-red-500 hover:shadow-[0_6px_20px_rgba(224,0,0,0.4)] transition-all disabled:opacity-60"
           >
             {saving ? "Sending..." : "Request Callback"}
