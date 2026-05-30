@@ -14,7 +14,7 @@ export default function FinalCTA({ cta, phone }: Props) {
   const subtext  = cta?.subtext       ?? "Practical Learning | Career Guidance | Industry Exposure | Placement Support";
   const primary  = cta?.primaryButton ?? { text: "Book Free Counseling", href: "/contact" };
   const bgImage  = cta?.bgImage ?? "";
-  const callNumber = phone ?? "+91 8388812126";
+  const callNumber = phone ?? "";
   const telHref = `tel:${callNumber.replace(/\s/g, "")}`;
 
   return (
