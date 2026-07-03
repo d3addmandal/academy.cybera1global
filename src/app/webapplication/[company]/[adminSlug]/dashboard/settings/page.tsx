@@ -166,7 +166,7 @@ export default function SettingsPage() {
               <Input value={settings.seo.keywords.join(", ")} onChange={(e) => updateNested("seo.keywords", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} />
             </Field>
             <Field label="OG Image URL">
-              <Input value={settings.seo.ogImage} onChange={(e) => updateNested("seo.ogImage", e.target.value)} placeholder="https://<store>.public.blob.vercel-storage.com/uploads/..." />
+              <Input value={settings.seo.ogImage} onChange={(e) => updateNested("seo.ogImage", e.target.value)} placeholder="/images/og-image.jpg" />
             </Field>
           </div>
         </Card>
