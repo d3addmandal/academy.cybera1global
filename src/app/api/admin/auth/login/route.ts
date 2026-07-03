@@ -1,6 +1,7 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { usersDb, sessionsDb, companyExists } from "@/lib/db";
+import { blobHydrate } from "@/lib/blob-db";
 import { signToken, setAuthCookie, adminDashboardUrl } from "@/lib/auth";
 import { sanitizeEmail, sanitizeText } from "@/lib/sanitize";
 import { checkRateLimit, recordFailedLogin, resetFailedLogin } from "@/lib/rate-limit";
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    await blobHydrate(companySlug);
     if (!companyExists(companySlug)) {
       return NextResponse.json(
         { success: false, error: "Invalid email or password." },

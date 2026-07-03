@@ -44,13 +44,10 @@ export async function getAuthFromCookies(): Promise<AuthPayload | null> {
   if (!token) return null;
   const payload = await verifyToken(token);
   if (!payload) return null;
-  // On Vercel, /tmp/ is per-container — skip session file check and trust JWT.
-  if (process.env.VERCEL !== "1") {
-    if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
-    try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
-  }
-  // Ensure Blob data is in /tmp/ for this container (no-op on warm containers or local dev)
+  // Refresh the local cache first so the session check below reads current data.
   await blobHydrate(payload.companySlug);
+  if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
+  try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
   return payload;
 }
 
@@ -59,13 +56,10 @@ export async function getAuthFromRequest(req: NextRequest): Promise<AuthPayload 
   if (!token) return null;
   const payload = await verifyToken(token);
   if (!payload) return null;
-  // On Vercel, /tmp/ is per-container — skip session file check and trust JWT.
-  if (process.env.VERCEL !== "1") {
-    if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
-    try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
-  }
-  // Ensure Blob data is in /tmp/ for this container (no-op on warm containers or local dev)
+  // Refresh the local cache first so the session check below reads current data.
   await blobHydrate(payload.companySlug);
+  if (!sessionsDb.isValid(payload.companySlug, payload.userId, payload.sessionId)) return null;
+  try { sessionsDb.touch(payload.companySlug, payload.userId); } catch { /* non-fatal */ }
   return payload;
 }
 

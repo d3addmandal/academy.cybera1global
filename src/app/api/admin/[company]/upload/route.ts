@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
 import { put, del } from "@vercel/blob";
-import fs from "fs";
-import path from "path";
+import { HAS_BLOB, BLOB_TOKEN } from "@/lib/env";
 
 type Params = { params: Promise<{ company: string }> };
 
@@ -115,38 +114,24 @@ export async function POST(req: NextRequest, { params }: Params) {
     const prefix = folder ? "" : `${uploadType}-`;
     const filename = `${prefix}${Date.now()}-${randomId}.${ext}`;
 
-    // On Vercel: public/ is read-only — use Vercel Blob CDN storage
-    if (process.env.VERCEL === "1") {
-      const token = process.env.BLOB_READ_WRITE_TOKEN;
-      if (!token) {
-        console.error("[upload] BLOB_READ_WRITE_TOKEN is not set");
-        return NextResponse.json(
-          { success: false, error: "Storage not configured. Please connect a Vercel Blob store to this project in the Vercel dashboard under Storage." },
-          { status: 500 }
-        );
-      }
-
-      const blobPath = folder
-        ? `uploads/${company}/${folder}/${filename}`
-        : `uploads/${company}/${filename}`;
-
-      const blob = await put(blobPath, new Blob([bytes], { type: declaredMime }), {
-        access: "public",
-        token,
-      });
-
-      return NextResponse.json({ success: true, url: blob.url, filename });
+    if (!HAS_BLOB) {
+      console.error("[upload] BLOB_READ_WRITE_TOKEN is not set");
+      return NextResponse.json(
+        { success: false, error: "Storage not configured. Add BLOB_READ_WRITE_TOKEN (see .env.example / Vercel dashboard under Storage)." },
+        { status: 500 }
+      );
     }
 
-    // Local dev: write to public/uploads/
-    const uploadDir = path.join(process.cwd(), "public", "uploads", company, folder);
-    fs.mkdirSync(uploadDir, { recursive: true });
-    fs.writeFileSync(path.join(uploadDir, filename), bytes);
-    const url = folder
-      ? `/uploads/${company}/${folder}/${filename}`
-      : `/uploads/${company}/${filename}`;
+    const blobPath = folder
+      ? `uploads/${company}/${folder}/${filename}`
+      : `uploads/${company}/${filename}`;
 
-    return NextResponse.json({ success: true, url, filename });
+    const blob = await put(blobPath, new Blob([bytes], { type: declaredMime }), {
+      access: "public",
+      token: BLOB_TOKEN,
+    });
+
+    return NextResponse.json({ success: true, url: blob.url, filename });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[upload]", message);
@@ -175,12 +160,11 @@ export async function DELETE(req: NextRequest, { params }: Params) {
       return NextResponse.json({ success: false, error: "Invalid or unauthorized blob URL." }, { status: 403 });
     }
 
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) {
-      return NextResponse.json({ success: true }); // local dev — nothing to delete
+    if (!HAS_BLOB) {
+      return NextResponse.json({ success: true }); // storage not configured — nothing to delete
     }
 
-    await del(url, { token });
+    await del(url, { token: BLOB_TOKEN });
     return NextResponse.json({ success: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

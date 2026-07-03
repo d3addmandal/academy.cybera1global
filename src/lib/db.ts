@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { after } from "next/server";
 import { blobWrite } from "@/lib/blob-db";
+import { HAS_BLOB, TMP_DATA_DIR } from "@/lib/env";
 import type {
   AdminUser, SiteSettings, ThemeSettings, NavigationSettings,
   HomePageContent, Programme, BlogPost, Event, Testimonial, Trainer,
@@ -10,41 +11,32 @@ import type {
   ContactSubmission,
 } from "@/types/cms";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-
-// On Vercel, the deployment bundle is read-only; writes must go to /tmp.
-// Reads check /tmp first (for writes made in this invocation) then fall back
-// to the committed data/ directory.
-const IS_VERCEL = process.env.VERCEL === "1";
-const WRITE_DIR = IS_VERCEL ? "/tmp/data" : DATA_DIR;
-const READ_DIRS = IS_VERCEL ? ["/tmp/data", DATA_DIR] : [DATA_DIR];
+// Vercel Blob is the source of truth in every environment; this is just the
+// local synchronous-read cache (populated/refreshed by blobHydrate()).
+const DATA_DIR = TMP_DATA_DIR;
 
 // ─── Low-level file helpers ──────────────────────────────────────────────────
 
 function ensureDir(companySlug: string): void {
-  const dir = path.join(WRITE_DIR, companySlug);
+  const dir = path.join(DATA_DIR, companySlug);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
 function readFile<T>(companySlug: string, filename: string): T | null {
-  for (const base of READ_DIRS) {
-    const filePath = path.join(base, companySlug, filename);
-    if (fs.existsSync(filePath)) {
-      try {
-        return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
-      } catch {
-        continue;
-      }
-    }
+  const filePath = path.join(DATA_DIR, companySlug, filename);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 function writeFile<T>(companySlug: string, filename: string, data: T): void {
   ensureDir(companySlug);
-  const filePath = path.join(WRITE_DIR, companySlug, filename);
+  const filePath = path.join(DATA_DIR, companySlug, filename);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
-  if (IS_VERCEL) {
+  if (HAS_BLOB) {
     // Use after() so Vercel keeps the function alive until the blob write completes.
     const task = blobWrite(companySlug, filename, data).catch(err =>
       console.error("[db] blobWrite failed:", filename, err)
@@ -53,7 +45,7 @@ function writeFile<T>(companySlug: string, filename: string, data: T): void {
       after(task);
     } catch (e) {
       // after() throws outside a request context (e.g. build time) — log so
-      // it's visible in Vercel function logs if it fires unexpectedly at runtime.
+      // it's visible in the function logs if it fires unexpectedly at runtime.
       console.warn("[db] after() unavailable for blobWrite:", filename, e);
     }
   }
@@ -526,8 +518,10 @@ export const contactsDb = {
 
 // ─── Company check / init ─────────────────────────────────────────────────────
 
+// Callers must `await blobHydrate(slug)` first — this only checks the local
+// cache, it doesn't itself talk to Blob.
 export function companyExists(slug: string): boolean {
-  return READ_DIRS.some((base) => fs.existsSync(path.join(base, slug, "users.json")));
+  return fs.existsSync(path.join(DATA_DIR, slug, "users.json"));
 }
 
 export function isInitialized(slug: string): boolean {
@@ -599,7 +593,7 @@ function defaultSettings(slug: string): SiteSettings {
       titleTemplate: "%s | Academy",
       defaultDescription: "Hands-on cybersecurity programs designed by security professionals.",
       keywords: ["cybersecurity", "ethical hacking", "VAPT", "SOC analyst"],
-      ogImage: "/images/og-image.jpg",
+      ogImage: "",
     },
     scripts: { headScripts: "", bodyStartScripts: "", bodyEndScripts: "" },
     updatedAt: new Date().toISOString(),
@@ -687,7 +681,7 @@ function defaultHomeContent(): HomePageContent {
         { icon: "Shield", label: "Enterprise Exposure" },
         { icon: "Users", label: "Community Ecosystem" },
       ],
-      heroImage: "/images/home-hero.jpg",
+      heroImage: "",
       floatingCards: {
         popularProgram: {
           enabled: true,
@@ -778,7 +772,7 @@ function defaultHomeContent(): HomePageContent {
       ],
       ctaText: "Train Your Team",
       ctaLink: "/corporate-training",
-      image: "/images/corporate-training.jpg",
+      image: "",
       statValue: "500+",
       statLabel: "Professionals Trained",
     },
@@ -799,7 +793,7 @@ function defaultHomeContent(): HomePageContent {
       ],
       ctaText: "Partner With Us",
       ctaLink: "/institutions",
-      image: "/images/institution.jpg",
+      image: "",
       statValue: "25+",
       statLabel: "Partner Institutions",
     },

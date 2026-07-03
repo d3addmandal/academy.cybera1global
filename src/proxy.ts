@@ -1,8 +1,8 @@
-// proxy.ts  (replaces middleware.ts — delete middleware.ts after applying this)
+// proxy.ts  (Next.js 16 — replaces middleware.ts, both cannot coexist)
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import fs from "fs";
-import path from "path";
+import { sessionsDb } from "@/lib/db";
+import { blobHydrate } from "@/lib/blob-db";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECTION 1 — Scanner / bot blocking  (formerly middleware.ts)
@@ -26,6 +26,7 @@ const SCANNER_UA: RegExp[] = [
   /gobuster/i,
   /ffuf/i,
   /wfuzz/i,
+  /nessus/i,
   /hydra/i,
   /medusa/i,
   /python-requests\/[0-9]/i,
@@ -163,35 +164,6 @@ async function verifyToken(token: string): Promise<TokenPayload | null> {
   }
 }
 
-const PROXY_DATA_DIR = path.join(process.cwd(), "data");
-const SESSION_INACTIVITY_MS = 30 * 60 * 1000;
-
-function isSessionActive(
-  companySlug: string,
-  userId: string,
-  sessionId: string
-): boolean {
-  if (process.env.VERCEL === "1") return true;
-  try {
-    const filePath = path.join(PROXY_DATA_DIR, companySlug, "sessions.json");
-    if (!fs.existsSync(filePath)) return false;
-    const sessions = JSON.parse(fs.readFileSync(filePath, "utf-8")) as Array<{
-      userId: string;
-      sessionId: string;
-      lastActivityAt?: string;
-      createdAt: string;
-    }>;
-    const s = sessions.find(
-      (r) => r.userId === userId && r.sessionId === sessionId
-    );
-    if (!s) return false;
-    const lastActivity = new Date(s.lastActivityAt ?? s.createdAt).getTime();
-    return Date.now() - lastActivity <= SESSION_INACTIVITY_MS;
-  } catch {
-    return false;
-  }
-}
-
 function clearCookie(res: NextResponse) {
   res.cookies.set({
     name: COOKIE_NAME,
@@ -292,7 +264,8 @@ export async function proxy(req: NextRequest) {
     return applySecurityHeaders(redirectToLogin(req, pathname));
   }
 
-  if (!isSessionActive(auth.companySlug, auth.userId, auth.sessionId)) {
+  await blobHydrate(auth.companySlug);
+  if (!sessionsDb.isValid(auth.companySlug, auth.userId, auth.sessionId)) {
     if (isAdminApi) {
       return applySecurityHeaders(
         NextResponse.json(

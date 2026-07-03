@@ -42,7 +42,6 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website", locale: "en_IN", siteName: "Cyber A1 Academy",
       title: "Cyber A1 Academy - Industry-Focused Cybersecurity Training",
       description: "Build real cybersecurity skills with hands-on programs designed by security professionals.",
-      images: [{ url: "/images/og-image.jpg", width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
