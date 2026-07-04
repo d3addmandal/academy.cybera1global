@@ -15,23 +15,20 @@ let _publicKey: KeyObject | null = null;
 let _warnedMissingKeys = false;
 
 // Env vars pasted via a dashboard textarea, a CLI, or copied out of a table/markdown
-// cell can lose their real newlines — either turned into literal "\n" escape
-// sequences, or fully collapsed onto one line. Both fail OpenSSL's PEM decoder
-// with an opaque "DECODER routines::unsupported", so repair both cases before
-// handing the value off: unescape literal "\n" first, then if the result still
-// has no line breaks (fully collapsed), reconstruct proper PEM line-wrapping
-// from the BEGIN/END markers.
+// cell can lose their real newlines in all sorts of partial ways — literal "\n" escape
+// sequences, fully collapsed onto one line, or just the newline right after BEGIN/before
+// END eaten while the body keeps its own. OpenSSL's PEM decoder has zero tolerance for any
+// of these and fails with an opaque "DECODER routines::unsupported", so rather than special-
+// casing each corruption shape, always locate the BEGIN/END markers and rebuild the PEM's
+// line-wrapping from scratch — this is a no-op on an already-correct PEM and repairs every
+// partial-newline-loss variant in one pass.
 function normalizePem(pem: string): string {
-  let value = pem.trim().replace(/^['"]|['"]$/g, "").replace(/\\n/g, "\n");
-  if (!value.includes("\n")) {
-    const match = value.match(/-----BEGIN ([A-Z ]+)-----\s*([A-Za-z0-9+/=\s]+?)\s*-----END \1-----/);
-    if (match) {
-      const [, label, body] = match;
-      const wrapped = body.replace(/\s+/g, "").match(/.{1,64}/g)?.join("\n") ?? body;
-      value = `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----\n`;
-    }
-  }
-  return value;
+  const cleaned = pem.trim().replace(/^['"]|['"]$/g, "").replace(/\\n/g, "\n").replace(/\\r/g, "");
+  const match = cleaned.match(/-----BEGIN ([A-Z0-9 ]+)-----([\s\S]*?)-----END \1-----/);
+  if (!match) return cleaned;
+  const [, label, rawBody] = match;
+  const wrapped = rawBody.replace(/\s+/g, "").match(/.{1,64}/g)?.join("\n") ?? rawBody;
+  return `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----\n`;
 }
 
 function loadKeys(): { privateKey: KeyObject; publicKey: KeyObject } {
