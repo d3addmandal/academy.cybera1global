@@ -172,7 +172,7 @@ function ImageUpload({ label, hint, value, onChange, uploadType, company }: {
       </div>
       <div className="text-center">
         <p className={`font-bold text-slate-800 ${compact ? "text-xs" : "text-sm"}`}>
-          {isUploading ? "Uploading..." : dropping ? "Drop to upload" : "Drag & drop your image here"}
+          {isUploading ? "Optimizing & uploading..." : dropping ? "Drop to upload" : "Drag & drop your image here"}
         </p>
         {!isUploading && <p className={`text-slate-400 mt-0.5 ${compact ? "text-[10px]" : "text-xs"}`}>or</p>}
       </div>

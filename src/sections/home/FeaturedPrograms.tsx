@@ -36,14 +36,11 @@ export default function FeaturedPrograms({ programmes, config }: Props) {
           </Link>
         </div>
 
-        {/* Cards grid — 6 columns on desktop */}
+        {/* Cards grid — 2 cols mobile, up to 6 cols on large desktop/ultra-wide */}
         {programmes.length === 0 ? (
           <div className="text-center py-16 text-gray-400">No programmes published yet.</div>
         ) : (
-          <div
-            className="gap-4 grid grid-cols-2 sm:grid-cols-3 justify-center"
-            style={{ gridTemplateColumns: "repeat(auto-fill, 178px)" }}
-          >
+          <div className="gap-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {programmes.map((course) => (
               <ProgramCard key={course.id} course={course} />
             ))}

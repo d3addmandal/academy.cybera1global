@@ -21,6 +21,7 @@ const IDLE_EVENTS = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"
 
 export default function AdminShell({ children, company, adminSlug, companyName, userName, userEmail, role }: Props) {
   const [collapsed, setCollapsed] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -52,12 +53,22 @@ export default function AdminShell({ children, company, adminSlug, companyName, 
   return (
     <ToastProvider>
       <div className="min-h-screen bg-slate-50" suppressHydrationWarning>
+        {/* Backdrop — mobile/tablet only, closes the drawer on tap-outside */}
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+        )}
         <AdminSidebar
           company={company}
           adminSlug={adminSlug}
           companyName={companyName}
           collapsed={collapsed}
           onToggle={() => setCollapsed((c) => !c)}
+          mobileOpen={mobileOpen}
+          onMobileClose={() => setMobileOpen(false)}
           role={role}
         />
         <AdminHeader
@@ -67,10 +78,10 @@ export default function AdminShell({ children, company, adminSlug, companyName, 
           userName={userName}
           userEmail={userEmail}
           collapsed={collapsed}
+          onMenuClick={() => setMobileOpen(true)}
         />
         <main
-          className="min-h-screen pt-16 transition-all duration-300"
-          style={{ marginLeft: collapsed ? 64 : 256 }}
+          className={`min-h-screen pt-16 transition-all duration-300 ${collapsed ? "lg:ml-16" : "lg:ml-64"}`}
         >
           <div className="p-4 lg:p-6">{children}</div>
         </main>

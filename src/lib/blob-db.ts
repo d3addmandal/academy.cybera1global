@@ -44,6 +44,7 @@ function fixBrokenImagePaths(value: unknown): unknown {
 const FILES_NEEDING_IMAGE_SANITIZE = new Set([
   "programmes.json", "blog.json", "events.json",
   "home.json", "testimonials.json", "trainers.json", "theme.json",
+  "certificates.json", "certificate-templates.json",
 ]);
 
 const IS_VERCEL = process.env.VERCEL === "1";

@@ -3,6 +3,7 @@ import { getAuthFromRequest } from "@/lib/auth";
 import { put, del } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 type Params = { params: Promise<{ company: string }> };
 
@@ -45,6 +46,11 @@ const EXT_MAP: Record<string, string> = {
   "image/x-icon": "ico",
   "image/vnd.microsoft.icon": "ico",
 };
+
+// Raster formats we re-encode to WebP; SVG stays vector and ICO/CUR has no libvips encoder.
+const COMPRESSIBLE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_DIMENSION = 1920;
+const WEBP_QUALITY = 80;
 
 export async function POST(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
@@ -106,7 +112,29 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
-    const ext = EXT_MAP[declaredMime] ?? "jpg";
+    // Compress + re-encode to WebP (strips EXIF/GPS/ICC metadata as a side effect of
+    // never calling withMetadata(); .rotate() bakes in EXIF orientation first so images
+    // don't appear sideways once that tag is gone). SVG/ICO pass through untouched.
+    let outputBytes = bytes;
+    let outputMime = declaredMime;
+    let outputExt = EXT_MAP[declaredMime] ?? "jpg";
+
+    if (COMPRESSIBLE_MIME.has(declaredMime)) {
+      try {
+        const compressed = await sharp(bytes, { animated: declaredMime === "image/gif" })
+          .rotate()
+          .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: WEBP_QUALITY })
+          .toBuffer();
+        outputBytes = compressed;
+        outputMime = "image/webp";
+        outputExt = "webp";
+      } catch (err) {
+        console.warn("[upload] compression failed, storing original:", err);
+      }
+    }
+
+    const ext = outputExt;
     const uploadType = ((formData.get("type") as string) ?? "image")
       .replace(/[^a-z0-9-]/gi, "").toLowerCase();
     const folder = ((formData.get("folder") as string) ?? "")
@@ -130,7 +158,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         ? `uploads/${company}/${folder}/${filename}`
         : `uploads/${company}/${filename}`;
 
-      const blob = await put(blobPath, new Blob([bytes], { type: declaredMime }), {
+      const blob = await put(blobPath, new Blob([outputBytes], { type: outputMime }), {
         access: "public",
         token,
       });
@@ -141,7 +169,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Local dev: write to public/uploads/
     const uploadDir = path.join(process.cwd(), "public", "uploads", company, folder);
     fs.mkdirSync(uploadDir, { recursive: true });
-    fs.writeFileSync(path.join(uploadDir, filename), bytes);
+    fs.writeFileSync(path.join(uploadDir, filename), outputBytes);
     const url = folder
       ? `/uploads/${company}/${folder}/${filename}`
       : `/uploads/${company}/${filename}`;

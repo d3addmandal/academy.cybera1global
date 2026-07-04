@@ -56,8 +56,8 @@ export function Toggle({ checked, onChange, label, size = "md" }: ToggleProps) {
   const translate = checked ? (size === "sm" ? "translate-x-4" : "translate-x-5") : "translate-x-0.5";
 
   return (
-    <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onChange(!checked)}>
-      <div className={`${w} ${h} rounded-full flex items-center transition-colors ${checked ? "bg-red-600" : "bg-slate-200"}`}>
+    <div className="flex items-center gap-2.5 cursor-pointer p-2 -m-2" onClick={() => onChange(!checked)}>
+      <div className={`${w} ${h} rounded-full flex items-center transition-colors flex-shrink-0 ${checked ? "bg-red-600" : "bg-slate-200"}`}>
         <div className={`${dot} ${translate} rounded-full bg-white shadow transition-transform`} />
       </div>
       {label && <span className="text-sm text-slate-600">{label}</span>}
@@ -104,12 +104,12 @@ interface CardProps { title: ReactNode; subtitle?: string; children: ReactNode; 
 export function Card({ title, subtitle, children, action }: CardProps) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div className="flex items-start justify-between px-6 py-4 border-b border-slate-100">
-        <div>
-          <h3 className="font-bold text-slate-800">{title}</h3>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 px-6 py-4 border-b border-slate-100">
+        <div className="min-w-0">
+          <h3 className="font-bold text-slate-800 break-words">{title}</h3>
           {subtitle && <p className="text-sm text-slate-400 mt-0.5">{subtitle}</p>}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -118,12 +118,12 @@ export function Card({ title, subtitle, children, action }: CardProps) {
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
   return (
-    <div className="flex items-start justify-between mb-6">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900">{title}</h1>
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-black text-slate-900 break-words">{title}</h1>
         {subtitle && <p className="text-slate-500 text-sm mt-1">{subtitle}</p>}
       </div>
-      {actions && <div className="flex items-center gap-3">{actions}</div>}
+      {actions && <div className="flex items-center gap-3 flex-wrap flex-shrink-0">{actions}</div>}
     </div>
   );
 }
@@ -155,6 +155,10 @@ export function StatusBadge({ status }: { status: string }) {
     published: "bg-emerald-50 text-emerald-700 border-emerald-200",
     draft: "bg-amber-50 text-amber-700 border-amber-200",
     archived: "bg-slate-100 text-slate-500 border-slate-200",
+    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    suspended: "bg-amber-50 text-amber-700 border-amber-200",
+    revoked: "bg-red-50 text-red-700 border-red-200",
+    expired: "bg-slate-100 text-slate-500 border-slate-200",
   };
   return (
     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${map[status] ?? map.draft}`}>

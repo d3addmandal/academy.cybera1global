@@ -61,6 +61,7 @@ function GalleryModal({ images, onClose }: { images: string[]; onClose: () => vo
                 <img
                   src={src}
                   alt={`Event photo ${i + 1}`}
+                  loading="lazy"
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
@@ -81,8 +82,8 @@ function EventGallery({ images }: { images: string[] }) {
   return (
     <>
       <div
-        className="rounded-xl overflow-hidden mb-4"
-        style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gridTemplateRows: "1fr 1fr", gap: "6px", height: "224px" }}
+        className="rounded-xl overflow-hidden mb-4 h-40 sm:h-[224px]"
+        style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr", gridTemplateRows: "1fr 1fr", gap: "6px" }}
       >
         {slots.map((src, i) => {
           const showOverlay = i === 4 && extraCount > 0;
@@ -93,7 +94,7 @@ function EventGallery({ images }: { images: string[] }) {
               onClick={showOverlay ? () => setModalOpen(true) : undefined}
             >
               {src ? (
-                <img src={src} alt="" className="w-full h-full object-cover" />
+                <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300" />
               )}
@@ -175,7 +176,7 @@ export default function CommunitySection({
                     {/* Avatar */}
                     <div className="w-[72px] h-[72px] rounded-full overflow-hidden flex-shrink-0 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center text-white font-black text-2xl">
                       {t.imageUrl ? (
-                        <img src={t.imageUrl} alt={t.name} className="w-full h-full object-cover"
+                        <img src={t.imageUrl} alt={t.name} loading="lazy" className="w-full h-full object-cover"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       ) : t.name.charAt(0)}
                     </div>
@@ -248,7 +249,7 @@ export default function CommunitySection({
                   >
                     <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-br from-gray-700 to-gray-900">
                       {post.image && (
-                        <img src={post.image} alt={post.title} className="w-full h-full object-cover"
+                        <img src={post.image} alt={post.title} loading="lazy" className="w-full h-full object-cover"
                           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
                       )}
                     </div>

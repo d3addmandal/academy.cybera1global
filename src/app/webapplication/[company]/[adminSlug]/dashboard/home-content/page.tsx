@@ -742,11 +742,6 @@ export default function HomeContentPage() {
               <Plus className="w-4 h-4" /> Add FAQ
             </button>
           </Card>
-          <Card title='"Still Have Questions?" Card'>
-            <Field label="Card Background Image" hint="Upload a dark atmospheric photo — an overlay keeps text readable">
-              <ImageUpload value={content.faqCardBgImage ?? ""} onChange={(url) => update("faqCardBgImage", url)} company={company} folder="home" aspectClass="aspect-[4/3]" />
-            </Field>
-          </Card>
           </>
         )}
 

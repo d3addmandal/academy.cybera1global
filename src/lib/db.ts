@@ -7,7 +7,7 @@ import type {
   HomePageContent, Programme, BlogPost, Event, Testimonial, Trainer,
   CustomPage, FAQ, NavigationMenu,
   AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent,
-  ContactSubmission,
+  ContactSubmission, Certificate, CertificateTemplate, CertificateAuditLogEntry,
 } from "@/types/cms";
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -498,6 +498,131 @@ export const trainersDb = {
     if (filtered.length === all.length) return false;
     writeFile(slug, "trainers.json", filtered);
     return true;
+  },
+};
+
+// ─── Certificate Templates ─────────────────────────────────────────────────────
+
+export const certificateTemplatesDb = {
+  getAll(slug: string): CertificateTemplate[] {
+    return (readFile<CertificateTemplate[]>(slug, "certificate-templates.json") ?? [])
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+  getById(slug: string, id: string): CertificateTemplate | undefined {
+    return this.getAll(slug).find((t) => t.id === id);
+  },
+  create(slug: string, data: Omit<CertificateTemplate, "id" | "companySlug" | "createdAt" | "updatedAt">): CertificateTemplate {
+    let all = this.getAll(slug);
+    if (data.isDefault) all = all.map((t) => ({ ...t, isDefault: false }));
+    const template: CertificateTemplate = {
+      ...data,
+      id: generateId(),
+      companySlug: slug,
+      createdAt: now(),
+      updatedAt: now(),
+    };
+    writeFile(slug, "certificate-templates.json", [...all, template]);
+    return template;
+  },
+  update(slug: string, id: string, data: Partial<CertificateTemplate>): CertificateTemplate | null {
+    let all = this.getAll(slug);
+    const idx = all.findIndex((t) => t.id === id);
+    if (idx === -1) return null;
+    if (data.isDefault) all = all.map((t) => (t.id === id ? t : { ...t, isDefault: false }));
+    all[idx] = { ...all[idx], ...data, updatedAt: now() };
+    writeFile(slug, "certificate-templates.json", all);
+    return all[idx];
+  },
+  delete(slug: string, id: string): boolean {
+    const all = this.getAll(slug);
+    const filtered = all.filter((t) => t.id !== id);
+    if (filtered.length === all.length) return false;
+    writeFile(slug, "certificate-templates.json", filtered);
+    return true;
+  },
+};
+
+// ─── Certificates ───────────────────────────────────────────────────────────────
+
+const CERT_NUMBER_ALPHABET = "23456789ABCDEFGHJKMNPQRSTVWXYZ"; // no 0/O/1/I/L ambiguity
+
+function generateCertificateNumber(): string {
+  const year = new Date().getFullYear();
+  const code = Array.from({ length: 8 }, () =>
+    CERT_NUMBER_ALPHABET[Math.floor(Math.random() * CERT_NUMBER_ALPHABET.length)]
+  ).join("");
+  return `CERT-${year}-${code}`;
+}
+
+type CertificateCreateInput = Omit<Certificate, "id" | "companySlug" | "createdAt" | "updatedAt" | "certificateNumber"> & {
+  certificateNumber?: string;
+};
+
+export const certificatesDb = {
+  getAll(slug: string): Certificate[] {
+    return (readFile<Certificate[]>(slug, "certificates.json") ?? [])
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+  getById(slug: string, id: string): Certificate | undefined {
+    return this.getAll(slug).find((c) => c.id === id);
+  },
+  getByCertificateNumber(slug: string, certificateNumber: string): Certificate | undefined {
+    return this.getAll(slug).find((c) => c.certificateNumber === certificateNumber);
+  },
+  create(slug: string, data: CertificateCreateInput): Certificate {
+    const all = this.getAll(slug);
+    let certificateNumber = data.certificateNumber;
+    if (!certificateNumber) {
+      // Astronomically unlikely to collide, but guard anyway.
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const candidate = generateCertificateNumber();
+        if (!all.some((c) => c.certificateNumber === candidate)) { certificateNumber = candidate; break; }
+      }
+      if (!certificateNumber) certificateNumber = generateCertificateNumber();
+    }
+    const certificate: Certificate = {
+      ...data,
+      certificateNumber,
+      id: generateId(),
+      companySlug: slug,
+      createdAt: now(),
+      updatedAt: now(),
+    };
+    writeFile(slug, "certificates.json", [...all, certificate]);
+    return certificate;
+  },
+  update(slug: string, id: string, data: Partial<Certificate>): Certificate | null {
+    const all = this.getAll(slug);
+    const idx = all.findIndex((c) => c.id === id);
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...data, updatedAt: now() };
+    writeFile(slug, "certificates.json", all);
+    return all[idx];
+  },
+  delete(slug: string, id: string): boolean {
+    const all = this.getAll(slug);
+    const filtered = all.filter((c) => c.id !== id);
+    if (filtered.length === all.length) return false;
+    writeFile(slug, "certificates.json", filtered);
+    return true;
+  },
+};
+
+// ─── Certificate Audit Log (append-only) ─────────────────────────────────────────
+
+export const certificateAuditLogDb = {
+  getAll(slug: string): CertificateAuditLogEntry[] {
+    return (readFile<CertificateAuditLogEntry[]>(slug, "certificate-audit-log.json") ?? [])
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+  getByCertificateId(slug: string, certificateId: string): CertificateAuditLogEntry[] {
+    return this.getAll(slug).filter((e) => e.certificateId === certificateId);
+  },
+  append(slug: string, entries: Omit<CertificateAuditLogEntry, "id" | "createdAt">[]): CertificateAuditLogEntry[] {
+    const all = this.getAll(slug);
+    const stamped = entries.map((e) => ({ ...e, id: generateId(), createdAt: now() }));
+    writeFile(slug, "certificate-audit-log.json", [...stamped, ...all]);
+    return stamped;
   },
 };
 

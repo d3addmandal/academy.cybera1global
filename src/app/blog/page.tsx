@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight, Search } from "lucide-react";
-import { getCRMBlogPosts } from "@/lib/content";
+import { getCRMBlogPosts, getSiteNav } from "@/lib/content";
 import BlogCard from "@/components/shared/BlogCard";
 
 export const metadata: Metadata = {
@@ -17,6 +17,11 @@ export default function BlogPage() {
   const rest = posts.filter((b) => b.id !== featured?.id);
 
   const categories = ["All", ...Array.from(new Set(posts.map(p => p.category)))];
+
+  // Sticky offset must account for the announcement bar's height only when it's actually shown —
+  // otherwise (admin disabled it in CRM) there'd be a stale gap under the sticky category bar.
+  const announcementOn = getSiteNav()?.announcementBar?.enabled ?? true;
+  const stickyTopClass = announcementOn ? "top-[65px] md:top-[105px]" : "top-16";
 
   return (
     <div className="pt-16">
@@ -38,7 +43,7 @@ export default function BlogPage() {
       </section>
 
       {/* Category bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-[65px] md:top-[105px] z-30">
+      <div className={`bg-white border-b border-gray-100 sticky z-30 ${stickyTopClass}`}>
         <div className="site-container py-4 flex items-center gap-3 overflow-x-auto">
           {categories.map((cat) => (
             <button key={cat} className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-all ${cat === "All" ? "bg-red-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"}`}>

@@ -7,10 +7,22 @@ export function sanitizeText(value: unknown, maxLen = 10000): string {
   return value.replace(BLOCKED_CHARS, "").trim().slice(0, maxLen);
 }
 
-// Use for rich-text HTML fields (blog content, page content, etc.)
+// Substrings that could let CSS carry an old IE-era script vector
+// (expression(), -moz-binding, behavior:) — modern browsers don't execute
+// these, but this is cheap defense-in-depth for an admin-writable style attribute.
+const UNSAFE_STYLE_PATTERNS = [/expression\s*\(/i, /-moz-binding/i, /behavior\s*:/i, /javascript\s*:/i, /@import/i];
+
+function stripUnsafeStyleValues(html: string): string {
+  return html.replace(/style\s*=\s*"([^"]*)"/gi, (match, styleValue: string) => {
+    if (UNSAFE_STYLE_PATTERNS.some((p) => p.test(styleValue))) return "";
+    return match;
+  });
+}
+
+// Use for rich-text HTML fields (blog content, page content, certificate templates, etc.)
 export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
   if (typeof value !== "string") return "";
-  return sanitizeHtmlLib(value.slice(0, maxLen), {
+  const cleaned = sanitizeHtmlLib(value.slice(0, maxLen), {
     allowedTags: [
       "h1", "h2", "h3", "h4", "h5", "h6",
       "p", "br", "hr",
@@ -26,7 +38,7 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       img: ["src", "alt", "width", "height", "loading"],
       td: ["colspan", "rowspan"],
       th: ["colspan", "rowspan"],
-      "*": ["class"],
+      "*": ["class", "style"],
     },
     allowedSchemes: ["https", "http"],
     allowedSchemesByTag: { img: ["https", "http", "/"] },
@@ -38,6 +50,7 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       },
     },
   });
+  return stripUnsafeStyleValues(cleaned);
 }
 
 export function sanitizeEmail(value: unknown): string {

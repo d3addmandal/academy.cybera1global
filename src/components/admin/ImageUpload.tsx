@@ -354,7 +354,7 @@ export default function ImageUpload({
               {stage === "uploading" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60">
                   <Loader2 className="w-8 h-8 animate-spin text-white" />
-                  <p className="text-white text-xs font-medium">Uploading…</p>
+                  <p className="text-white text-xs font-medium">Optimizing &amp; uploading…</p>
                 </div>
               )}
             </div>
@@ -382,7 +382,7 @@ export default function ImageUpload({
                   className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg font-semibold hover:bg-red-500 transition-colors disabled:opacity-50 flex items-center gap-1.5"
                 >
                   {stage === "uploading"
-                    ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading…</>
+                    ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Optimizing…</>
                     : <><Check className="w-3.5 h-3.5" /> Upload</>}
                 </button>
               </div>

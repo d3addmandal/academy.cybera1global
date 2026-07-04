@@ -24,14 +24,15 @@ function TrainerCard({ trainer }: { trainer: Trainer }) {
   const hasGithub   = trainer.github   && trainer.github   !== "#" && trainer.github   !== "";
 
   return (
-    <div className="flex bg-[#0c0d15] border border-white/[0.06] rounded-xl overflow-hidden h-[215px]">
+    <div className="flex flex-col sm:flex-row bg-[#0c0d15] border border-white/[0.06] rounded-xl overflow-hidden sm:h-[215px]">
 
       {/* ── Col 1: Photo ── */}
-      <div className="w-[155px] flex-shrink-0 relative bg-[#090a11]">
+      <div className="w-full h-40 sm:h-auto sm:w-[155px] sm:flex-shrink-0 relative bg-[#090a11]">
         {trainer.imageUrl ? (
           <img
             src={trainer.imageUrl}
             alt={trainer.name}
+            loading="lazy"
             className="absolute inset-0 w-full h-full object-cover object-top"
           />
         ) : (
@@ -39,12 +40,12 @@ function TrainerCard({ trainer }: { trainer: Trainer }) {
             <span className="text-white/20 text-5xl font-black select-none">{inits(trainer.name)}</span>
           </div>
         )}
-        {/* right-edge fade blending photo into card */}
-        <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#0c0d15] to-transparent" />
+        {/* right-edge fade blending photo into card (desktop row layout only) */}
+        <div className="hidden sm:block absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#0c0d15] to-transparent" />
       </div>
 
       {/* ── Col 2: Name + Certifications ── */}
-      <div className="flex-1 min-w-0 px-5 py-4 flex flex-col border-r border-white/[0.05] relative">
+      <div className="flex-1 min-w-0 px-5 py-4 flex flex-col border-b sm:border-b-0 sm:border-r border-white/[0.05] relative">
         {/* Social icons */}
         <div className="absolute top-3 right-3 flex items-center gap-2">
           {hasGithub && (
@@ -77,6 +78,7 @@ function TrainerCard({ trainer }: { trainer: Trainer }) {
                   src={badge.logoUrl}
                   alt={badge.name}
                   title={badge.name}
+                  loading="lazy"
                   className="h-8 w-auto max-w-[64px] object-contain flex-shrink-0"
                 />
               ) : (
@@ -93,13 +95,13 @@ function TrainerCard({ trainer }: { trainer: Trainer }) {
       </div>
 
       {/* ── Col 3: Expertise ── */}
-      <div className="w-[170px] flex-shrink-0 px-4 py-4 flex flex-col">
+      <div className="w-full sm:w-[170px] sm:flex-shrink-0 px-4 py-4 sm:overflow-hidden flex flex-col">
         <p className="text-gray-500 text-[9px] font-bold uppercase tracking-[0.14em] mb-2.5">Expertise</p>
         <ul className="space-y-1.5">
           {expertiseList.slice(0, 5).map((item) => (
             <li key={item} className="flex items-start gap-2 text-gray-300 text-[11px] leading-snug">
               <span className="text-gray-600 mt-[3px] flex-shrink-0 text-[10px]">•</span>
-              {item}
+              <span className="sm:line-clamp-2">{item}</span>
             </li>
           ))}
         </ul>

@@ -355,7 +355,6 @@ export interface HomePageContent {
   testimonials: TestimonialsSectionConfig;
   blog: BlogSectionConfig;
   faqs: FAQ[];
-  faqCardBgImage?: string;
   cta: CTASection;
   footer: FooterContent;
   updatedAt: string;
@@ -513,6 +512,81 @@ export interface Trainer {
   order: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// ─────────────────────────────────────────────
+// Certificates
+// ─────────────────────────────────────────────
+export type CertificateStatus = "active" | "revoked" | "expired" | "suspended";
+export type CertificateAuditAction =
+  | "created" | "updated" | "deleted" | "status_changed"
+  | "downloaded" | "qr_regenerated" | "template_changed" | "reissued";
+
+export interface CertificateTemplate {
+  id: string;
+  companySlug: string;
+  name: string;
+  description?: string;
+  htmlContent: string;
+  backgroundImageUrl?: string;
+  logoUrl?: string;
+  isDefault: boolean;
+  status: Status;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Certificate {
+  id: string;
+  companySlug: string;
+  certificateNumber: string;
+  templateId: string;
+
+  studentName: string;
+  studentEmail?: string;
+  studentPhone?: string;
+  studentPhotoUrl?: string;
+
+  courseName: string;
+  courseDescription?: string;
+
+  issueDate: string;
+  startDate?: string;
+  endDate?: string;
+  validityText?: string;
+
+  instructorName?: string;
+  organizationName: string;
+  organizationLogoUrl?: string;
+
+  status: CertificateStatus;
+  statusReason?: string;
+  statusChangedAt?: string;
+
+  qrCodePath: string;
+  verificationUrl: string;
+
+  signatureAlgorithm: "ed25519";
+  signatureValue: string;
+  signedDataVersion: 1;
+
+  reissuedFromCertificateId?: string;
+  supersededByCertificateId?: string;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CertificateAuditLogEntry {
+  id: string;
+  companySlug: string;
+  certificateId: string;
+  certificateNumber: string;
+  action: CertificateAuditAction;
+  actorUserId: string;
+  actorEmail: string;
+  detail?: string;
+  createdAt: string;
 }
 
 // ─────────────────────────────────────────────

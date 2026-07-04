@@ -472,7 +472,7 @@ export default function TrainerManagement({ company, initialTrainers }: Props) {
                       className="inline-flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50"
                     >
                       {uploading
-                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</>
+                        ? <><Loader2 className="w-4 h-4 animate-spin" /> Optimizing…</>
                         : <><Upload className="w-4 h-4" /> {form.imageUrl ? "Replace Photo" : "Upload Photo"}</>
                       }
                     </button>

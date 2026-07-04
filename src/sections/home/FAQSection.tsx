@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
-import { Plus, Minus, ArrowRight } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import type { FAQ } from "@/types/cms";
 
 const DEFAULT_FAQS: FAQ[] = [
@@ -35,7 +34,7 @@ function FAQItem({ faq, open, setOpen }: { faq: FAQ; open: string | null; setOpe
   );
 }
 
-export default function FAQSection({ faqs, cardBgImage }: { faqs?: FAQ[] | null; cardBgImage?: string | null }) {
+export default function FAQSection({ faqs }: { faqs?: FAQ[] | null }) {
   const [open, setOpen] = useState<string | null>(null);
   const display = (faqs && faqs.length > 0) ? faqs : DEFAULT_FAQS;
   const half = Math.ceil(display.length / 2);
@@ -45,75 +44,21 @@ export default function FAQSection({ faqs, cardBgImage }: { faqs?: FAQ[] | null;
   return (
     <section className="py-8 bg-white">
       <div className="site-container">
-        <div className="grid lg:grid-cols-[1fr_310px] xl:grid-cols-[1fr_330px] gap-10 xl:gap-14 items-start">
+        <p className="text-red-600 text-[11px] font-bold uppercase tracking-[0.18em] mb-3">
+          Frequently Asked Questions
+        </p>
+        <h2 className="text-3xl lg:text-[2.25rem] font-black text-gray-900 leading-tight mb-8">
+          Have Questions? We&apos;ve Got Answers.
+        </h2>
 
-          {/* ── Left: header + 2-col FAQ grid ── */}
-          <div>
-            <p className="text-red-600 text-[11px] font-bold uppercase tracking-[0.18em] mb-3">
-              Frequently Asked Questions
-            </p>
-            <h2 className="text-3xl lg:text-[2.25rem] font-black text-gray-900 leading-tight mb-8">
-              Have Questions? We&apos;ve Got Answers.
-            </h2>
-
-            <div className="grid sm:grid-cols-2 gap-x-10">
-              {[left, right].map((group, gi) => (
-                <div key={gi} className="divide-y divide-gray-100">
-                  {group.map((faq) => (
-                    <FAQItem key={faq.id} faq={faq} open={open} setOpen={setOpen} />
-                  ))}
-                </div>
+        <div className="grid sm:grid-cols-2 gap-x-10">
+          {[left, right].map((group, gi) => (
+            <div key={gi} className="divide-y divide-gray-100">
+              {group.map((faq) => (
+                <FAQItem key={faq.id} faq={faq} open={open} setOpen={setOpen} />
               ))}
             </div>
-          </div>
-
-          {/* ── Right: "Still have questions?" card ── */}
-          <div
-            className="relative rounded-2xl p-7 overflow-hidden min-h-[280px]"
-            style={
-              cardBgImage
-                ? { backgroundImage: `url(${cardBgImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-                : { backgroundColor: "#080d18" }
-            }
-          >
-            {/* Dark overlay when using a background image */}
-            {cardBgImage && (
-              <div className="absolute inset-0 bg-[#080d18]/80 pointer-events-none" />
-            )}
-
-            {/* Big "?" bubble */}
-            <div className="absolute -top-2 right-4 w-24 h-24 rounded-full bg-red-600 flex items-center justify-center shadow-[0_8px_30px_rgba(220,0,0,0.45)] z-10">
-              <span className="text-white font-black text-5xl leading-none select-none">?</span>
-            </div>
-
-            {/* Chat dots bubble */}
-            <div className="absolute top-16 right-20 w-12 h-12 rounded-full bg-red-800/60 flex items-center justify-center z-10 shadow-md">
-              <span className="text-red-200 text-base font-black leading-none">&#8226;&#8226;&#8226;</span>
-            </div>
-
-            {/* Blue glow dot */}
-            <div className="absolute bottom-7 right-7 w-5 h-5 rounded-full bg-blue-500 shadow-[0_0_12px_4px_rgba(59,130,246,0.5)] z-10" />
-
-            {/* Small red dot accent */}
-            <div className="absolute bottom-14 right-5 w-2.5 h-2.5 rounded-full bg-red-500 opacity-70" />
-
-            {/* Content */}
-            <div className="relative z-20 mt-14">
-              <h3 className="text-white font-bold text-xl leading-snug mb-2">
-                Still have questions?
-              </h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-7">
-                Talk to our experts and get personalized guidance.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 bg-red-600 text-white text-sm font-bold px-5 py-3 rounded-lg hover:bg-red-500 hover:shadow-[0_6px_20px_rgba(220,0,0,0.4)] transition-all"
-              >
-                Book Free Counseling <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
+          ))}
         </div>
       </div>
     </section>

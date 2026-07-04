@@ -221,7 +221,7 @@ export default function MultiImageUpload({
                 {uploading ? (
                   <>
                     <p className={`font-bold text-slate-800 ${items.length > 0 ? "text-xs" : "text-sm"}`}>
-                      Uploading {progress.done}/{progress.total}…
+                      Optimizing &amp; uploading {progress.done}/{progress.total}…
                     </p>
                     <div className="mt-2 w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden mx-auto">
                       <div

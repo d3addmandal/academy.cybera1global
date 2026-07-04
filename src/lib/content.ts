@@ -9,8 +9,9 @@ import {
   themeDb, settingsDb, navDb, homeDb,
   programmesDb, blogDb, eventsDb, testimonialsDb, faqsDb, menusDb, trainersDb,
   academyPageDb, corporatePageDb, institutionsPageDb, careerPageDb,
+  certificatesDb, certificateTemplatesDb,
 } from "./db";
-import type { Programme, BlogPost, Event, Testimonial, Trainer, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent } from "@/types/cms";
+import type { Programme, BlogPost, Event, Testimonial, Trainer, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent, Certificate, CertificateTemplate } from "@/types/cms";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 
@@ -122,4 +123,12 @@ export function getInstitutionsPageContent(): InstitutionsPageContent | null {
 }
 export function getCareerPageContent(): CareerPageContent | null {
   try { return careerPageDb.get(COMPANY); } catch { return null; }
+}
+
+// ── Certificates (public verification) ────────────────────────────────────────
+export function getCRMCertificateByNumber(certificateNumber: string): Certificate | undefined {
+  try { return certificatesDb.getByCertificateNumber(COMPANY, certificateNumber); } catch { return undefined; }
+}
+export function getCRMCertificateTemplate(templateId: string): CertificateTemplate | undefined {
+  try { return certificateTemplatesDb.getById(COMPANY, templateId); } catch { return undefined; }
 }

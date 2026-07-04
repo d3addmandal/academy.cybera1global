@@ -2,6 +2,8 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -137,6 +139,8 @@ export default async function RootLayout({
         </main>
         {!isAdmin && <Footer />}
         {!isAdmin && <FloatingButtons settings={settings} />}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

@@ -109,7 +109,7 @@ export default function Footer() {
           <div className="w-full sm:w-44 flex-shrink-0 flex flex-col gap-2">
             <Link href="/" className="flex items-center gap-2">
               {logoImageUrl ? (
-                <img src={logoImageUrl} alt={companyName} className="h-7 w-auto object-contain" />
+                <img src={logoImageUrl} alt={companyName} loading="lazy" className="h-7 w-auto object-contain" />
               ) : (
                 <>
                   <div
@@ -129,15 +129,15 @@ export default function Footer() {
               )}
             </Link>
             <p className="text-[13px] text-gray-500 leading-relaxed line-clamp-3">{description}</p>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               {socialItems.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label} href={href}
                   target={href !== "#" ? "_blank" : undefined}
                   rel="noopener noreferrer" aria-label={label}
-                  className="w-6 h-6 rounded bg-gray-800/80 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white transition-all"
+                  className="w-10 h-10 rounded bg-gray-800/80 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white transition-all flex-shrink-0"
                 >
-                  <Icon style={{ width: 12, height: 12 }} />
+                  <Icon style={{ width: 14, height: 14 }} />
                 </a>
               ))}
             </div>
@@ -203,7 +203,7 @@ export default function Footer() {
                   {achievements.map((a, i) => (
                     <div key={i} className="bg-gray-800/60 rounded p-1.5 flex items-center justify-center">
                       {a.logoUrl
-                        ? <img src={a.logoUrl} alt={a.name} className="h-7 w-auto object-contain grayscale hover:grayscale-0 transition-all" />
+                        ? <img src={a.logoUrl} alt={a.name} loading="lazy" className="h-7 w-auto object-contain grayscale hover:grayscale-0 transition-all" />
                         : <span className="text-[11px] text-gray-500 text-center leading-tight">{a.name}</span>
                       }
                     </div>

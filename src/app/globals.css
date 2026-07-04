@@ -18,6 +18,11 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
+/* Defense-in-depth: nothing in the app should need horizontal body scroll */
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--color-white);
   color: var(--color-black);
@@ -102,6 +107,7 @@ body {
 @media (min-width: 1024px) {
   .site-container {
     width: 80%;
+    max-width: 1800px; /* caps content width on ultra-wide (1920px+/2560px+) monitors */
     padding-left: 0;
     padding-right: 0;
   }

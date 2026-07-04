@@ -74,7 +74,7 @@ export default function HomePage() {
         eventsConfig={home?.events}
         blogConfig={home?.blog}
       />
-      <FAQSection faqs={faqs} cardBgImage={home?.faqCardBgImage} />
+      <FAQSection faqs={faqs} />
       <FinalCTA cta={home?.cta} companyName={settings?.companyName} phone={settings?.phone} />
     </>
   );

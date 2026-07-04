@@ -217,6 +217,7 @@ export default function CareerPlacementPage() {
                   <img
                     src={company.logo}
                     alt={company.name}
+                    loading="lazy"
                     className="w-full h-full object-contain p-2"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                   />
