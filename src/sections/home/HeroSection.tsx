@@ -56,10 +56,6 @@ export default function HeroSection({ content }: Props) {
       {/* Subtle red ambient glow top-left */}
       <div className="absolute top-0 left-0 w-[600px] h-[400px] bg-red-950/25 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Red vertical accent bar */}
-      <div className="absolute hidden lg:block w-px bg-gradient-to-b from-transparent via-red-600/50 to-transparent top-16 bottom-16"
-        style={{ left: "calc(50% - 80px)" }} />
-
       <div className="relative z-10 w-full px-5 lg:px-0 lg:w-[95%] mx-auto pt-28 pb-16">
         <div className="grid lg:grid-cols-[1fr_260px] gap-8 lg:gap-12 items-center min-h-[calc(100vh-11rem)]">
 
