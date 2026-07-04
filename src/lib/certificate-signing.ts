@@ -14,6 +14,26 @@ let _privateKey: KeyObject | null = null;
 let _publicKey: KeyObject | null = null;
 let _warnedMissingKeys = false;
 
+// Env vars pasted via a dashboard textarea, a CLI, or copied out of a table/markdown
+// cell can lose their real newlines — either turned into literal "\n" escape
+// sequences, or fully collapsed onto one line. Both fail OpenSSL's PEM decoder
+// with an opaque "DECODER routines::unsupported", so repair both cases before
+// handing the value off: unescape literal "\n" first, then if the result still
+// has no line breaks (fully collapsed), reconstruct proper PEM line-wrapping
+// from the BEGIN/END markers.
+function normalizePem(pem: string): string {
+  let value = pem.trim().replace(/^['"]|['"]$/g, "").replace(/\\n/g, "\n");
+  if (!value.includes("\n")) {
+    const match = value.match(/-----BEGIN ([A-Z ]+)-----\s*([A-Za-z0-9+/=\s]+?)\s*-----END \1-----/);
+    if (match) {
+      const [, label, body] = match;
+      const wrapped = body.replace(/\s+/g, "").match(/.{1,64}/g)?.join("\n") ?? body;
+      value = `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----\n`;
+    }
+  }
+  return value;
+}
+
 function loadKeys(): { privateKey: KeyObject; publicKey: KeyObject } {
   if (_privateKey && _publicKey) return { privateKey: _privateKey, publicKey: _publicKey };
 
@@ -21,8 +41,17 @@ function loadKeys(): { privateKey: KeyObject; publicKey: KeyObject } {
   const publicPem = process.env.CERT_SIGNING_PUBLIC_KEY;
 
   if (privatePem && publicPem) {
-    _privateKey = crypto.createPrivateKey(privatePem);
-    _publicKey = crypto.createPublicKey(publicPem);
+    try {
+      _privateKey = crypto.createPrivateKey(normalizePem(privatePem));
+      _publicKey = crypto.createPublicKey(normalizePem(publicPem));
+    } catch (err) {
+      throw new Error(
+        "[certificate-signing] Failed to parse CERT_SIGNING_PRIVATE_KEY/CERT_SIGNING_PUBLIC_KEY. " +
+        "This usually means the PEM value lost its line breaks when it was pasted (e.g. copied out of a " +
+        "table or a UI that collapsed newlines). Re-copy the key exactly as generated, including the " +
+        "-----BEGIN/END----- lines on their own lines. Original error: " + (err instanceof Error ? err.message : String(err))
+      );
+    }
     return { privateKey: _privateKey, publicKey: _publicKey };
   }
 
