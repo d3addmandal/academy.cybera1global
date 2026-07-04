@@ -67,6 +67,16 @@ function now(): string {
   return new Date().toISOString();
 }
 
+// Generic raw file access for maintenance/migration tasks that need to walk a
+// whole company data file uniformly (e.g. recompress-images.ts) rather than
+// go through each collection's specific CRUD shape.
+export function readCompanyFile<T>(companySlug: string, filename: string): T | null {
+  return readFile<T>(companySlug, filename);
+}
+export function writeCompanyFile<T>(companySlug: string, filename: string, data: T): void {
+  writeFile(companySlug, filename, data);
+}
+
 // ─── Sessions (no-concurrent-login + inactivity timeout) ────────────────────
 
 const SESSION_INACTIVITY_MS = 30 * 60 * 1000; // 30 minutes

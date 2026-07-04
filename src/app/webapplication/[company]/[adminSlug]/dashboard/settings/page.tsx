@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PageHeader, Field, Input, Textarea, SaveBar, Card } from "@/components/admin/FormField";
+import { ConfirmModal } from "@/components/admin/Modal";
 import { useToast } from "@/components/admin/Toast";
-import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, ImageDown } from "lucide-react";
 import type { SiteSettings } from "@/types/cms";
+import type { RecompressSummary } from "@/lib/recompress-images";
 
 export default function SettingsPage() {
   const params = useParams();
@@ -19,6 +21,10 @@ export default function SettingsPage() {
   const [fetchError, setFetchError] = useState("");
   const [notifStatus, setNotifStatus] = useState<{ configured: boolean; active: string | null } | null>(null);
   const [sheetsStatus, setSheetsStatus] = useState<{ configured: boolean } | null>(null);
+  const [recompressBusy, setRecompressBusy] = useState(false);
+  const [recompressPreview, setRecompressPreview] = useState<RecompressSummary | null>(null);
+  const [recompressResult, setRecompressResult] = useState<RecompressSummary | null>(null);
+  const [confirmRecompressOpen, setConfirmRecompressOpen] = useState(false);
 
   function load() {
     setIsLoading(true);
@@ -47,6 +53,39 @@ export default function SettingsPage() {
       .then((d) => { if (d.success) setSheetsStatus(d.data); })
       .catch(() => {});
   }, [company]);
+
+  async function handlePreviewRecompress() {
+    setRecompressBusy(true);
+    setRecompressResult(null);
+    try {
+      const res = await fetch(`/api/admin/${company}/recompress-images`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dryRun: true }),
+      });
+      const data = await res.json();
+      if (data.success) setRecompressPreview(data.data);
+      else toast(data.error || "Preview failed.", "error");
+    } catch { toast("Network error.", "error"); }
+    finally { setRecompressBusy(false); }
+  }
+
+  async function handleRunRecompress() {
+    setRecompressBusy(true);
+    setConfirmRecompressOpen(false);
+    try {
+      const res = await fetch(`/api/admin/${company}/recompress-images`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dryRun: false }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRecompressResult(data.data);
+        setRecompressPreview(null);
+        toast(`Recompressed ${data.data.processed} image(s).`, "success");
+      } else toast(data.error || "Recompression failed.", "error");
+    } catch { toast("Network error.", "error"); }
+    finally { setRecompressBusy(false); }
+  }
 
   function update(key: string, value: unknown) {
     setSettings((p) => p ? { ...p, [key]: value } : p);
@@ -431,8 +470,69 @@ function sendTelegram(data) {
             </Field>
           </div>
         </Card>
+
+        {/* Maintenance */}
+        <Card title="Image Maintenance" subtitle="One-time cleanup for images uploaded before automatic compression existed.">
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">
+              Every new upload across the CRM (gallery, logos, photos, banners, etc.) is already
+              compressed to WebP automatically. This tool finds images uploaded <em>before</em> that
+              existed — still JPG/PNG/GIF — and recompresses them the same way, without touching QR
+              codes or favicons/site-icons (those are deliberately left uncompressed).
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={handlePreviewRecompress}
+                disabled={recompressBusy}
+                className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50"
+              >
+                <ImageDown className="w-4 h-4" /> {recompressBusy ? "Scanning…" : "Preview (no changes made)"}
+              </button>
+              {recompressPreview && recompressPreview.scanned > 0 && (
+                <button
+                  onClick={() => setConfirmRecompressOpen(true)}
+                  disabled={recompressBusy}
+                  className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 disabled:opacity-50"
+                >
+                  Recompress {recompressPreview.processed} Image{recompressPreview.processed === 1 ? "" : "s"} Now
+                </button>
+              )}
+            </div>
+
+            {recompressPreview && (
+              <div className="rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">
+                {recompressPreview.scanned === 0
+                  ? "Nothing to do — every image is already compressed."
+                  : `Found ${recompressPreview.scanned} image(s) that predate compression. ${recompressPreview.remaining > 0 ? `Will process ${recompressPreview.processed} this run, ${recompressPreview.remaining} more on a follow-up run.` : `All ${recompressPreview.processed} will be processed in one run.`}`}
+              </div>
+            )}
+
+            {recompressResult && (
+              <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700 space-y-1">
+                <p className="font-semibold">
+                  Recompressed {recompressResult.processed} image(s)
+                  {recompressResult.bytesBefore > 0 && (
+                    <> — {(recompressResult.bytesBefore / 1024).toFixed(0)}KB → {(recompressResult.bytesAfter / 1024).toFixed(0)}KB
+                    ({(100 - (recompressResult.bytesAfter / recompressResult.bytesBefore) * 100).toFixed(0)}% smaller)</>
+                  )}
+                </p>
+                {recompressResult.failed > 0 && <p className="text-amber-700">{recompressResult.failed} failed — check server logs.</p>}
+                {recompressResult.remaining > 0 && <p>Run again to process the remaining {recompressResult.remaining}.</p>}
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
       <SaveBar onSave={handleSave} isLoading={isSaving} isDirty={isDirty} />
+
+      <ConfirmModal
+        open={confirmRecompressOpen}
+        onClose={() => setConfirmRecompressOpen(false)}
+        onConfirm={handleRunRecompress}
+        isLoading={recompressBusy}
+        title="Recompress Images"
+        message={`This will replace ${recompressPreview?.processed ?? 0} image(s) with smaller WebP versions and update every reference to them. The originals are left in Blob storage (not deleted) in case anything needs reverting. Continue?`}
+      />
     </div>
   );
 }
