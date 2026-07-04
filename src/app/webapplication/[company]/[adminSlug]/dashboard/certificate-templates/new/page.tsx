@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { PageHeader, Field, Input, Textarea, Toggle, SaveBar, Card } from "@/components/admin/FormField";
+import { PageHeader, Field, Input, Textarea, Select, Toggle, SaveBar, Card } from "@/components/admin/FormField";
 import { useToast } from "@/components/admin/Toast";
-import ImageUpload from "@/components/admin/ImageUpload";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { renderCertificateHtml, SAMPLE_PLACEHOLDER_DATA } from "@/lib/certificate-template";
 import { TokenReferenceCard, DEFAULT_TEMPLATE_HTML } from "../TokenReferenceCard";
+import type { Programme } from "@/types/cms";
 
 export default function NewCertificateTemplatePage() {
   const params = useParams();
@@ -17,16 +17,23 @@ export default function NewCertificateTemplatePage() {
   const base = `/webapplication/${company}/${adminSlug}/dashboard`;
   const { toast } = useToast();
 
+  const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [form, setForm] = useState({
-    name: "", description: "", htmlContent: DEFAULT_TEMPLATE_HTML,
-    backgroundImageUrl: "", logoUrl: "", isDefault: false, status: "draft",
+    programmeId: "", description: "", htmlContent: DEFAULT_TEMPLATE_HTML,
+    isDefault: false, status: "draft",
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/admin/${company}/programmes`).then((r) => r.json()).then((d) => {
+      if (d.success) setProgrammes(d.data);
+    });
+  }, [company]);
 
   function update(key: string, value: unknown) { setForm((p) => ({ ...p, [key]: value })); }
 
   async function handleSave() {
-    if (!form.name || !form.htmlContent) { toast("Name and HTML content are required.", "error"); return; }
+    if (!form.programmeId || !form.htmlContent) { toast("Course and HTML/SVG content are required.", "error"); return; }
     setIsSaving(true);
     try {
       const res = await fetch(`/api/admin/${company}/certificate-templates`, {
@@ -51,23 +58,20 @@ export default function NewCertificateTemplatePage() {
       <Card title="Template Details">
         <div className="grid gap-4">
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Name *"><Input value={form.name} onChange={(e) => update("name", e.target.value)} /></Field>
+            <Field label="Certificate Template *" hint="Course this certificate template belongs to">
+              <Select value={form.programmeId} onChange={(e) => update("programmeId", e.target.value)}>
+                <option value="">Select a course…</option>
+                {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+              </Select>
+            </Field>
             <Field label="Description"><Input value={form.description} onChange={(e) => update("description", e.target.value)} /></Field>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Background Image">
-              <ImageUpload value={form.backgroundImageUrl} onChange={(url) => update("backgroundImageUrl", url)} company={company} folder="certificate-templates" aspectClass="aspect-[4/3]" />
-            </Field>
-            <Field label="Logo">
-              <ImageUpload value={form.logoUrl} onChange={(url) => update("logoUrl", url)} company={company} folder="certificate-templates" aspectClass="aspect-square" />
-            </Field>
           </div>
           <Toggle checked={form.isDefault} onChange={(v) => update("isDefault", v)} label="Set as default template" />
         </div>
       </Card>
 
       <div className="grid lg:grid-cols-[1fr_260px] gap-5 mt-5">
-        <Card title="HTML Content *" subtitle="Raw HTML/CSS — use the tokens listed for dynamic data">
+        <Card title="HTML / SVG Content *" subtitle="Raw HTML or SVG markup — use the tokens listed for dynamic data">
           <Textarea value={form.htmlContent} onChange={(e) => update("htmlContent", e.target.value)} rows={18} className="font-mono text-xs" />
         </Card>
         <TokenReferenceCard />

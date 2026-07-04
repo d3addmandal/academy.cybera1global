@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { PageHeader, Field, Input, Textarea, Select, SaveBar, Card, StatusBadge } from "@/components/admin/FormField";
+import { PageHeader, Field, Input, Select, SaveBar, Card, StatusBadge } from "@/components/admin/FormField";
 import DataTable from "@/components/admin/DataTable";
 import { useToast } from "@/components/admin/Toast";
-import ImageUpload from "@/components/admin/ImageUpload";
 import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
 import { downloadCertificatePdf, waitForImages } from "@/lib/certificate-pdf";
 import { ArrowLeft, Download, QrCode, RefreshCw, Link2 } from "lucide-react";
 import Link from "next/link";
-import type { Certificate, CertificateTemplate, CertificateAuditLogEntry, CertificateStatus } from "@/types/cms";
+import type { Certificate, CertificateTemplate, CertificateAuditLogEntry, CertificateStatus, Programme } from "@/types/cms";
 
 const STATUSES: CertificateStatus[] = ["active", "revoked", "expired", "suspended"];
 
@@ -24,6 +23,7 @@ export default function EditCertificatePage() {
 
   const [cert, setCert] = useState<Certificate | null>(null);
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
+  const [programmes, setProgrammes] = useState<Programme[]>([]);
   const [auditLog, setAuditLog] = useState<CertificateAuditLogEntry[]>([]);
   const [form, setForm] = useState<Partial<Certificate>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -38,9 +38,11 @@ export default function EditCertificatePage() {
     Promise.all([
       fetch(`/api/admin/${company}/certificates/${id}`).then((r) => r.json()),
       fetch(`/api/admin/${company}/certificate-templates`).then((r) => r.json()),
-    ]).then(([certRes, templatesRes]) => {
+      fetch(`/api/admin/${company}/programmes`).then((r) => r.json()),
+    ]).then(([certRes, templatesRes, programmesRes]) => {
       if (certRes.success) { setCert(certRes.data); setForm(certRes.data); }
       if (templatesRes.success) setTemplates(templatesRes.data);
+      if (programmesRes.success) setProgrammes(programmesRes.data);
       setIsLoading(false);
     });
     fetch(`/api/admin/${company}/certificates/${id}/audit-log`).then((r) => r.json()).then((d) => { if (d.success) setAuditLog(d.data); }).catch(() => {});
@@ -49,7 +51,7 @@ export default function EditCertificatePage() {
 
   function update(key: keyof Certificate, value: unknown) { setForm((p) => ({ ...p, [key]: value })); setIsDirty(true); }
 
-  const activeTemplate = templates.find((t) => t.id === form.templateId);
+  const activeTemplate = templates.find((t) => t.programmeId === form.programmeId) ?? templates.find((t) => t.id === form.templateId);
   const previewHtml = activeTemplate && cert
     ? renderCertificateHtml(activeTemplate.htmlContent, toPlaceholderData({ ...cert, ...form } as Certificate))
     : "";
@@ -131,10 +133,11 @@ export default function EditCertificatePage() {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-5 items-start">
         <div className="space-y-5">
-          <Card title="Template">
-            <Field label="Certificate Template">
-              <Select value={form.templateId ?? ""} onChange={(e) => update("templateId", e.target.value)}>
-                {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          <Card title="Course">
+            <Field label="Course Name" hint="Certificate template resolves automatically from the selected course">
+              <Select value={form.programmeId ?? ""} onChange={(e) => update("programmeId", e.target.value)}>
+                <option value="">Select a course…</option>
+                {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
               </Select>
             </Field>
           </Card>
@@ -143,37 +146,20 @@ export default function EditCertificatePage() {
             <div className="grid gap-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <Field label="Student Name"><Input value={form.studentName ?? ""} onChange={(e) => update("studentName", e.target.value)} /></Field>
-                <Field label="Student Email"><Input type="email" value={form.studentEmail ?? ""} onChange={(e) => update("studentEmail", e.target.value)} /></Field>
-              </div>
-              <Field label="Student Mobile"><Input value={form.studentPhone ?? ""} onChange={(e) => update("studentPhone", e.target.value)} /></Field>
-              <Field label="Student Photograph">
-                <ImageUpload value={form.studentPhotoUrl ?? ""} onChange={(url) => update("studentPhotoUrl", url)} company={company} folder="certificates/photos" aspectClass="aspect-square" />
-              </Field>
-            </div>
-          </Card>
-
-          <Card title="Course & Issuance">
-            <div className="grid gap-4">
-              <Field label="Course Name"><Input value={form.courseName ?? ""} onChange={(e) => update("courseName", e.target.value)} /></Field>
-              <Field label="Course Description"><Textarea value={form.courseDescription ?? ""} rows={3} onChange={(e) => update("courseDescription", e.target.value)} /></Field>
-              <div className="grid sm:grid-cols-3 gap-4">
-                <Field label="Issue Date"><Input type="date" value={form.issueDate ?? ""} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-                <Field label="Course Start Date"><Input type="date" value={form.startDate ?? ""} onChange={(e) => update("startDate", e.target.value)} /></Field>
-                <Field label="Course End Date"><Input type="date" value={form.endDate ?? ""} onChange={(e) => update("endDate", e.target.value)} /></Field>
+                <Field label="Student Date Of Birth"><Input type="date" value={form.studentDob ?? ""} onChange={(e) => update("studentDob", e.target.value)} /></Field>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="Certificate Validity"><Input value={form.validityText ?? ""} onChange={(e) => update("validityText", e.target.value)} /></Field>
-                <Field label="Instructor Name"><Input value={form.instructorName ?? ""} onChange={(e) => update("instructorName", e.target.value)} /></Field>
+                <Field label="Student Mobile"><Input value={form.studentPhone ?? ""} onChange={(e) => update("studentPhone", e.target.value)} /></Field>
+                <Field label="Student Email"><Input type="email" value={form.studentEmail ?? ""} onChange={(e) => update("studentEmail", e.target.value)} /></Field>
               </div>
             </div>
           </Card>
 
-          <Card title="Organization">
-            <div className="grid gap-4">
-              <Field label="Organization Name"><Input value={form.organizationName ?? ""} onChange={(e) => update("organizationName", e.target.value)} /></Field>
-              <Field label="Organization Logo">
-                <ImageUpload value={form.organizationLogoUrl ?? ""} onChange={(url) => update("organizationLogoUrl", url)} company={company} folder="certificates" aspectClass="aspect-square" />
-              </Field>
+          <Card title="Issuance">
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Field label="Issue Date"><Input type="date" value={form.issueDate ?? ""} onChange={(e) => update("issueDate", e.target.value)} /></Field>
+              <Field label="Course Start Date"><Input type="date" value={form.startDate ?? ""} onChange={(e) => update("startDate", e.target.value)} /></Field>
+              <Field label="Course End Date"><Input type="date" value={form.endDate ?? ""} onChange={(e) => update("endDate", e.target.value)} /></Field>
             </div>
           </Card>
 

@@ -80,9 +80,8 @@ export function buildCanonicalString(cert: {
   studentName: string;
   courseName: string;
   issueDate: string;
-  organizationName: string;
 }): string {
-  return [cert.certificateNumber, cert.studentName, cert.courseName, cert.issueDate, cert.organizationName].join("|");
+  return [cert.certificateNumber, cert.studentName, cert.courseName, cert.issueDate].join("|");
 }
 
 export function signCertificateData(data: string): string {

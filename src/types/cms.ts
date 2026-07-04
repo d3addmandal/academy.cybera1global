@@ -525,11 +525,10 @@ export type CertificateAuditAction =
 export interface CertificateTemplate {
   id: string;
   companySlug: string;
-  name: string;
+  programmeId: string; // the course this template belongs to — 1:1 in practice
+  name: string; // always derived server-side from the linked programme's title
   description?: string;
-  htmlContent: string;
-  backgroundImageUrl?: string;
-  logoUrl?: string;
+  htmlContent: string; // HTML or SVG markup
   isDefault: boolean;
   status: Status;
   createdAt: string;
@@ -541,23 +540,18 @@ export interface Certificate {
   companySlug: string;
   certificateNumber: string;
   templateId: string;
+  programmeId: string; // the course — resolves templateId server-side
 
   studentName: string;
   studentEmail?: string;
   studentPhone?: string;
-  studentPhotoUrl?: string;
+  studentDob?: string;
 
-  courseName: string;
-  courseDescription?: string;
+  courseName: string; // denormalized display copy, derived from the programme
 
   issueDate: string;
   startDate?: string;
   endDate?: string;
-  validityText?: string;
-
-  instructorName?: string;
-  organizationName: string;
-  organizationLogoUrl?: string;
 
   status: CertificateStatus;
   statusReason?: string;

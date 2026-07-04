@@ -56,7 +56,7 @@ export default async function CertificateVerificationPage({ params }: Props) {
     <div className="pt-28 pb-20 bg-gray-50 min-h-screen">
       <div className="site-container max-w-4xl">
         {theme?.logo?.imageUrl && (
-          <img src={theme.logo.imageUrl} alt={certificate.organizationName} className="h-10 mx-auto mb-6" />
+          <img src={theme.logo.imageUrl} alt="Certificate issuer logo" className="h-10 mx-auto mb-6" />
         )}
 
         <div className={`flex items-center justify-center gap-2 rounded-xl border px-5 py-4 mb-6 ${meta.bg}`}>
@@ -76,8 +76,6 @@ export default async function CertificateVerificationPage({ params }: Props) {
             <DetailRow icon={CalendarDays} label="Issue Date" value={certificate.issueDate} />
             {certificate.startDate && <DetailRow icon={CalendarDays} label="Course Start" value={certificate.startDate} />}
             {certificate.endDate && <DetailRow icon={CalendarDays} label="Course End" value={certificate.endDate} />}
-            {certificate.instructorName && <DetailRow icon={User} label="Instructor" value={certificate.instructorName} />}
-            <DetailRow icon={BadgeCheck} label="Organization" value={certificate.organizationName} />
           </div>
           {certificate.signatureValue && (
             <p className="text-xs text-emerald-600 font-semibold mt-4 flex items-center gap-1.5">

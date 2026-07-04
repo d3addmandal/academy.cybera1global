@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
-import { certificatesDb, certificateAuditLogDb } from "@/lib/db";
+import { certificatesDb, certificateAuditLogDb, certificateTemplatesDb, programmesDb } from "@/lib/db";
 import { isAdmin, forbidden } from "@/lib/permissions";
-import { sanitizeText, sanitizeEmail, sanitizePhone, sanitizeUrl } from "@/lib/sanitize";
+import { sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/sanitize";
 import { buildCanonicalString, signCertificateData } from "@/lib/certificate-signing";
 
 type Params = { params: Promise<{ company: string; id: string }> };
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 }
 
 // Fields that feed the signed canonical string — editing any of these re-signs the certificate.
-const SIGNED_FIELDS = ["studentName", "courseName", "issueDate", "organizationName"] as const;
+const SIGNED_FIELDS = ["studentName", "courseName", "issueDate"] as const;
 
 export async function PUT(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
@@ -33,17 +33,28 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (body.studentName !== undefined) patch.studentName = sanitizeText(body.studentName, 150);
   if (body.studentEmail !== undefined) patch.studentEmail = body.studentEmail ? sanitizeEmail(body.studentEmail) : "";
   if (body.studentPhone !== undefined) patch.studentPhone = body.studentPhone ? sanitizePhone(body.studentPhone) : "";
-  if (body.studentPhotoUrl !== undefined) patch.studentPhotoUrl = body.studentPhotoUrl ? sanitizeUrl(body.studentPhotoUrl) : "";
-  if (body.courseName !== undefined) patch.courseName = sanitizeText(body.courseName, 200);
-  if (body.courseDescription !== undefined) patch.courseDescription = sanitizeText(body.courseDescription, 2000);
+  if (body.studentDob !== undefined) patch.studentDob = body.studentDob ? sanitizeText(body.studentDob, 30) : "";
   if (body.issueDate !== undefined) patch.issueDate = sanitizeText(body.issueDate, 30);
   if (body.startDate !== undefined) patch.startDate = sanitizeText(body.startDate, 30);
   if (body.endDate !== undefined) patch.endDate = sanitizeText(body.endDate, 30);
-  if (body.validityText !== undefined) patch.validityText = sanitizeText(body.validityText, 100);
-  if (body.instructorName !== undefined) patch.instructorName = sanitizeText(body.instructorName, 150);
-  if (body.organizationName !== undefined) patch.organizationName = sanitizeText(body.organizationName, 150);
-  if (body.organizationLogoUrl !== undefined) patch.organizationLogoUrl = body.organizationLogoUrl ? sanitizeUrl(body.organizationLogoUrl) : "";
-  if (body.templateId !== undefined) patch.templateId = sanitizeText(body.templateId, 100);
+
+  if (body.programmeId !== undefined) {
+    const programmeId = sanitizeText(body.programmeId, 100);
+    const programme = programmesDb.getById(company, programmeId);
+    if (!programme) {
+      return NextResponse.json({ success: false, error: "Selected course does not exist." }, { status: 400 });
+    }
+    const template = certificateTemplatesDb.getAll(company).find((t) => t.programmeId === programmeId);
+    if (!template) {
+      return NextResponse.json(
+        { success: false, error: `No certificate template configured for "${programme.title}". Create one under Certificate Templates first.` },
+        { status: 400 }
+      );
+    }
+    patch.programmeId = programme.id;
+    patch.courseName = programme.title;
+    patch.templateId = template.id;
+  }
 
   const willChangeSignedField = SIGNED_FIELDS.some((f) => f in patch);
   if (willChangeSignedField) {
@@ -54,7 +65,6 @@ export async function PUT(req: NextRequest, { params }: Params) {
         studentName: merged.studentName,
         courseName: merged.courseName,
         issueDate: merged.issueDate,
-        organizationName: merged.organizationName,
       })
     );
   }

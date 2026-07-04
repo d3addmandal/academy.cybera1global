@@ -1,5 +1,5 @@
 /**
- * Placeholder substitution engine for certificate HTML templates.
+ * Placeholder substitution engine for certificate HTML/SVG templates.
  *
  * This is the one place admin-authored markup (the template) meets
  * user-supplied data (student name, course name, etc.) — every plain-text
@@ -10,23 +10,16 @@
 export interface CertificatePlaceholderData {
   student_name: string;
   student_email?: string;
-  student_phone?: string;
-  student_photo?: string;
   course_name: string;
-  course_description?: string;
   certificate_number: string;
   issue_date: string;
   course_start_date?: string;
   course_end_date?: string;
-  validity_text?: string;
-  instructor: string;
-  organization: string;
-  organization_logo?: string;
   qr_code: string;
   verification_url: string;
 }
 
-const IMAGE_TOKENS = new Set(["student_photo", "organization_logo", "qr_code"]);
+const IMAGE_TOKENS = new Set(["qr_code"]);
 
 export function escapeHtml(value: unknown): string {
   return String(value ?? "")
@@ -63,18 +56,11 @@ export function renderCertificateHtml(templateHtml: string, data: CertificatePla
 export interface CertificateLikeRecord {
   studentName: string;
   studentEmail?: string;
-  studentPhone?: string;
-  studentPhotoUrl?: string;
   courseName: string;
-  courseDescription?: string;
   certificateNumber: string;
   issueDate: string;
   startDate?: string;
   endDate?: string;
-  validityText?: string;
-  instructorName?: string;
-  organizationName: string;
-  organizationLogoUrl?: string;
   qrCodePath: string;
   verificationUrl: string;
 }
@@ -84,18 +70,11 @@ export function toPlaceholderData(cert: CertificateLikeRecord): CertificatePlace
   return {
     student_name: cert.studentName,
     student_email: cert.studentEmail,
-    student_phone: cert.studentPhone,
-    student_photo: cert.studentPhotoUrl,
     course_name: cert.courseName,
-    course_description: cert.courseDescription,
     certificate_number: cert.certificateNumber,
     issue_date: cert.issueDate,
     course_start_date: cert.startDate,
     course_end_date: cert.endDate,
-    validity_text: cert.validityText,
-    instructor: cert.instructorName ?? "",
-    organization: cert.organizationName,
-    organization_logo: cert.organizationLogoUrl,
     qr_code: cert.qrCodePath,
     verification_url: cert.verificationUrl,
   };
@@ -110,9 +89,6 @@ export const SAMPLE_PLACEHOLDER_DATA: CertificatePlaceholderData = {
   issue_date: new Date().toISOString().slice(0, 10),
   course_start_date: "2026-01-01",
   course_end_date: "2026-03-01",
-  validity_text: "Lifetime",
-  instructor: "Dr. Alex Rivera",
-  organization: "Cyber A1 Academy",
   qr_code: "",
   verification_url: "https://example.com/certificate/CERT-2026-SAMPLE1",
 };

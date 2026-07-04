@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { PageHeader, Field, Input, Textarea, Select, SaveBar, Card } from "@/components/admin/FormField";
+import { PageHeader, Field, Input, Select, SaveBar, Card } from "@/components/admin/FormField";
 import { useToast } from "@/components/admin/Toast";
-import ImageUpload from "@/components/admin/ImageUpload";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { CertificateTemplate } from "@/types/cms";
+import type { Programme } from "@/types/cms";
 
 export default function NewCertificatePage() {
   const params = useParams();
@@ -16,31 +15,25 @@ export default function NewCertificatePage() {
   const base = `/webapplication/${company}/${adminSlug}/dashboard`;
   const { toast } = useToast();
 
-  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
+  const [programmes, setProgrammes] = useState<Programme[]>([]);
   const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
-    templateId: "", studentName: "", studentEmail: "", studentPhone: "", studentPhotoUrl: "",
-    courseName: "", courseDescription: "", issueDate: today, startDate: "", endDate: "",
-    validityText: "", instructorName: "", organizationName: "", organizationLogoUrl: "",
+    programmeId: "", studentName: "", studentEmail: "", studentPhone: "", studentDob: "",
+    issueDate: today, startDate: "", endDate: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/admin/${company}/certificate-templates`).then((r) => r.json()).then((d) => {
-      if (d.success) {
-        setTemplates(d.data);
-        const def = d.data.find((t: CertificateTemplate) => t.isDefault) ?? d.data[0];
-        if (def) update("templateId", def.id);
-      }
+    fetch(`/api/admin/${company}/programmes`).then((r) => r.json()).then((d) => {
+      if (d.success) setProgrammes(d.data);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [company]);
 
   function update(key: string, value: unknown) { setForm((p) => ({ ...p, [key]: value })); }
 
   async function handleSave() {
-    if (!form.studentName || !form.courseName || !form.organizationName || !form.templateId) {
-      toast("Student name, course name, organization, and template are required.", "error");
+    if (!form.studentName || !form.programmeId || !form.issueDate) {
+      toast("Student name, course name, and issue date are required.", "error");
       return;
     }
     setIsSaving(true);
@@ -62,11 +55,11 @@ export default function NewCertificatePage() {
         <PageHeader title="New Certificate" />
       </div>
 
-      <Card title="Template">
-        <Field label="Certificate Template *" hint="Manage templates under Certificate Templates">
-          <Select value={form.templateId} onChange={(e) => update("templateId", e.target.value)}>
-            <option value="">Select a template…</option>
-            {templates.map((t) => <option key={t.id} value={t.id}>{t.name}{t.isDefault ? " (Default)" : ""}</option>)}
+      <Card title="Course">
+        <Field label="Course Name *" hint="Certificate template resolves automatically from the selected course">
+          <Select value={form.programmeId} onChange={(e) => update("programmeId", e.target.value)}>
+            <option value="">Select a course…</option>
+            {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
           </Select>
         </Field>
       </Card>
@@ -76,43 +69,22 @@ export default function NewCertificatePage() {
           <div className="grid gap-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Student Name *"><Input value={form.studentName} onChange={(e) => update("studentName", e.target.value)} /></Field>
-              <Field label="Student Email"><Input type="email" value={form.studentEmail} onChange={(e) => update("studentEmail", e.target.value)} /></Field>
+              <Field label="Student Date Of Birth"><Input type="date" value={form.studentDob} onChange={(e) => update("studentDob", e.target.value)} /></Field>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Student Mobile"><Input value={form.studentPhone} onChange={(e) => update("studentPhone", e.target.value)} /></Field>
-            </div>
-            <Field label="Student Photograph">
-              <ImageUpload value={form.studentPhotoUrl} onChange={(url) => update("studentPhotoUrl", url)} company={company} folder="certificates/photos" aspectClass="aspect-square" />
-            </Field>
-          </div>
-        </Card>
-      </div>
-
-      <div className="mt-5">
-        <Card title="Course & Issuance">
-          <div className="grid gap-4">
-            <Field label="Course Name *"><Input value={form.courseName} onChange={(e) => update("courseName", e.target.value)} /></Field>
-            <Field label="Course Description"><Textarea value={form.courseDescription} rows={3} onChange={(e) => update("courseDescription", e.target.value)} /></Field>
-            <div className="grid sm:grid-cols-3 gap-4">
-              <Field label="Issue Date *"><Input type="date" value={form.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-              <Field label="Course Start Date"><Input type="date" value={form.startDate} onChange={(e) => update("startDate", e.target.value)} /></Field>
-              <Field label="Course End Date"><Input type="date" value={form.endDate} onChange={(e) => update("endDate", e.target.value)} /></Field>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Certificate Validity" hint="e.g. Lifetime, Valid for 2 years"><Input value={form.validityText} onChange={(e) => update("validityText", e.target.value)} /></Field>
-              <Field label="Instructor Name"><Input value={form.instructorName} onChange={(e) => update("instructorName", e.target.value)} /></Field>
+              <Field label="Student Email"><Input type="email" value={form.studentEmail} onChange={(e) => update("studentEmail", e.target.value)} /></Field>
             </div>
           </div>
         </Card>
       </div>
 
       <div className="mt-5">
-        <Card title="Organization">
-          <div className="grid gap-4">
-            <Field label="Organization Name *"><Input value={form.organizationName} onChange={(e) => update("organizationName", e.target.value)} /></Field>
-            <Field label="Organization Logo">
-              <ImageUpload value={form.organizationLogoUrl} onChange={(url) => update("organizationLogoUrl", url)} company={company} folder="certificates" aspectClass="aspect-square" />
-            </Field>
+        <Card title="Issuance">
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Field label="Issue Date *"><Input type="date" value={form.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
+            <Field label="Course Start Date"><Input type="date" value={form.startDate} onChange={(e) => update("startDate", e.target.value)} /></Field>
+            <Field label="Course End Date"><Input type="date" value={form.endDate} onChange={(e) => update("endDate", e.target.value)} /></Field>
           </div>
         </Card>
       </div>

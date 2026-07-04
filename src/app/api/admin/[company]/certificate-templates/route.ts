@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
-import { certificateTemplatesDb } from "@/lib/db";
+import { certificateTemplatesDb, programmesDb } from "@/lib/db";
 import { isAdmin, forbidden } from "@/lib/permissions";
-import { sanitizeText, sanitizeUrl, sanitizeHtml } from "@/lib/sanitize";
+import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";
 
 type Params = { params: Promise<{ company: string }> };
 
@@ -22,18 +22,22 @@ export async function POST(req: NextRequest, { params }: Params) {
   const { company } = await params;
   const body = await req.json().catch(() => ({}));
 
-  const name = sanitizeText(body.name, 150);
+  const programmeId = sanitizeText(body.programmeId, 100);
   const htmlContent = sanitizeHtml(body.htmlContent, 200_000);
-  if (!name || !htmlContent) {
-    return NextResponse.json({ success: false, error: "Name and HTML content are required." }, { status: 400 });
+  if (!programmeId || !htmlContent) {
+    return NextResponse.json({ success: false, error: "Course and HTML/SVG content are required." }, { status: 400 });
+  }
+
+  const programme = programmesDb.getById(company, programmeId);
+  if (!programme) {
+    return NextResponse.json({ success: false, error: "Selected course does not exist." }, { status: 400 });
   }
 
   const template = certificateTemplatesDb.create(company, {
-    name,
+    programmeId: programme.id,
+    name: programme.title,
     description: body.description ? sanitizeText(body.description, 500) : undefined,
     htmlContent,
-    backgroundImageUrl: body.backgroundImageUrl ? sanitizeUrl(body.backgroundImageUrl) : undefined,
-    logoUrl: body.logoUrl ? sanitizeUrl(body.logoUrl) : undefined,
     isDefault: Boolean(body.isDefault),
     status: ["published", "draft", "archived"].includes(body.status) ? body.status : "draft",
   });

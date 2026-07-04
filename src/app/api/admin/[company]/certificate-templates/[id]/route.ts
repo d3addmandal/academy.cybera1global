@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/auth";
-import { certificateTemplatesDb, certificatesDb } from "@/lib/db";
+import { certificateTemplatesDb, certificatesDb, programmesDb } from "@/lib/db";
 import { isAdmin, forbidden } from "@/lib/permissions";
-import { sanitizeText, sanitizeUrl, sanitizeHtml } from "@/lib/sanitize";
+import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";
 
 type Params = { params: Promise<{ company: string; id: string }> };
 
@@ -24,11 +24,17 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const body = await req.json().catch(() => ({}));
 
   const patch: Record<string, unknown> = {};
-  if (body.name !== undefined) patch.name = sanitizeText(body.name, 150);
+  if (body.programmeId !== undefined) {
+    const programmeId = sanitizeText(body.programmeId, 100);
+    const programme = programmesDb.getById(company, programmeId);
+    if (!programme) {
+      return NextResponse.json({ success: false, error: "Selected course does not exist." }, { status: 400 });
+    }
+    patch.programmeId = programme.id;
+    patch.name = programme.title;
+  }
   if (body.description !== undefined) patch.description = sanitizeText(body.description, 500);
   if (body.htmlContent !== undefined) patch.htmlContent = sanitizeHtml(body.htmlContent, 200_000);
-  if (body.backgroundImageUrl !== undefined) patch.backgroundImageUrl = body.backgroundImageUrl ? sanitizeUrl(body.backgroundImageUrl) : "";
-  if (body.logoUrl !== undefined) patch.logoUrl = body.logoUrl ? sanitizeUrl(body.logoUrl) : "";
   if (body.isDefault !== undefined) patch.isDefault = Boolean(body.isDefault);
   if (body.status !== undefined && ["published", "draft", "archived"].includes(body.status)) patch.status = body.status;
 

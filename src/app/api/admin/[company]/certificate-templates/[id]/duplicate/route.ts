@@ -14,11 +14,10 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (!original) return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
 
   const duplicate = certificateTemplatesDb.create(company, {
+    programmeId: original.programmeId,
     name: `${original.name} (Copy)`,
     description: original.description,
     htmlContent: original.htmlContent,
-    backgroundImageUrl: original.backgroundImageUrl,
-    logoUrl: original.logoUrl,
     isDefault: false,
     status: "draft",
   });

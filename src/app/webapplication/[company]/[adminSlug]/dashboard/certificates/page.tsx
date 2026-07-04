@@ -2,15 +2,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  Edit2, Trash2, Eye, Download, QrCode, RefreshCw, Link2, FileSpreadsheet, FileText,
+  Edit2, Trash2, Eye, Download, QrCode, RefreshCw, Link2, FileSpreadsheet, FileText, Upload,
 } from "lucide-react";
 import DataTable from "@/components/admin/DataTable";
 import { StatusBadge, PageHeader } from "@/components/admin/FormField";
-import { ConfirmModal } from "@/components/admin/Modal";
+import Modal, { ConfirmModal } from "@/components/admin/Modal";
 import { useToast } from "@/components/admin/Toast";
 import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
 import { downloadCertificatePdf, downloadCertificatesZip, waitForImages } from "@/lib/certificate-pdf";
 import type { Certificate, CertificateTemplate } from "@/types/cms";
+
+interface BulkImportRowResult {
+  row: number;
+  studentName: string;
+  courseName: string;
+  ok: boolean;
+  error?: string;
+}
+interface BulkImportResponse {
+  success: boolean;
+  error?: string;
+  dryRun: boolean;
+  total: number;
+  successCount: number;
+  failureCount: number;
+  createdCount: number;
+  results: BulkImportRowResult[];
+}
 
 const MAX_BULK_DOWNLOAD = 25;
 
@@ -31,6 +49,11 @@ export default function CertificatesPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const renderHostRef = useRef<HTMLDivElement>(null);
+
+  const [importOpen, setImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<BulkImportResponse | null>(null);
+  const [importBusy, setImportBusy] = useState(false);
 
   const load = () => {
     setIsLoading(true);
@@ -142,6 +165,32 @@ export default function CertificatesPage() {
     load();
   }
 
+  function closeImportModal() {
+    setImportOpen(false);
+    setImportFile(null);
+    setImportResult(null);
+  }
+
+  async function runImport(dryRun: boolean) {
+    if (!importFile) return;
+    setImportBusy(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", importFile);
+      formData.append("dryRun", String(dryRun));
+      const res: BulkImportResponse = await fetch(`/api/admin/${company}/certificates/bulk-import`, {
+        method: "POST", body: formData,
+      }).then((r) => r.json());
+      if (!res.success) { toast(res.error || "Import failed.", "error"); return; }
+      setImportResult(res);
+      if (!dryRun) { toast(`Created ${res.createdCount} certificate(s).`, "success"); load(); }
+    } catch {
+      toast("Network error.", "error");
+    } finally {
+      setImportBusy(false);
+    }
+  }
+
   return (
     <div>
       <PageHeader
@@ -149,6 +198,9 @@ export default function CertificatesPage() {
         subtitle="Issue, manage, and verify student certificates."
         actions={
           <>
+            <button onClick={() => setImportOpen(true)} className="inline-flex items-center gap-1.5 text-sm text-slate-500 border border-slate-200 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors">
+              <Upload className="w-3.5 h-3.5" /> Bulk Import
+            </button>
             <a href={`/api/admin/${company}/certificates/export?format=csv`} className="inline-flex items-center gap-1.5 text-sm text-slate-500 border border-slate-200 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors">
               <FileText className="w-3.5 h-3.5" /> CSV
             </a>
@@ -223,6 +275,87 @@ export default function CertificatesPage() {
         title="Delete Certificates"
         message={`Delete ${bulkIds.length} selected certificate(s)? This cannot be undone.`}
       />
+
+      <Modal
+        open={importOpen}
+        onClose={closeImportModal}
+        title="Bulk Import Certificates"
+        size="lg"
+        footer={
+          importResult?.dryRun ? (
+            <>
+              <button onClick={closeImportModal} className="px-4 py-2 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
+              <button onClick={() => runImport(false)} disabled={importBusy || importResult.successCount === 0}
+                className="px-4 py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-500 disabled:opacity-60 transition-colors">
+                {importBusy ? "Importing…" : `Confirm & Create ${importResult.successCount}`}
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={closeImportModal} className="px-4 py-2 text-sm font-semibold text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                {importResult ? "Close" : "Cancel"}
+              </button>
+              {!importResult && (
+                <button onClick={() => runImport(true)} disabled={importBusy || !importFile}
+                  className="px-4 py-2 text-sm font-semibold bg-red-600 text-white rounded-lg hover:bg-red-500 disabled:opacity-60 transition-colors">
+                  {importBusy ? "Validating…" : "Preview"}
+                </button>
+              )}
+            </>
+          )
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">
+            Upload a CSV or Excel file with columns: <span className="font-mono text-xs">Student Name, Course Name, Issue Date, Student Date Of Birth, Student Mobile, Student Email, Course Start Date, Course End Date</span>.
+          </p>
+          <a href={`/api/admin/${company}/certificates/bulk-import/sample`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-700">
+            <Download className="w-3.5 h-3.5" /> Download sample file
+          </a>
+          {!importResult && (
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={(e) => setImportFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200"
+            />
+          )}
+          {importResult && (
+            <div className="space-y-3">
+              <div className="flex gap-4 text-sm">
+                <span className="text-slate-600">Total: <strong>{importResult.total}</strong></span>
+                <span className="text-emerald-600">Valid: <strong>{importResult.successCount}</strong></span>
+                <span className="text-red-600">Errors: <strong>{importResult.failureCount}</strong></span>
+                {!importResult.dryRun && <span className="text-slate-600">Created: <strong>{importResult.createdCount}</strong></span>}
+              </div>
+              <div className="border border-slate-200 rounded-lg max-h-64 overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-slate-50 sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500">Row</th>
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500">Student</th>
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500">Course</th>
+                      <th className="text-left px-3 py-2 font-semibold text-slate-500">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {importResult.results.map((r) => (
+                      <tr key={r.row} className="border-t border-slate-100">
+                        <td className="px-3 py-1.5 text-slate-500">{r.row}</td>
+                        <td className="px-3 py-1.5">{r.studentName}</td>
+                        <td className="px-3 py-1.5">{r.courseName}</td>
+                        <td className="px-3 py-1.5">
+                          {r.ok ? <span className="text-emerald-600">OK</span> : <span className="text-red-600">{r.error}</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
