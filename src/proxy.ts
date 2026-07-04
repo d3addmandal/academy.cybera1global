@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import fs from "fs";
 import path from "path";
+import { blobHydrate } from "@/lib/blob-db";
+
+const COMPANY_SLUG = process.env.COMPANY_SLUG ?? "cybera1";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECTION 1 — Scanner / bot blocking  (formerly middleware.ts)
@@ -231,6 +234,17 @@ export async function proxy(req: NextRequest) {
   // 1. Run scanner / bot blocking FIRST — cheapest, no async needed
   const blocked = runBotBlocking(req);
   if (blocked) return applySecurityHeaders(blocked);
+
+  // 2. Ensure the local CRM-data cache is warm/fresh BEFORE Next.js starts
+  // rendering anything for this request. proxy.ts runs strictly before the
+  // render pipeline, so this is the one point that can *guarantee* freshness
+  // regardless of how React orders nested async Server Component execution —
+  // relying solely on layout.tsx's own blobHydrate() call left a real race on
+  // cold containers (a page's own content reads could run before hydration
+  // finished writing files to disk, rendering with empty/default data until
+  // a later request hit the now-warm container). Cheap after the first hit
+  // per company per TTL window — blobHydrate() short-circuits otherwise.
+  await blobHydrate(COMPANY_SLUG);
 
   const { pathname } = req.nextUrl;
   const method = req.method;
