@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# CRM uploads/local dev seed images — production serves these from Vercel Blob only
+/public/uploads/*
+/public/images/*

@@ -240,7 +240,7 @@ function ImageUpload({ label, hint, value, onChange, uploadType, company }: {
       </div>
       <Field label="Or paste image URL" hint={hint}>
         <Input value={value} onChange={(e) => onChange(e.target.value)}
-          placeholder={uploadType === "logo" ? "/uploads/cybera1/logo.png" : "/favicon.ico"} />
+          placeholder="https://<store>.public.blob.vercel-storage.com/uploads/..." />
       </Field>
     </div>
   );

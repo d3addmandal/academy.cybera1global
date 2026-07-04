@@ -52,12 +52,15 @@ export async function generateMetadata(): Promise<Metadata> {
       description: "Industry-Focused Cybersecurity Training Platform",
     },
     robots: { index: true, follow: true },
-    icons: {
-      icon: faviconUrl || "/favicon.ico",
-      shortcut: faviconUrl || "/favicon.ico",
-      apple: siteIconUrl || faviconUrl || "/favicon.ico",
-      other: siteIconUrl ? [{ rel: "apple-touch-icon", url: siteIconUrl }] : [],
-    },
+    // No static fallback file — if the CRM hasn't got a favicon configured yet,
+    // omit the icon fields entirely rather than pointing at a path that doesn't exist.
+    icons: faviconUrl || siteIconUrl
+      ? {
+          ...(faviconUrl ? { icon: faviconUrl, shortcut: faviconUrl } : {}),
+          ...(siteIconUrl || faviconUrl ? { apple: siteIconUrl || faviconUrl } : {}),
+          other: siteIconUrl ? [{ rel: "apple-touch-icon", url: siteIconUrl }] : [],
+        }
+      : undefined,
   };
 }
 
