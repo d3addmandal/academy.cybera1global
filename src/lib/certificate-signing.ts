@@ -31,6 +31,33 @@ function normalizePem(pem: string): string {
   return `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----\n`;
 }
 
+// Strips everything that isn't a base64 character — copes with any whitespace/newline
+// corruption, and also strips a "-----BEGIN...-----"/"-----END...-----" wrapper if one is
+// still present (those markers contain no base64 characters, so they vanish along with
+// any surviving internal line breaks).
+function base64Body(value: string): string {
+  return value.replace(/[^A-Za-z0-9+/=]/g, "");
+}
+
+// A single unbroken base64 string (raw PKCS8/SPKI DER, no PEM header/footer/newlines) has
+// nothing left for a copy-paste UI to mangle — no line breaks to lose, no "-----BEGIN-----"
+// markers to corrupt. Preferred going forward; PEM is still accepted for back-compat.
+function loadDerOrPem(
+  value: string,
+  kind: "private" | "public"
+): KeyObject {
+  const trimmed = value.trim();
+  if (trimmed.includes("-----BEGIN")) {
+    return kind === "private"
+      ? crypto.createPrivateKey(normalizePem(trimmed))
+      : crypto.createPublicKey(normalizePem(trimmed));
+  }
+  const der = Buffer.from(base64Body(trimmed), "base64");
+  return kind === "private"
+    ? crypto.createPrivateKey({ key: der, format: "der", type: "pkcs8" })
+    : crypto.createPublicKey({ key: der, format: "der", type: "spki" });
+}
+
 function loadKeys(): { privateKey: KeyObject; publicKey: KeyObject } {
   if (_privateKey && _publicKey) return { privateKey: _privateKey, publicKey: _publicKey };
 
@@ -39,14 +66,15 @@ function loadKeys(): { privateKey: KeyObject; publicKey: KeyObject } {
 
   if (privatePem && publicPem) {
     try {
-      _privateKey = crypto.createPrivateKey(normalizePem(privatePem));
-      _publicKey = crypto.createPublicKey(normalizePem(publicPem));
+      _privateKey = loadDerOrPem(privatePem, "private");
+      _publicKey = loadDerOrPem(publicPem, "public");
     } catch (err) {
       throw new Error(
         "[certificate-signing] Failed to parse CERT_SIGNING_PRIVATE_KEY/CERT_SIGNING_PUBLIC_KEY. " +
-        "This usually means the PEM value lost its line breaks when it was pasted (e.g. copied out of a " +
-        "table or a UI that collapsed newlines). Re-copy the key exactly as generated, including the " +
-        "-----BEGIN/END----- lines on their own lines. Original error: " + (err instanceof Error ? err.message : String(err))
+        "This usually means the value was corrupted when it was pasted (e.g. copied out of a table or a " +
+        "UI that collapsed newlines or swapped in smart-quotes/dashes). Re-generate and re-paste both keys " +
+        "as a single unbroken base64 line (no -----BEGIN/END----- markers needed) to avoid this entirely. " +
+        "Original error: " + (err instanceof Error ? err.message : String(err))
       );
     }
     return { privateKey: _privateKey, publicKey: _publicKey };
