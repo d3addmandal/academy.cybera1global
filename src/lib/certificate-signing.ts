@@ -31,13 +31,20 @@ function normalizePem(pem: string): string {
   return `-----BEGIN ${label}-----\n${wrapped}\n-----END ${label}-----\n`;
 }
 
-// Strips everything that isn't a base64 character — copes with any whitespace/newline
-// corruption, and also strips a "-----BEGIN...-----"/"-----END...-----" wrapper if one is
-// still present (those markers contain no base64 characters, so they vanish along with
-// any surviving internal line breaks).
-function base64Body(value: string): string {
-  return value.replace(/[^A-Za-z0-9+/=]/g, "");
+// A literal space where base64 should have none is almost always a mis-decoded "+" (some
+// hop in the paste path treated the value as application/x-www-form-urlencoded); base64url
+// variants substitute "-"/"_" for "+"/"/"; and some paste paths trim trailing "=" padding.
+// Repair all three, then strip anything else left over (stray newlines/quotes/smart-dashes).
+function normalizeBase64(value: string): string {
+  let s = value.trim().replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/");
+  s = s.replace(/[^A-Za-z0-9+/=]/g, "");
+  while (s.length % 4 !== 0) s += "=";
+  return s;
 }
+
+// ed25519 DER lengths are fixed — a mismatch here means the base64 was truncated/corrupted
+// in transit, and we'd rather say that plainly than let OpenSSL throw an opaque ASN.1 error.
+const EXPECTED_DER_BYTES = { private: 48, public: 44 } as const;
 
 // A single unbroken base64 string (raw PKCS8/SPKI DER, no PEM header/footer/newlines) has
 // nothing left for a copy-paste UI to mangle — no line breaks to lose, no "-----BEGIN-----"
@@ -52,7 +59,14 @@ function loadDerOrPem(
       ? crypto.createPrivateKey(normalizePem(trimmed))
       : crypto.createPublicKey(normalizePem(trimmed));
   }
-  const der = Buffer.from(base64Body(trimmed), "base64");
+  const der = Buffer.from(normalizeBase64(trimmed), "base64");
+  const expected = EXPECTED_DER_BYTES[kind];
+  if (der.length !== expected) {
+    throw new Error(
+      `Decoded ${kind} key is ${der.length} bytes, expected ${expected} for an ed25519 key — ` +
+      "the base64 value was truncated or had characters dropped in transit."
+    );
+  }
   return kind === "private"
     ? crypto.createPrivateKey({ key: der, format: "der", type: "pkcs8" })
     : crypto.createPublicKey({ key: der, format: "der", type: "spki" });
