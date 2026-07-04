@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getCRMTestimonials, getCareerPageContent } from "@/lib/content";
+import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import type { CareerPageContent } from "@/types/cms";
 
 export const dynamic = "force-dynamic";
@@ -214,12 +215,10 @@ export default function CareerPlacementPage() {
             {partnerCompanies.map((company) => (
               <div key={company.name} className="bg-white border border-gray-100 rounded-xl p-4 flex flex-col items-center justify-center aspect-square hover:border-red-200 hover:shadow-sm transition-all gap-2">
                 {company.logo ? (
-                  <img
+                  <ImageWithFallback
                     src={company.logo}
                     alt={company.name}
-                    loading="lazy"
                     className="w-full h-full object-contain p-2"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                   />
                 ) : (
                   <span className="text-gray-600 font-bold text-xs text-center leading-tight">{company.name}</span>
