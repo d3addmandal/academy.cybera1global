@@ -52,6 +52,11 @@ const COMPRESSIBLE_MIME = new Set(["image/jpeg", "image/png", "image/webp", "ima
 const MAX_DIMENSION = 1920;
 const WEBP_QUALITY = 80;
 
+// Favicons/site-icons are tiny (16-64px) — lossy WebP re-encoding introduces
+// visible compression artifacts at that size (this is what made a PNG favicon
+// render as a garbled blob in the browser tab). Store these exactly as uploaded.
+const ICON_UPLOAD_TYPES = new Set(["favicon", "site-icon"]);
+
 export async function POST(req: NextRequest, { params }: Params) {
   const auth = await getAuthFromRequest(req);
   if (!auth) {
@@ -112,14 +117,20 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
     }
 
+    const uploadType = ((formData.get("type") as string) ?? "image")
+      .replace(/[^a-z0-9-]/gi, "").toLowerCase();
+    const folder = ((formData.get("folder") as string) ?? "")
+      .replace(/[^a-z0-9\-_/]/gi, "").toLowerCase().slice(0, 64);
+
     // Compress + re-encode to WebP (strips EXIF/GPS/ICC metadata as a side effect of
     // never calling withMetadata(); .rotate() bakes in EXIF orientation first so images
-    // don't appear sideways once that tag is gone). SVG/ICO pass through untouched.
+    // don't appear sideways once that tag is gone). SVG/ICO pass through untouched,
+    // and so do favicon/site-icon uploads regardless of format (see ICON_UPLOAD_TYPES).
     let outputBytes = bytes;
     let outputMime = declaredMime;
     let outputExt = EXT_MAP[declaredMime] ?? "jpg";
 
-    if (COMPRESSIBLE_MIME.has(declaredMime)) {
+    if (COMPRESSIBLE_MIME.has(declaredMime) && !ICON_UPLOAD_TYPES.has(uploadType)) {
       try {
         const compressed = await sharp(bytes, { animated: declaredMime === "image/gif" })
           .rotate()
@@ -135,10 +146,6 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     const ext = outputExt;
-    const uploadType = ((formData.get("type") as string) ?? "image")
-      .replace(/[^a-z0-9-]/gi, "").toLowerCase();
-    const folder = ((formData.get("folder") as string) ?? "")
-      .replace(/[^a-z0-9\-_/]/gi, "").toLowerCase().slice(0, 64);
     const randomId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
     const prefix = folder ? "" : `${uploadType}-`;
     const filename = `${prefix}${Date.now()}-${randomId}.${ext}`;
