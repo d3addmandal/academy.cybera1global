@@ -30,9 +30,15 @@ export function escapeHtml(value: unknown): string {
     .replace(/'/g, "&#39;");
 }
 
+// Tag name is "image", not "img": per the HTML5 parsing spec, a bare <image> start
+// tag outside SVG foreign content is auto-corrected to <img> (attributes kept as-is),
+// while inside a <svg>...</svg> template it parses as the real SVG <image> element.
+// Carrying both `src` (for the <img> case) and `href`/`xlink:href` (for the SVG case)
+// makes the same token markup work whether the template is HTML or raw SVG.
 function imageTag(url: string, alt: string): string {
   if (!url) return "";
-  return `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" />`;
+  const safeUrl = escapeHtml(url);
+  return `<image src="${safeUrl}" href="${safeUrl}" xlink:href="${safeUrl}" alt="${escapeHtml(alt)}" />`;
 }
 
 /**

@@ -35,7 +35,7 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       // SVG — certificate templates can be pure SVG markup
       "svg", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon",
       "text", "tspan", "g", "defs", "linearGradient", "radialGradient", "stop",
-      "clipPath", "use", "symbol",
+      "clipPath", "use", "symbol", "image",
     ],
     allowedAttributes: {
       a: ["href", "title", "target", "rel"],
@@ -43,6 +43,7 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       td: ["colspan", "rowspan"],
       th: ["colspan", "rowspan"],
       use: ["href", "xlink:href"],
+      image: ["src", "href", "xlink:href", "alt"],
       "*": [
         "class", "style", "id",
         // SVG attributes — allowed globally since they're inert without a matching tag
@@ -56,7 +57,7 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       ],
     },
     allowedSchemes: ["https", "http"],
-    allowedSchemesByTag: { img: ["https", "http", "/"] },
+    allowedSchemesByTag: { img: ["https", "http", "/"], image: ["https", "http", "/"] },
     transformTags: {
       a: (tagName, attribs) => {
         const out: Record<string, string> = { ...attribs, rel: "noopener noreferrer" };
