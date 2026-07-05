@@ -50,6 +50,8 @@ interface Props<T extends { id: string }> {
   selectable?: boolean;
   onSelectionChange?: (ids: string[]) => void;
   bulkActions?: BulkAction[];
+  /** Pins the table to a fixed height (toolbar/header/pagination stay put) and scrolls only the rows, instead of letting the card grow with the data. */
+  fillHeight?: boolean;
 }
 
 const MAX_INLINE_ACTIONS = 3;
@@ -126,6 +128,7 @@ export default function DataTable<T extends { id: string }>({
   selectable,
   onSelectionChange,
   bulkActions,
+  fillHeight,
 }: Props<T>) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<string>("");
@@ -185,10 +188,10 @@ export default function DataTable<T extends { id: string }>({
   const hasHeaderControls = title || createHref || searchKeys.length > 0 || (filters && filters.length > 0);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div className={`bg-white rounded-xl border border-slate-200 overflow-hidden ${fillHeight ? "flex flex-col h-[calc(100vh-220px)]" : ""}`}>
       {/* Bulk action bar — replaces the normal header row while items are selected */}
       {selectable && bulkActions && selected.size > 0 ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 bg-red-50/60">
+        <div className="flex-shrink-0 flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 bg-red-50/60">
           <span className="text-sm font-semibold text-slate-700">{selected.size} selected</span>
           <div className="flex flex-wrap items-center gap-2">
             {bulkActions.map((action) => (
@@ -215,7 +218,7 @@ export default function DataTable<T extends { id: string }>({
         </div>
       ) : (
         hasHeaderControls && (
-          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 border-b border-slate-100">
+          <div className="flex-shrink-0 flex flex-wrap items-center justify-between gap-3 px-4 py-4 border-b border-slate-100">
             {title && <h3 className="font-bold text-slate-800">{title}</h3>}
             <div className="flex flex-wrap items-center gap-3 ml-auto">
               {filters?.map((f) => (
@@ -261,9 +264,9 @@ export default function DataTable<T extends { id: string }>({
           <p className="text-slate-400 text-sm">{search ? `No results for "${search}"` : emptyMessage}</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className={fillHeight ? "flex-1 min-h-0 overflow-auto" : "overflow-x-auto"}>
           <table className="w-full text-sm">
-            <thead>
+            <thead className={fillHeight ? "sticky top-0 z-10" : ""}>
               <tr className="bg-slate-50 border-b border-slate-100">
                 {selectable && (
                   <th className="px-5 py-3 w-10">
@@ -314,7 +317,7 @@ export default function DataTable<T extends { id: string }>({
 
       {/* Footer count + pagination */}
       {sorted.length > 0 && (
-        <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 text-xs text-slate-400">
+        <div className="flex-shrink-0 flex items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 text-xs text-slate-400">
           <span>
             {pageSize
               ? `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, sorted.length)} of ${sorted.length}`

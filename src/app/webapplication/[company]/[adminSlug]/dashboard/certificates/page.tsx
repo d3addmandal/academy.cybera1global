@@ -214,6 +214,7 @@ export default function CertificatesPage() {
       <DataTable
         data={data}
         isLoading={isLoading || busy}
+        fillHeight
         createHref={`${base}/certificates/new`}
         createLabel="New Certificate"
         searchKeys={["studentName", "courseName", "certificateNumber"] as (keyof Certificate)[]}
