@@ -51,26 +51,22 @@ const IS_VERCEL = process.env.VERCEL === "1";
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const TMP_DATA = "/tmp/data";
 
-// Bounds how long a warm container can serve a stale local copy before
-// re-checking Blob. Below this, blobHydrate() is a cheap in-memory check;
-// past it, one caller pays a fresh list() round-trip and everyone else in
-// the window reuses that result. Without this, a container that hydrated
-// once at cold start would NEVER see a later edit made on a different
-// container until it's recycled — this is what caused images/content to
-// look stale until a hard refresh (or a lucky routing to a fresher container).
-const HYDRATE_TTL_MS = 30_000;
+// No staleness window at all — every request re-verifies against Blob before
+// rendering, full stop. A *finished* hydration is never reused for a later
+// request no matter how recent; only a hydration that's still in-flight gets
+// shared (see `settled` below), since that's the exact same fetch multiple
+// callers in the same request wave are already waiting on, not a stale cache.
+const HYDRATE_TTL_MS = 0;
 
 // Tolerates minor clock skew between this container and Blob's uploadedAt
 // timestamps when deciding whether a freshly-listed blob is newer than the
 // local file already on disk.
 const CLOCK_SKEW_TOLERANCE_MS = 2_000;
 
-// Tracks in-flight/completed hydration per company, plus when it started.
-// Storing the Promise itself means concurrent calls join the same work instead of
-// fast-pathing with a "done" flag that's set before downloads actually finish.
-// Once startedAt is older than HYDRATE_TTL_MS, the next call re-hydrates instead
-// of reusing the (now potentially stale) resolved promise forever.
-const hydrationState = new Map<string, { promise: Promise<void>; startedAt: number }>();
+// Tracks in-flight/completed hydration per company. `settled` distinguishes
+// "still being fetched — reuse this exact promise" (always safe, not staleness)
+// from "already finished" (never reused, per HYDRATE_TTL_MS above).
+const hydrationState = new Map<string, { promise: Promise<void>; startedAt: number; settled: boolean }>();
 
 if (IS_VERCEL && !TOKEN) {
   console.error(
@@ -93,40 +89,46 @@ export async function blobWrite(company: string, filename: string, data: unknown
 }
 
 /**
- * Hydrate /tmp/data/ from Vercel Blob — on cold-start containers, and again
- * every HYDRATE_TTL_MS afterward so edits made on other containers become
- * visible here within a bounded window instead of never.
- *
- * The Promise is stored in the Map BEFORE any async work starts so that
- * concurrent calls (e.g. layout + page rendering in the same request wave)
- * all await the same in-flight download — no caller ever reads /tmp/ before
- * the files are actually written.
- */
-/**
- * Drops the cached hydration timestamp for a company so the next blobHydrate()
- * call re-checks Blob immediately instead of trusting the TTL window. Used when
- * a read comes back empty and the caller needs to rule out "this container's
- * copy just hasn't caught up yet" before treating it as a genuine miss.
+ * Kept for the certificate-verification retry path (a not-found result forces one
+ * extra re-check before giving up) — now a no-op in terms of "skipping a cache
+ * window" since there is no window, but still useful to drop an in-flight entry
+ * if a previous hydration attempt errored and is stuck.
  */
 export function invalidateHydration(company: string): void {
   hydrationState.delete(company);
 }
 
+/**
+ * Hydrate /tmp/data/ from Vercel Blob — on every single request (no TTL window,
+ * see HYDRATE_TTL_MS above), so an edit made on any container is visible on the
+ * very next request anywhere, not just "eventually".
+ *
+ * The Promise is stored in the Map BEFORE any async work starts so that
+ * concurrent calls (e.g. layout + page rendering in the same request wave)
+ * all await the same in-flight download — no caller ever reads /tmp/ before
+ * the files are actually written, and no caller triggers a second redundant
+ * list() call while one is already in flight for this company.
+ */
 export function blobHydrate(company: string): Promise<void> {
   if (!IS_VERCEL || !TOKEN) return Promise.resolve();
 
   const existing = hydrationState.get(company);
-  if (existing && Date.now() - existing.startedAt < HYDRATE_TTL_MS) {
+  if (existing && (!existing.settled || Date.now() - existing.startedAt < HYDRATE_TTL_MS)) {
     return existing.promise;
   }
 
   const startedAt = Date.now();
-  const promise = _doHydrate(company).catch((err) => {
-    console.error("[blob-db] hydrate failed:", err);
-    hydrationState.delete(company); // allow retry on the next request
-  });
-  hydrationState.set(company, { promise, startedAt });
-  return promise;
+  const entry: { promise: Promise<void>; startedAt: number; settled: boolean } = {
+    promise: Promise.resolve(), startedAt, settled: false,
+  };
+  entry.promise = _doHydrate(company)
+    .catch((err) => {
+      console.error("[blob-db] hydrate failed:", err);
+      hydrationState.delete(company); // allow retry on the next request
+    })
+    .finally(() => { entry.settled = true; });
+  hydrationState.set(company, entry);
+  return entry.promise;
 }
 
 async function _doHydrate(company: string): Promise<void> {
