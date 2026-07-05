@@ -36,6 +36,12 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       "svg", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon",
       "text", "tspan", "g", "defs", "linearGradient", "radialGradient", "stop",
       "clipPath", "use", "symbol", "image",
+      // SVG masks/filters — PDF-to-SVG converters (mutool, pdftocairo, etc.) commonly
+      // implement soft-edged watermarks/logos as a luminance mask built from a feColorMatrix
+      // filter chain. None of these execute script or touch the network; they're pure
+      // pixel-math primitives, safe to allow.
+      "mask", "filter", "feColorMatrix", "feGaussianBlur", "feBlend", "feMerge", "feMergeNode",
+      "feOffset", "feComposite", "feFlood", "feTile",
     ],
     allowedAttributes: {
       a: ["href", "title", "target", "rel"],
@@ -50,16 +56,28 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
         "viewBox", "xmlns", "preserveAspectRatio",
         "fill", "stroke", "stroke-width", "d", "points",
         "x", "y", "cx", "cy", "r", "rx", "ry", "x1", "y1", "x2", "y2",
-        "transform", "font-family", "font-size", "font-weight",
+        "transform", "font-family", "font-size", "font-weight", "letter-spacing",
         "text-anchor", "dominant-baseline",
         "offset", "stop-color", "stop-opacity", "gradientUnits", "gradientTransform",
         "clip-path", "width", "height",
+        // Opacity/paint-rule attributes — without these, shapes meant to be
+        // faint/translucent (watermarks, background tints) render fully opaque.
+        "fill-opacity", "stroke-opacity", "fill-rule", "clip-rule",
+        // mask/filter references and feColorMatrix-family primitive attributes.
+        "mask", "filter", "mask-type", "color-interpolation-filters",
+        "values", "type", "in", "in2", "result", "stdDeviation",
       ],
     },
     allowedSchemes: ["https", "http"],
     // "data" is allowed for img/image specifically (inline base64 QR codes in SVG templates) —
     // safe here because it's scoped to image-source attributes, not anchors/scripts.
     allowedSchemesByTag: { img: ["https", "http", "/", "data"], image: ["https", "http", "/", "data"] },
+    // sanitize-html's underlying parser lowercases every tag/attribute name by default,
+    // which silently mangles every mixed-case SVG identifier (feColorMatrix, linearGradient,
+    // clipPath, viewBox, preserveAspectRatio, gradientUnits, gradientTransform, stdDeviation,
+    // ...) into something that no longer matches the allow-list and gets stripped. Preserve
+    // original casing so SVG templates round-trip exactly as authored.
+    parser: { lowerCaseTags: false, lowerCaseAttributeNames: false },
     transformTags: {
       a: (tagName, attribs) => {
         const out: Record<string, string> = { ...attribs, rel: "noopener noreferrer" };
