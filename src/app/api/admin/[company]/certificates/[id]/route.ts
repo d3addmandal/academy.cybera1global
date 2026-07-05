@@ -38,22 +38,37 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (body.startDate !== undefined) patch.startDate = sanitizeText(body.startDate, 30);
   if (body.endDate !== undefined) patch.endDate = sanitizeText(body.endDate, 30);
 
+  let targetProgrammeId = existing.programmeId;
   if (body.programmeId !== undefined) {
     const programmeId = sanitizeText(body.programmeId, 100);
     const programme = programmesDb.getById(company, programmeId);
     if (!programme) {
       return NextResponse.json({ success: false, error: "Selected course does not exist." }, { status: 400 });
     }
-    const template = certificateTemplatesDb.getAll(company).find((t) => t.programmeId === programmeId);
-    if (!template) {
+    patch.programmeId = programme.id;
+    patch.courseName = programme.title;
+    targetProgrammeId = programme.id;
+  }
+
+  const courseTemplates = certificateTemplatesDb.getAll(company).filter((t) => t.programmeId === targetProgrammeId);
+  if (body.templateId !== undefined) {
+    const templateId = sanitizeText(body.templateId, 100);
+    const chosen = courseTemplates.find((t) => t.id === templateId);
+    if (!chosen) {
+      return NextResponse.json({ success: false, error: "Selected template does not belong to this course." }, { status: 400 });
+    }
+    patch.templateId = chosen.id;
+  } else if (body.programmeId !== undefined) {
+    // Course changed but no explicit template chosen — fall back to the course's first template.
+    const fallback = courseTemplates[0];
+    if (!fallback) {
+      const programmeName = (patch.courseName as string) ?? existing.courseName;
       return NextResponse.json(
-        { success: false, error: `No certificate template configured for "${programme.title}". Create one under Certificate Templates first.` },
+        { success: false, error: `No certificate template configured for "${programmeName}". Create one under Certificate Templates first.` },
         { status: 400 }
       );
     }
-    patch.programmeId = programme.id;
-    patch.courseName = programme.title;
-    patch.templateId = template.id;
+    patch.templateId = fallback.id;
   }
 
   const willChangeSignedField = SIGNED_FIELDS.some((f) => f in patch);

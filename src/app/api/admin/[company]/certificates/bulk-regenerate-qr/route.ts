@@ -28,9 +28,9 @@ export async function POST(req: NextRequest, { params }: Params) {
     const existing = certificatesDb.getById(company, id);
     if (!existing) continue;
     const verificationUrl = existing.verificationUrl || `${req.nextUrl.origin}/certificate/${existing.certificateNumber}`;
-    const qrCodePath = await generateAndStoreQr(company, existing.id, verificationUrl);
+    const qr = await generateAndStoreQr(company, existing.id, verificationUrl);
     await deleteStoredQr(existing.qrCodePath);
-    certificatesDb.update(company, id, { qrCodePath, verificationUrl });
+    certificatesDb.update(company, id, { qrCodePath: qr.url, qrCodeBase64: qr.base64, verificationUrl });
     auditEntries.push({
       companySlug: company,
       certificateId: id,

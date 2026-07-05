@@ -51,7 +51,14 @@ export default function EditCertificatePage() {
 
   function update(key: keyof Certificate, value: unknown) { setForm((p) => ({ ...p, [key]: value })); setIsDirty(true); }
 
-  const activeTemplate = templates.find((t) => t.programmeId === form.programmeId) ?? templates.find((t) => t.id === form.templateId);
+  function selectCourse(programmeId: string) {
+    const matches = templates.filter((t) => t.programmeId === programmeId);
+    setForm((p) => ({ ...p, programmeId, templateId: matches[0]?.id ?? "" }));
+    setIsDirty(true);
+  }
+
+  const courseTemplates = templates.filter((t) => t.programmeId === form.programmeId);
+  const activeTemplate = templates.find((t) => t.id === form.templateId) ?? templates.find((t) => t.programmeId === form.programmeId);
   const previewHtml = activeTemplate && cert
     ? renderCertificateHtml(activeTemplate.htmlContent, toPlaceholderData({ ...cert, ...form } as Certificate))
     : "";
@@ -133,13 +140,30 @@ export default function EditCertificatePage() {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-5 items-start">
         <div className="space-y-5">
-          <Card title="Course">
-            <Field label="Course Name" hint="Certificate template resolves automatically from the selected course">
-              <Select value={form.programmeId ?? ""} onChange={(e) => update("programmeId", e.target.value)}>
-                <option value="">Select a course…</option>
-                {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
-              </Select>
-            </Field>
+          <Card title="Course & Template">
+            <div className="grid gap-4">
+              <Field label="Course Name">
+                <Select value={form.programmeId ?? ""} onChange={(e) => selectCourse(e.target.value)}>
+                  <option value="">Select a course…</option>
+                  {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+                </Select>
+              </Field>
+
+              {form.programmeId && courseTemplates.length === 0 && (
+                <p className="text-xs text-red-600">
+                  No certificate template configured for this course.{" "}
+                  <Link href={`${base}/certificate-templates/new`} className="underline font-semibold">Create one</Link> first.
+                </p>
+              )}
+
+              {courseTemplates.length > 0 && (
+                <Field label="Certificate Template" hint="Which design to issue this certificate with">
+                  <Select value={form.templateId ?? ""} onChange={(e) => update("templateId", e.target.value)}>
+                    {courseTemplates.map((t) => <option key={t.id} value={t.id}>{t.name}{t.isDefault ? " (Default)" : ""}</option>)}
+                  </Select>
+                </Field>
+              )}
+            </div>
           </Card>
 
           <Card title="Student Details">

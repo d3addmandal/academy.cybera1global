@@ -9,7 +9,8 @@ const TOKENS: { token: string; description: string }[] = [
   { token: "{{issue_date}}", description: "Certificate issue date" },
   { token: "{{course_start_date}}", description: "Course start date" },
   { token: "{{course_end_date}}", description: "Course end date" },
-  { token: "{{qr_code}}", description: "Verification QR code <img>" },
+  { token: "{{qr_code}}", description: "Verification QR code — renders as an <image> tag (works in both HTML and SVG templates)" },
+  { token: "{{qr_code_base64}}", description: "Raw base64 QR PNG — use inside your own href=\"data:image/png;base64,...\"" },
   { token: "{{verification_url}}", description: "Public verification link" },
 ];
 

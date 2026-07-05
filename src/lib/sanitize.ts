@@ -57,7 +57,9 @@ export function sanitizeHtml(value: unknown, maxLen = 200_000): string {
       ],
     },
     allowedSchemes: ["https", "http"],
-    allowedSchemesByTag: { img: ["https", "http", "/"], image: ["https", "http", "/"] },
+    // "data" is allowed for img/image specifically (inline base64 QR codes in SVG templates) —
+    // safe here because it's scoped to image-source attributes, not anchors/scripts.
+    allowedSchemesByTag: { img: ["https", "http", "/", "data"], image: ["https", "http", "/", "data"] },
     transformTags: {
       a: (tagName, attribs) => {
         const out: Record<string, string> = { ...attribs, rel: "noopener noreferrer" };

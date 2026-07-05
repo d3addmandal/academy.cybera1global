@@ -16,6 +16,8 @@ export interface CertificatePlaceholderData {
   course_start_date?: string;
   course_end_date?: string;
   qr_code: string;
+  /** Raw base64 PNG payload (no data: prefix) — for templates that build their own `href="data:image/png;base64,{{qr_code_base64}}"` rather than using the {{qr_code}} <image> tag. */
+  qr_code_base64?: string;
   verification_url: string;
 }
 
@@ -47,7 +49,7 @@ function imageTag(url: string, alt: string): string {
  * so a template author immediately notices a typo while previewing.
  */
 export function renderCertificateHtml(templateHtml: string, data: CertificatePlaceholderData): string {
-  return templateHtml.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (match, token: string) => {
+  return templateHtml.replace(/\{\{\s*([a-z0-9_]+)\s*\}\}/g, (match, token: string) => {
     if (!(token in data)) return match;
     const value = data[token as keyof CertificatePlaceholderData];
 
@@ -68,6 +70,7 @@ export interface CertificateLikeRecord {
   startDate?: string;
   endDate?: string;
   qrCodePath: string;
+  qrCodeBase64?: string;
   verificationUrl: string;
 }
 
@@ -82,6 +85,7 @@ export function toPlaceholderData(cert: CertificateLikeRecord): CertificatePlace
     course_start_date: cert.startDate,
     course_end_date: cert.endDate,
     qr_code: cert.qrCodePath,
+    qr_code_base64: cert.qrCodeBase64,
     verification_url: cert.verificationUrl,
   };
 }
@@ -96,5 +100,6 @@ export const SAMPLE_PLACEHOLDER_DATA: CertificatePlaceholderData = {
   course_start_date: "2026-01-01",
   course_end_date: "2026-03-01",
   qr_code: "",
+  qr_code_base64: "",
   verification_url: "https://example.com/certificate/CERT-2026-SAMPLE1",
 };

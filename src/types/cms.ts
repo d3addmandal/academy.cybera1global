@@ -558,6 +558,7 @@ export interface Certificate {
   statusChangedAt?: string;
 
   qrCodePath: string;
+  qrCodeBase64?: string; // raw PNG payload (no data: prefix) — for templates that inline the QR via a data URI instead of loading qrCodePath as an external image
   verificationUrl: string;
 
   signatureAlgorithm: "ed25519";

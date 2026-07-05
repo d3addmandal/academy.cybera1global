@@ -15,10 +15,10 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
 
   const verificationUrl = existing.verificationUrl || `${req.nextUrl.origin}/certificate/${existing.certificateNumber}`;
-  const qrCodePath = await generateAndStoreQr(company, existing.id, verificationUrl);
+  const qr = await generateAndStoreQr(company, existing.id, verificationUrl);
   await deleteStoredQr(existing.qrCodePath);
 
-  const updated = certificatesDb.update(company, id, { qrCodePath, verificationUrl });
+  const updated = certificatesDb.update(company, id, { qrCodePath: qr.url, qrCodeBase64: qr.base64, verificationUrl });
 
   certificateAuditLogDb.append(company, [{
     companySlug: company,

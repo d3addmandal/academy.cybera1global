@@ -43,8 +43,11 @@ export async function POST(req: NextRequest, { params }: Params) {
     certificateNumber = sanitizeText(body.certificateNumber, 64).replace(/[^A-Za-z0-9-]/g, "");
   }
 
+  const templateId = body.templateId ? sanitizeText(body.templateId, 100) : undefined;
+
   const result = await createCertificateFull(company, req.nextUrl.origin, {
     programmeId,
+    templateId,
     studentName,
     studentEmail: body.studentEmail ? sanitizeEmail(body.studentEmail) : undefined,
     studentPhone: body.studentPhone ? sanitizePhone(body.studentPhone) : undefined,

@@ -5,7 +5,7 @@ import { PageHeader, Field, Input, Select, SaveBar, Card } from "@/components/ad
 import { useToast } from "@/components/admin/Toast";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { Programme } from "@/types/cms";
+import type { Programme, CertificateTemplate } from "@/types/cms";
 
 export default function NewCertificatePage() {
   const params = useParams();
@@ -16,20 +16,32 @@ export default function NewCertificatePage() {
   const { toast } = useToast();
 
   const [programmes, setProgrammes] = useState<Programme[]>([]);
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
-    programmeId: "", studentName: "", studentEmail: "", studentPhone: "", studentDob: "",
+    programmeId: "", templateId: "", studentName: "", studentEmail: "", studentPhone: "", studentDob: "",
     issueDate: today, startDate: "", endDate: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/admin/${company}/programmes`).then((r) => r.json()).then((d) => {
-      if (d.success) setProgrammes(d.data);
+    Promise.all([
+      fetch(`/api/admin/${company}/programmes`).then((r) => r.json()),
+      fetch(`/api/admin/${company}/certificate-templates`).then((r) => r.json()),
+    ]).then(([programmesRes, templatesRes]) => {
+      if (programmesRes.success) setProgrammes(programmesRes.data);
+      if (templatesRes.success) setTemplates(templatesRes.data);
     });
   }, [company]);
 
+  const courseTemplates = templates.filter((t) => t.programmeId === form.programmeId);
+
   function update(key: string, value: unknown) { setForm((p) => ({ ...p, [key]: value })); }
+
+  function selectCourse(programmeId: string) {
+    const matches = templates.filter((t) => t.programmeId === programmeId);
+    setForm((p) => ({ ...p, programmeId, templateId: matches[0]?.id ?? "" }));
+  }
 
   async function handleSave() {
     if (!form.studentName || !form.programmeId || !form.issueDate) {
@@ -55,13 +67,30 @@ export default function NewCertificatePage() {
         <PageHeader title="New Certificate" />
       </div>
 
-      <Card title="Course">
-        <Field label="Course Name *" hint="Certificate template resolves automatically from the selected course">
-          <Select value={form.programmeId} onChange={(e) => update("programmeId", e.target.value)}>
-            <option value="">Select a course…</option>
-            {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
-          </Select>
-        </Field>
+      <Card title="Course & Template">
+        <div className="grid gap-4">
+          <Field label="Course Name *">
+            <Select value={form.programmeId} onChange={(e) => selectCourse(e.target.value)}>
+              <option value="">Select a course…</option>
+              {programmes.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+            </Select>
+          </Field>
+
+          {form.programmeId && courseTemplates.length === 0 && (
+            <p className="text-xs text-red-600">
+              No certificate template configured for this course.{" "}
+              <Link href={`${base}/certificate-templates/new`} className="underline font-semibold">Create one</Link> first.
+            </p>
+          )}
+
+          {courseTemplates.length > 0 && (
+            <Field label="Certificate Template *" hint="Which design to issue this certificate with">
+              <Select value={form.templateId} onChange={(e) => update("templateId", e.target.value)}>
+                {courseTemplates.map((t) => <option key={t.id} value={t.id}>{t.name}{t.isDefault ? " (Default)" : ""}</option>)}
+              </Select>
+            </Field>
+          )}
+        </div>
       </Card>
 
       <div className="mt-5">

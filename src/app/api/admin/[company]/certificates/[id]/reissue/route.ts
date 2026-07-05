@@ -16,6 +16,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   const result = await createCertificateFull(company, req.nextUrl.origin, {
     programmeId: original.programmeId,
+    templateId: original.templateId,
     studentName: original.studentName,
     studentEmail: original.studentEmail,
     studentPhone: original.studentPhone,
