@@ -48,3 +48,9 @@ next-env.d.ts
 # CRM uploads/local dev seed images — production serves these from Vercel Blob only
 /public/uploads/*
 /public/images/*
+
+# Local CRM data store — real per-company content (incl. admin credentials once seeded)
+# lives in Vercel Blob storage in production and is never read from here there; locally
+# it's your own working copy. Never commit real data here — see src/lib/seed.ts for how
+# a fresh company is bootstrapped (random password, generated at runtime, not committed).
+/data/*
