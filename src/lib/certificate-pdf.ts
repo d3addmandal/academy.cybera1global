@@ -10,6 +10,16 @@
 const A4_LANDSCAPE_MM = { width: 297, height: 210 };
 
 async function renderElementToJpeg(element: HTMLElement): Promise<string> {
+  // SVG certificate templates render as a bare <svg> at the top of the container. html2canvas
+  // re-implements rendering itself and has no support for <foreignObject> — it paints a solid
+  // black box where the nested HTML should be — so SVG templates take the native rasterization
+  // path instead (serialize -> Image -> canvas), which uses the browser's own SVG engine and
+  // handles foreignObject, gradients, and web fonts exactly as the live preview shows them.
+  const root = element.firstElementChild;
+  if (root && root.tagName.toLowerCase() === "svg") {
+    return renderSvgToJpeg(root as unknown as SVGSVGElement);
+  }
+
   const html2canvas = (await import("html2canvas")).default;
   const canvas = await html2canvas(element, {
     scale: 2,
@@ -17,6 +27,41 @@ async function renderElementToJpeg(element: HTMLElement): Promise<string> {
     backgroundColor: "#ffffff",
   });
   return canvas.toDataURL("image/jpeg", 0.92);
+}
+
+async function renderSvgToJpeg(svg: SVGSVGElement): Promise<string> {
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  const width = clone.viewBox?.baseVal?.width || Number(clone.getAttribute("width")) || 1123;
+  const height = clone.viewBox?.baseVal?.height || Number(clone.getAttribute("height")) || 794;
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  if (!clone.getAttribute("width")) clone.setAttribute("width", String(width));
+  if (!clone.getAttribute("height")) clone.setAttribute("height", String(height));
+
+  const svgString = new XMLSerializer().serializeToString(clone);
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Failed to rasterize SVG certificate template."));
+      img.src = url;
+    });
+
+    const scale = 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas 2D context unavailable.");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.92);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 /** Renders a single certificate element to a downloaded A4-landscape PDF. */
