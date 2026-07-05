@@ -522,13 +522,29 @@ export type CertificateAuditAction =
   | "created" | "updated" | "deleted" | "status_changed"
   | "downloaded" | "qr_regenerated" | "template_changed" | "reissued";
 
+export interface CertificateTemplateField {
+  token: string; // one of the 9 supported {{token}} names
+  x: number;
+  y: number; // px, at canvasWidth/canvasHeight resolution
+  fontSize?: number;
+  fontWeight?: "normal" | "bold";
+  color?: string;
+  textAlign?: "left" | "center" | "right";
+  width?: number; // qr_code box size in px — unused for text fields
+}
+
 export interface CertificateTemplate {
   id: string;
   companySlug: string;
-  programmeId: string; // the course this template belongs to — 1:1 in practice
-  name: string; // always derived server-side from the linked programme's title
+  programmeId: string; // the course this template belongs to (a course can have several distinct templates)
+  name: string; // admin-typed, distinguishes multiple templates on the same course
   description?: string;
-  htmlContent: string; // HTML or SVG markup
+  mode: "visual" | "raw"; // which authoring UI produced htmlContent
+  backgroundImageUrl?: string; // visual-mode base/background image
+  canvasWidth?: number; // defaults to 1123 when absent
+  canvasHeight?: number; // defaults to 794 when absent
+  fields?: CertificateTemplateField[]; // visual-mode field placements — source of truth for re-editing
+  htmlContent: string; // always the compiled (visual mode) or hand-authored (raw mode) render source
   isDefault: boolean;
   status: Status;
   createdAt: string;

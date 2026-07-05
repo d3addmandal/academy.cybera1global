@@ -7,6 +7,21 @@
  * substitute a data field as raw HTML.
  */
 
+import type { CertificateTemplateField } from "@/types/cms";
+
+/** Shared metadata for the 9 supported {{token}}s — single source of truth for the visual-builder palette and the raw-mode reference card. */
+export const CERTIFICATE_TOKENS: { token: string; label: string; description: string }[] = [
+  { token: "student_name", label: "Student Name", description: "Student's full name" },
+  { token: "student_email", label: "Student Email", description: "Student's email (if provided)" },
+  { token: "course_name", label: "Course Name", description: "Course/programme name" },
+  { token: "certificate_number", label: "Certificate Number", description: "Unique certificate number" },
+  { token: "issue_date", label: "Issue Date", description: "Certificate issue date" },
+  { token: "course_start_date", label: "Course Start Date", description: "Course start date" },
+  { token: "course_end_date", label: "Course End Date", description: "Course end date" },
+  { token: "qr_code", label: "QR Code", description: "Verification QR code image" },
+  { token: "verification_url", label: "Verification URL", description: "Public verification link" },
+];
+
 export interface CertificatePlaceholderData {
   student_name: string;
   student_email?: string;
@@ -103,3 +118,105 @@ export const SAMPLE_PLACEHOLDER_DATA: CertificatePlaceholderData = {
   qr_code_base64: "",
   verification_url: "https://example.com/certificate/CERT-2026-SAMPLE1",
 };
+
+export const DEFAULT_CANVAS_WIDTH = 1123;
+export const DEFAULT_CANVAS_HEIGHT = 794;
+
+const HEX_COLOR = /^#[0-9a-fA-F]{3,8}$/;
+
+function safeNum(value: unknown, fallback: number): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.round(n) : fallback;
+}
+
+function safeColor(value: unknown, fallback: string): string {
+  return typeof value === "string" && HEX_COLOR.test(value) ? value : fallback;
+}
+
+function safeAlign(value: unknown): "left" | "center" | "right" {
+  return value === "center" || value === "right" ? value : "left";
+}
+
+const VALID_TOKENS = new Set(CERTIFICATE_TOKENS.map((t) => t.token));
+
+/**
+ * Server-side validation for a visual-builder `fields` array submitted from the CRM —
+ * this is admin-authenticated input, but still untrusted shape/range-wise before it's
+ * written to disk and later interpolated (via compileCertificateTemplateHtml) into inline
+ * CSS. Drops anything malformed instead of rejecting the whole request.
+ */
+export function sanitizeTemplateFields(value: unknown): CertificateTemplateField[] {
+  if (!Array.isArray(value)) return [];
+  const out: CertificateTemplateField[] = [];
+  for (const raw of value) {
+    if (!raw || typeof raw !== "object") continue;
+    const item = raw as Record<string, unknown>;
+    if (typeof item.token !== "string" || !VALID_TOKENS.has(item.token)) continue;
+    const x = Number(item.x);
+    const y = Number(item.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+
+    const field: CertificateTemplateField = { token: item.token, x: Math.round(x), y: Math.round(y) };
+
+    const fontSize = Number(item.fontSize);
+    if (Number.isFinite(fontSize)) field.fontSize = Math.max(6, Math.min(200, Math.round(fontSize)));
+
+    const width = Number(item.width);
+    if (Number.isFinite(width)) field.width = Math.max(10, Math.min(2000, Math.round(width)));
+
+    if (item.fontWeight === "bold" || item.fontWeight === "normal") field.fontWeight = item.fontWeight;
+    if (typeof item.color === "string" && HEX_COLOR.test(item.color)) field.color = item.color;
+    if (item.textAlign === "left" || item.textAlign === "center" || item.textAlign === "right") field.textAlign = item.textAlign;
+
+    out.push(field);
+  }
+  return out.slice(0, 20);
+}
+
+export interface CompileTemplateInput {
+  backgroundImageUrl?: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  fields: CertificateTemplateField[];
+}
+
+/**
+ * Turns a visual-builder field layout into the same absolute-positioned HTML
+ * a raw-mode admin would type by hand — {{token}} placeholders included — so
+ * it flows through the exact same renderCertificateHtml()/sanitizeHtml()/PDF
+ * pipeline as every other template, visual or raw.
+ */
+export function compileCertificateTemplateHtml({
+  backgroundImageUrl, canvasWidth, canvasHeight, fields,
+}: CompileTemplateInput): string {
+  const width = safeNum(canvasWidth, DEFAULT_CANVAS_WIDTH);
+  const height = safeNum(canvasHeight, DEFAULT_CANVAS_HEIGHT);
+
+  const backgroundTag = backgroundImageUrl
+    ? `<img src="${escapeHtml(backgroundImageUrl)}" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" />`
+    : "";
+
+  const fieldTags = fields.map((field) => {
+    const x = safeNum(field.x, 0);
+    const y = safeNum(field.y, 0);
+
+    if (field.token === "qr_code") {
+      const size = safeNum(field.width, 100);
+      const scale = size / 480;
+      return `<div style="position:absolute;left:${x}px;top:${y}px;width:${size}px;height:${size}px;overflow:hidden;"><div style="width:480px;height:480px;transform:scale(${scale});transform-origin:top left;">{{qr_code}}</div></div>`;
+    }
+
+    const fontSize = safeNum(field.fontSize, 20);
+    const fontWeight = field.fontWeight === "bold" ? "bold" : "normal";
+    const color = safeColor(field.color, "#111111");
+    const textAlign = safeAlign(field.textAlign);
+    const token = escapeHtml(field.token).replace(/[^a-z0-9_]/g, "");
+
+    return `<div style="position:absolute;left:${x}px;top:${y}px;font-family:Arial,Helvetica,sans-serif;font-size:${fontSize}px;font-weight:${fontWeight};color:${color};text-align:${textAlign};white-space:nowrap;">{{${token}}}</div>`;
+  }).join("\n  ");
+
+  return `<div style="position:relative;width:${width}px;height:${height}px;background:#ffffff;overflow:hidden;">
+  ${backgroundTag}
+  ${fieldTags}
+</div>`;
+}

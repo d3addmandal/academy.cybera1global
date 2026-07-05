@@ -1,17 +1,19 @@
 "use client";
 import { Card } from "@/components/admin/FormField";
+import { CERTIFICATE_TOKENS } from "@/lib/certificate-template";
 
+// The 9 tokens also drive the Visual Builder's drag-and-drop palette (single source of
+// truth in certificate-template.ts); qr_code_base64 is raw-mode-only (a data-URI building
+// block, not something that makes sense as a positionable canvas field), so it's appended
+// here rather than added to the shared list.
 const TOKENS: { token: string; description: string }[] = [
-  { token: "{{student_name}}", description: "Student's full name" },
-  { token: "{{student_email}}", description: "Student's email (if provided)" },
-  { token: "{{course_name}}", description: "Course/programme name" },
-  { token: "{{certificate_number}}", description: "Unique certificate number" },
-  { token: "{{issue_date}}", description: "Certificate issue date" },
-  { token: "{{course_start_date}}", description: "Course start date" },
-  { token: "{{course_end_date}}", description: "Course end date" },
-  { token: "{{qr_code}}", description: "Verification QR code — renders as an <image> tag (works in both HTML and SVG templates)" },
+  ...CERTIFICATE_TOKENS.map((t) => ({
+    token: `{{${t.token}}}`,
+    description: t.token === "qr_code"
+      ? "Verification QR code — renders as an <image> tag (works in both HTML and SVG templates)"
+      : t.description,
+  })),
   { token: "{{qr_code_base64}}", description: "Raw base64 QR PNG — use inside your own href=\"data:image/png;base64,...\"" },
-  { token: "{{verification_url}}", description: "Public verification link" },
 ];
 
 export function TokenReferenceCard() {
