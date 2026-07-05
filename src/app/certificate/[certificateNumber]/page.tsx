@@ -4,9 +4,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { ShieldCheck, ShieldOff, ShieldAlert, ShieldQuestion, CalendarDays, User, BadgeCheck } from "lucide-react";
-import { getCRMCertificateByNumber, getCRMCertificateTemplate, getSiteTheme } from "@/lib/content";
+import { getCRMCertificateByNumber, getCRMCertificateTemplate, getSiteTheme, COMPANY_SLUG } from "@/lib/content";
 import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { blobHydrate, invalidateHydration } from "@/lib/blob-db";
 import CertificateViewer from "./CertificateViewer";
 import type { CertificateStatus } from "@/types/cms";
 
@@ -43,7 +44,16 @@ export default async function CertificateVerificationPage({ params }: Props) {
   }
 
   const certificateNumber = rawNumber.replace(/[^A-Za-z0-9-]/g, "");
-  const certificate = getCRMCertificateByNumber(certificateNumber);
+  let certificate = getCRMCertificateByNumber(certificateNumber);
+  if (!certificate) {
+    // A certificate created moments ago on a different serverless container can be briefly
+    // invisible here until this container's next scheduled Blob re-hydration (bounded by
+    // HYDRATE_TTL_MS in blob-db.ts). Certificate verification is a public trust feature, so
+    // force one immediate re-check against Blob before treating this as a genuine miss.
+    invalidateHydration(COMPANY_SLUG);
+    await blobHydrate(COMPANY_SLUG);
+    certificate = getCRMCertificateByNumber(certificateNumber);
+  }
   if (!certificate) notFound();
 
   const template = getCRMCertificateTemplate(certificate.templateId);

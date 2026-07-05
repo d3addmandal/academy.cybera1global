@@ -102,6 +102,16 @@ export async function blobWrite(company: string, filename: string, data: unknown
  * all await the same in-flight download — no caller ever reads /tmp/ before
  * the files are actually written.
  */
+/**
+ * Drops the cached hydration timestamp for a company so the next blobHydrate()
+ * call re-checks Blob immediately instead of trusting the TTL window. Used when
+ * a read comes back empty and the caller needs to rule out "this container's
+ * copy just hasn't caught up yet" before treating it as a genuine miss.
+ */
+export function invalidateHydration(company: string): void {
+  hydrationState.delete(company);
+}
+
 export function blobHydrate(company: string): Promise<void> {
   if (!IS_VERCEL || !TOKEN) return Promise.resolve();
 

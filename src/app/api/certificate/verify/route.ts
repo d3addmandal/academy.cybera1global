@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCRMCertificateByNumber } from "@/lib/content";
+import { getCRMCertificateByNumber, COMPANY_SLUG } from "@/lib/content";
 import { sanitizeText } from "@/lib/sanitize";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { blobHydrate, invalidateHydration } from "@/lib/blob-db";
 
 // Same message regardless of malformed input vs. genuinely nonexistent number —
 // never distinguishable, to avoid giving an enumeration script a signal.
@@ -21,7 +22,14 @@ export async function POST(req: NextRequest) {
   const certificateNumber = sanitizeText(body.certificateNumber, 64).replace(/[^A-Za-z0-9-]/g, "");
   if (!certificateNumber) return NOT_FOUND;
 
-  const certificate = getCRMCertificateByNumber(certificateNumber);
+  let certificate = getCRMCertificateByNumber(certificateNumber);
+  if (!certificate) {
+    // See src/app/certificate/[certificateNumber]/page.tsx for why: a certificate created
+    // moments ago on a different container can be briefly invisible here otherwise.
+    invalidateHydration(COMPANY_SLUG);
+    await blobHydrate(COMPANY_SLUG);
+    certificate = getCRMCertificateByNumber(certificateNumber);
+  }
   if (!certificate) return NOT_FOUND;
 
   return NextResponse.json({ success: true, data: { certificateNumber: certificate.certificateNumber } });

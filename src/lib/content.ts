@@ -14,6 +14,7 @@ import {
 import type { Programme, BlogPost, Event, Testimonial, Trainer, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent, Certificate, CertificateTemplate } from "@/types/cms";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
+export const COMPANY_SLUG = COMPANY;
 
 // ── Branding / layout ────────────────────────────────────────────────────────
 export function getSiteTheme() {
