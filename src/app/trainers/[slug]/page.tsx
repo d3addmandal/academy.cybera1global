@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCRMTrainerBySlug, getCRMProgrammeBySlug, getSiteSettings } from "@/lib/content";
+import { ensureFreshData, getCRMTrainerBySlug, getCRMProgrammeBySlug, getSiteSettings } from "@/lib/content";
 import { Award, BookOpen, ArrowLeft, Linkedin, Github, Twitter, ArrowRight } from "lucide-react";
 
 interface Props {
@@ -26,6 +26,7 @@ function initials(name: string): string {
 }
 
 export default async function TrainerProfilePage({ params }: Props) {
+  await ensureFreshData();
   const { slug } = await params;
   const trainer = getCRMTrainerBySlug(slug);
 

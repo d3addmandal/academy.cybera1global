@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Search, ArrowRight, Clock } from "lucide-react";
-import { getCRMProgrammes } from "@/lib/content";
+import { ensureFreshData, getCRMProgrammes } from "@/lib/content";
 import ProgramCard from "@/components/shared/ProgramCard";
 
 export const metadata: Metadata = {
@@ -20,7 +20,8 @@ const categories = [
   { id: "corporate", label: "Corporate Training" },
 ];
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  await ensureFreshData();
   const allProgrammes = getCRMProgrammes().filter(p => p.status === "published");
   const careerTrack = allProgrammes.filter(p => p.category === "career-track");
   const specialized = allProgrammes.filter(p => p.category === "specialized");

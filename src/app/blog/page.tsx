@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight, Search } from "lucide-react";
-import { getCRMBlogPosts, getSiteNav } from "@/lib/content";
+import { ensureFreshData, getCRMBlogPosts, getSiteNav } from "@/lib/content";
 import BlogCard from "@/components/shared/BlogCard";
 
 export const metadata: Metadata = {
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   description: "Read expert articles on cybersecurity, ethical hacking, VAPT, cloud security, SOC operations, and career development.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  await ensureFreshData();
   const posts = getCRMBlogPosts();
   const featured = posts.find((b) => b.isFeatured);
   const rest = posts.filter((b) => b.id !== featured?.id);

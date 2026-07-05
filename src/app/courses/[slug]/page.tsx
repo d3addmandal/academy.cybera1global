@@ -8,7 +8,7 @@ import {
   Phone, User, Award, Cpu, ChevronRight, BookOpen, Calendar,
   Target, Wrench, Briefcase,
 } from "lucide-react";
-import { getCRMProgrammeBySlug, getCRMProgrammes } from "@/lib/content";
+import { ensureFreshData, getCRMProgrammeBySlug, getCRMProgrammes } from "@/lib/content";
 import FAQClient from "./FAQClient";
 import ContactForm from "./ContactForm";
 
@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CourseDetailPage({ params }: Props) {
+  await ensureFreshData();
   const { slug } = await params;
   const programme = getCRMProgrammeBySlug(slug);
   if (!programme) notFound();

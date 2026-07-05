@@ -7,7 +7,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import EnquiryForm from "./EnquiryForm";
 import type { CorporatePageContent } from "@/types/cms";
-import { getCorporatePageContent, getSiteSettings } from "@/lib/content";
+import { ensureFreshData, getCorporatePageContent, getSiteSettings } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +70,8 @@ const DEFAULTS: CorporatePageContent = {
   updatedAt: "",
 };
 
-export default function CorporateTrainingPage() {
+export default async function CorporateTrainingPage() {
+  await ensureFreshData();
   const cms = getCorporatePageContent() ?? DEFAULTS;
   const settings = getSiteSettings();
   const phone = settings?.phone ?? "+91 8240 006 007";

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCRMCertificateByNumber, COMPANY_SLUG } from "@/lib/content";
+import { ensureFreshData, getCRMCertificateByNumber, COMPANY_SLUG } from "@/lib/content";
 import { sanitizeText } from "@/lib/sanitize";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { blobHydrate, invalidateHydration } from "@/lib/blob-db";
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
   const certificateNumber = sanitizeText(body.certificateNumber, 64).replace(/[^A-Za-z0-9-]/g, "");
   if (!certificateNumber) return NOT_FOUND;
 
+  await ensureFreshData();
   let certificate = getCRMCertificateByNumber(certificateNumber);
   if (!certificate) {
     // See src/app/certificate/[certificateNumber]/page.tsx for why: a certificate created

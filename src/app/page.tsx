@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import {
+  ensureFreshData,
   getSiteHome, getSiteSettings,
   getCRMFeaturedProgrammes, getCRMFeaturedBlogs,
   getCRMFeaturedEvents, getCRMFeaturedTestimonials, getCRMFAQs,
@@ -27,8 +28,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   // Read all CRM data fresh on every request
+  await ensureFreshData();
   const home = getSiteHome();
   const settings = getSiteSettings();
 

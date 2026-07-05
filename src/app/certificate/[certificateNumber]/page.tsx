@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { ShieldCheck, ShieldOff, ShieldAlert, ShieldQuestion, CalendarDays, User, BadgeCheck } from "lucide-react";
-import { getCRMCertificateByNumber, getCRMCertificateTemplate, getSiteTheme, COMPANY_SLUG } from "@/lib/content";
+import { ensureFreshData, getCRMCertificateByNumber, getCRMCertificateTemplate, getSiteTheme, COMPANY_SLUG } from "@/lib/content";
 import { renderCertificateHtml, toPlaceholderData, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from "@/lib/certificate-template";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { blobHydrate, invalidateHydration } from "@/lib/blob-db";
@@ -24,6 +24,7 @@ const STATUS_META: Record<CertificateStatus, { label: string; icon: typeof Shiel
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { certificateNumber } = await params;
+  await ensureFreshData();
   const certificate = getCRMCertificateByNumber(certificateNumber);
   if (!certificate) return { title: "Certificate Not Found" };
   return { title: `Certificate Verification — ${certificate.studentName}`, robots: { index: false, follow: false } };
@@ -44,6 +45,7 @@ export default async function CertificateVerificationPage({ params }: Props) {
   }
 
   const certificateNumber = rawNumber.replace(/[^A-Za-z0-9-]/g, "");
+  await ensureFreshData();
   let certificate = getCRMCertificateByNumber(certificateNumber);
   if (!certificate) {
     // A certificate created moments ago on a different serverless container can be briefly

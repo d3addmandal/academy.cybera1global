@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, Clock, ArrowLeft, Share2, Tag } from "lucide-react";
-import { getCRMBlogBySlug, getCRMBlogPosts } from "@/lib/content";
+import { ensureFreshData, getCRMBlogBySlug, getCRMBlogPosts } from "@/lib/content";
 import BlogCard from "@/components/shared/BlogCard";
 
 interface Props { params: Promise<{ slug: string }> }
@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  await ensureFreshData();
   const { slug } = await params;
   const post = getCRMBlogBySlug(slug);
   if (!post) notFound();

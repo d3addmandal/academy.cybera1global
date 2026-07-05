@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import ContactFormClient from "./ContactFormClient";
-import { getSiteSettings } from "@/lib/content";
+import { ensureFreshData, getSiteSettings } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,8 @@ export const metadata: Metadata = {
     "Get in touch with Cyber A1 Academy. Book a free counseling session, enquire about programs, or reach out to our team in Durgapur, Delhi, or Kolkata.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  await ensureFreshData();
   const settings = getSiteSettings();
   const phone = settings?.phone ?? "+91 8240 006 007";
   const email = settings?.email ?? "info@cybera1academy.com";

@@ -11,10 +11,29 @@ import {
   academyPageDb, corporatePageDb, institutionsPageDb, careerPageDb,
   certificatesDb, certificateTemplatesDb,
 } from "./db";
+import { blobHydrate } from "./blob-db";
 import type { Programme, BlogPost, Event, Testimonial, Trainer, FAQ, HomePageContent, NavigationMenu, AcademyPageContent, CorporatePageContent, InstitutionsPageContent, CareerPageContent, Certificate, CertificateTemplate } from "@/types/cms";
 
 const COMPANY = process.env.COMPANY_SLUG ?? "cybera1";
 export const COMPANY_SLUG = COMPANY;
+
+/**
+ * Call this as the very first line of any route segment's own page/layout
+ * function (or any other independently-rendered Server Component that reads
+ * CRM content) — before any getCRMXxx()/getSiteXxx() call in that same
+ * function body.
+ *
+ * Next.js renders a layout and its nested page (the `children` prop) as
+ * separate, parallel route segments — a parent layout's own awaited work is
+ * NOT guaranteed to finish before a nested page's synchronous data reads run
+ * (this is what made content look stale until 2-3 refreshes: whichever
+ * segment's hydration lost the race served whatever /tmp/ already had).
+ * Awaiting this inline, in the exact same function that does the reads
+ * right after, is the only ordering JS actually guarantees.
+ */
+export async function ensureFreshData(): Promise<void> {
+  await blobHydrate(COMPANY);
+}
 
 // ── Branding / layout ────────────────────────────────────────────────────────
 export function getSiteTheme() {

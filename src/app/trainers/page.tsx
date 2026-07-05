@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getCRMTrainers, getSiteSettings } from "@/lib/content";
+import { ensureFreshData, getCRMTrainers, getSiteSettings } from "@/lib/content";
 import { Award, ArrowRight, Linkedin, Github, Twitter } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +17,8 @@ function initials(name: string): string {
   return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 }
 
-export default function TrainersPage() {
+export default async function TrainersPage() {
+  await ensureFreshData();
   const trainers = getCRMTrainers();
 
   return (

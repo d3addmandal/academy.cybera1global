@@ -8,8 +8,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingButtons from "@/components/shared/FloatingButtons";
-import { getSiteTheme, getSiteSettings, getSiteNav, getCRMPublishedProgrammes } from "@/lib/content";
-import { blobHydrate } from "@/lib/blob-db";
+import { ensureFreshData, getSiteTheme, getSiteSettings, getSiteNav, getCRMPublishedProgrammes } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +21,7 @@ const inter = Inter({
 const FONT_SIZE_MAP = { sm: "14px", md: "16px", lg: "18px" } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
+  await ensureFreshData();
   const theme = getSiteTheme();
   const faviconUrl = theme?.logo?.faviconUrl;
   const siteIconUrl = theme?.logo?.siteIconUrl;
@@ -71,9 +71,8 @@ export default async function RootLayout({
   const h = await headers();
   const isAdmin = h.get("x-is-admin") === "true";
 
-  // On Vercel, hydrate /tmp/ from Blob CDN on cold containers (no-op if already warm).
   // Always hydrate — admin routes need up-to-date data too (uploaded images, saved settings).
-  await blobHydrate(process.env.COMPANY_SLUG ?? "cybera1");
+  await ensureFreshData();
 
   // Read CRM content for website pages (skipped for admin to avoid unnecessary reads)
   const theme = isAdmin ? null : getSiteTheme();

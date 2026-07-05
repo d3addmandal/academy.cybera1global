@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, MapPin, Clock, ArrowRight, ExternalLink } from "lucide-react";
-import { getCRMEvents } from "@/lib/content";
+import { ensureFreshData, getCRMEvents } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Events & Community â€” Workshops, Bootcamps, CTF & More",
@@ -19,7 +19,8 @@ const eventTypeStyle: Record<string, string> = {
   webinar: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
 };
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  await ensureFreshData();
   const events = getCRMEvents();
 
   return (

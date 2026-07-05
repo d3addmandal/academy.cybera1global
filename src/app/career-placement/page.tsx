@@ -6,7 +6,7 @@ import {
   BookOpen, FlaskConical, BarChart3, Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { getCRMTestimonials, getCareerPageContent } from "@/lib/content";
+import { ensureFreshData, getCRMTestimonials, getCareerPageContent } from "@/lib/content";
 import ImageWithFallback from "@/components/shared/ImageWithFallback";
 import type { CareerPageContent } from "@/types/cms";
 
@@ -76,7 +76,8 @@ const DEFAULTS: CareerPageContent = {
   updatedAt: "",
 };
 
-export default function CareerPlacementPage() {
+export default async function CareerPlacementPage() {
+  await ensureFreshData();
   const cms = getCareerPageContent() ?? DEFAULTS;
   const testimonials = getCRMTestimonials();
   const seenNames = new Set<string>();

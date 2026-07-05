@@ -7,7 +7,7 @@ import {
   Building2, CheckCircle2, ArrowRight, Cpu, Globe, BarChart3,
   Monitor, Zap, Star, type LucideIcon,
 } from "lucide-react";
-import { getAcademyPageContent } from "@/lib/content";
+import { ensureFreshData, getAcademyPageContent } from "@/lib/content";
 import type { AcademyPageContent } from "@/types/cms";
 
 export const metadata: Metadata = {
@@ -88,7 +88,8 @@ const DEFAULTS: AcademyPageContent = {
   updatedAt: "",
 };
 
-export default function AcademyPage() {
+export default async function AcademyPage() {
+  await ensureFreshData();
   const cms = getAcademyPageContent() ?? DEFAULTS;
   const { hero, about, why, methodology, domains, labs, trainers, cta } = cms;
 
