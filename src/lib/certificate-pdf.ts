@@ -9,7 +9,13 @@
 
 const A4_LANDSCAPE_MM = { width: 297, height: 210 };
 
-async function renderElementToJpeg(element: HTMLElement): Promise<string> {
+interface RenderedImage {
+  dataUrl: string;
+  width: number;
+  height: number;
+}
+
+async function renderElementToJpeg(element: HTMLElement): Promise<RenderedImage> {
   // SVG certificate templates render as a bare <svg> at the top of the container. html2canvas
   // re-implements rendering itself and has no support for <foreignObject> — it paints a solid
   // black box where the nested HTML should be — so SVG templates take the native rasterization
@@ -20,16 +26,21 @@ async function renderElementToJpeg(element: HTMLElement): Promise<string> {
     return renderSvgToJpeg(root as unknown as SVGSVGElement);
   }
 
+  // IMPORTANT: `element` must not itself be affected by a CSS transform (e.g. a
+  // `scale(...)` used elsewhere purely to shrink an on-screen preview) — html2canvas
+  // does not correctly account for that when sizing its capture, and ends up rasterizing
+  // only part of the content stretched across the full output, cutting the rest off.
+  // Callers must pass a dedicated, untransformed, full-resolution element.
   const html2canvas = (await import("html2canvas")).default;
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
   });
-  return canvas.toDataURL("image/jpeg", 0.92);
+  return { dataUrl: canvas.toDataURL("image/jpeg", 0.92), width: canvas.width, height: canvas.height };
 }
 
-async function renderSvgToJpeg(svg: SVGSVGElement): Promise<string> {
+async function renderSvgToJpeg(svg: SVGSVGElement): Promise<RenderedImage> {
   const clone = svg.cloneNode(true) as SVGSVGElement;
   const width = clone.viewBox?.baseVal?.width || Number(clone.getAttribute("width")) || 1123;
   const height = clone.viewBox?.baseVal?.height || Number(clone.getAttribute("height")) || 794;
@@ -58,18 +69,31 @@ async function renderSvgToJpeg(svg: SVGSVGElement): Promise<string> {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.92);
+    return { dataUrl: canvas.toDataURL("image/jpeg", 0.92), width: canvas.width, height: canvas.height };
   } finally {
     URL.revokeObjectURL(url);
   }
 }
 
+/** "Contain" fit centered on an A4 landscape page — preserves the certificate's own aspect ratio (whatever the template's canvas size is) instead of stretching it to exactly fill 297x210mm, which would distort a design that isn't already in that ratio. */
+function fitWithinPage(imgWidth: number, imgHeight: number): { w: number; h: number; x: number; y: number } {
+  const pageW = A4_LANDSCAPE_MM.width;
+  const pageH = A4_LANDSCAPE_MM.height;
+  const imgAspect = imgWidth / imgHeight;
+  const pageAspect = pageW / pageH;
+
+  const w = imgAspect > pageAspect ? pageW : pageH * imgAspect;
+  const h = imgAspect > pageAspect ? pageW / imgAspect : pageH;
+  return { w, h, x: (pageW - w) / 2, y: (pageH - h) / 2 };
+}
+
 /** Renders a single certificate element to a downloaded A4-landscape PDF. */
 export async function downloadCertificatePdf(element: HTMLElement, filename: string): Promise<void> {
   const { jsPDF } = await import("jspdf");
-  const imgData = await renderElementToJpeg(element);
+  const { dataUrl, width, height } = await renderElementToJpeg(element);
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-  pdf.addImage(imgData, "JPEG", 0, 0, A4_LANDSCAPE_MM.width, A4_LANDSCAPE_MM.height);
+  const { w, h, x, y } = fitWithinPage(width, height);
+  pdf.addImage(dataUrl, "JPEG", x, y, w, h);
   pdf.save(filename);
 }
 
@@ -96,9 +120,10 @@ export async function downloadCertificatesZip(
   for (let i = 0; i < certificateNumbers.length; i++) {
     const certificateNumber = certificateNumbers[i];
     await renderInto(certificateNumber, container);
-    const imgData = await renderElementToJpeg(container);
+    const { dataUrl, width, height } = await renderElementToJpeg(container);
     const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    pdf.addImage(imgData, "JPEG", 0, 0, A4_LANDSCAPE_MM.width, A4_LANDSCAPE_MM.height);
+    const { w, h, x, y } = fitWithinPage(width, height);
+    pdf.addImage(dataUrl, "JPEG", x, y, w, h);
     const bytes = pdf.output("arraybuffer");
     zip.file(`${certificateNumber}.pdf`, bytes);
     onProgress?.(i + 1, certificateNumbers.length);

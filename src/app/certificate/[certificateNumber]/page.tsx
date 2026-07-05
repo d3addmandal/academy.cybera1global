@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { ShieldCheck, ShieldOff, ShieldAlert, ShieldQuestion, CalendarDays, User, BadgeCheck } from "lucide-react";
 import { getCRMCertificateByNumber, getCRMCertificateTemplate, getSiteTheme, COMPANY_SLUG } from "@/lib/content";
-import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
+import { renderCertificateHtml, toPlaceholderData, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from "@/lib/certificate-template";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { blobHydrate, invalidateHydration } from "@/lib/blob-db";
 import CertificateViewer from "./CertificateViewer";
@@ -94,7 +94,14 @@ export default async function CertificateVerificationPage({ params }: Props) {
           )}
         </div>
 
-        {certificateHtml && <CertificateViewer certificateHtml={certificateHtml} certificateNumber={certificate.certificateNumber} />}
+        {certificateHtml && (
+          <CertificateViewer
+            certificateHtml={certificateHtml}
+            certificateNumber={certificate.certificateNumber}
+            canvasWidth={template?.canvasWidth ?? DEFAULT_CANVAS_WIDTH}
+            canvasHeight={template?.canvasHeight ?? DEFAULT_CANVAS_HEIGHT}
+          />
+        )}
       </div>
     </div>
   );

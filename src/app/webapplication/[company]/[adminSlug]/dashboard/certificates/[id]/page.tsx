@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { PageHeader, Field, Input, Select, SaveBar, Card, StatusBadge } from "@/components/admin/FormField";
 import DataTable from "@/components/admin/DataTable";
 import { useToast } from "@/components/admin/Toast";
-import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
+import { renderCertificateHtml, toPlaceholderData, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from "@/lib/certificate-template";
 import { downloadCertificatePdf, waitForImages } from "@/lib/certificate-pdf";
 import { ArrowLeft, Download, QrCode, RefreshCw, Link2 } from "lucide-react";
 import Link from "next/link";
@@ -62,6 +62,9 @@ export default function EditCertificatePage() {
   const previewHtml = activeTemplate && cert
     ? renderCertificateHtml(activeTemplate.htmlContent, toPlaceholderData({ ...cert, ...form } as Certificate))
     : "";
+  const canvasWidth = activeTemplate?.canvasWidth ?? DEFAULT_CANVAS_WIDTH;
+  const canvasHeight = activeTemplate?.canvasHeight ?? DEFAULT_CANVAS_HEIGHT;
+  const previewScale = Math.min(0.32, 320 / canvasWidth);
 
   async function handleSave() {
     if (!cert) return;
@@ -250,13 +253,19 @@ export default function EditCertificatePage() {
           </Card>
 
           <Card title="Preview">
-            <div className="overflow-auto border border-slate-200 rounded-lg">
-              <div ref={previewRef} style={{ width: 1123, transform: "scale(0.32)", transformOrigin: "top left", height: 358 }}
+            <div className="overflow-auto border border-slate-200 rounded-lg" style={{ height: canvasHeight * previewScale }}>
+              <div style={{ width: canvasWidth, transform: `scale(${previewScale})`, transformOrigin: "top left" }}
                 dangerouslySetInnerHTML={{ __html: previewHtml }} />
             </div>
           </Card>
         </div>
       </div>
+
+      {/* Off-screen, full-resolution, untransformed copy used only for PDF generation —
+          html2canvas doesn't correctly capture an element affected by a CSS transform
+          (the scaled Preview card above is display-only). */}
+      <div ref={previewRef} style={{ position: "fixed", left: -99999, top: 0, width: canvasWidth }}
+        dangerouslySetInnerHTML={{ __html: previewHtml }} aria-hidden="true" />
 
       <SaveBar onSave={handleSave} isLoading={isSaving} isDirty={isDirty} />
     </div>

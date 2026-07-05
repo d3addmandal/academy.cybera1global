@@ -8,7 +8,7 @@ import DataTable from "@/components/admin/DataTable";
 import { StatusBadge, PageHeader } from "@/components/admin/FormField";
 import Modal, { ConfirmModal } from "@/components/admin/Modal";
 import { useToast } from "@/components/admin/Toast";
-import { renderCertificateHtml, toPlaceholderData } from "@/lib/certificate-template";
+import { renderCertificateHtml, toPlaceholderData, DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from "@/lib/certificate-template";
 import { downloadCertificatePdf, downloadCertificatesZip, waitForImages } from "@/lib/certificate-pdf";
 import type { Certificate, CertificateTemplate } from "@/types/cms";
 
@@ -74,6 +74,11 @@ export default function CertificatesPage() {
     const cert = data.find((c) => c.certificateNumber === certificateNumber);
     const template = cert ? templates.find((t) => t.id === cert.templateId) : undefined;
     if (!cert || !template) { container.innerHTML = ""; return; }
+    // Each certificate's template can have its own canvas size (visual-builder templates
+    // size to their uploaded background image) — resize the shared capture host to match
+    // before painting it, so absolutely-positioned fields aren't clipped by a stale width.
+    container.style.width = `${template.canvasWidth ?? DEFAULT_CANVAS_WIDTH}px`;
+    container.style.height = `${template.canvasHeight ?? DEFAULT_CANVAS_HEIGHT}px`;
     container.innerHTML = renderCertificateHtml(template.htmlContent, toPlaceholderData(cert));
     await waitForImages(container);
   }
