@@ -192,8 +192,12 @@ export function compileCertificateTemplateHtml({
   const width = safeNum(canvasWidth, DEFAULT_CANVAS_WIDTH);
   const height = safeNum(canvasHeight, DEFAULT_CANVAS_HEIGHT);
 
+  // A CSS background-image (not an <img> with object-fit) — html2canvas (used for PDF
+  // generation) doesn't respect object-fit on <img> elements, rendering the image at its
+  // native size instead of stretched to fill, which left the rest of the canvas blank.
+  // background-size:cover is a normal part of html2canvas's rendering model and works.
   const backgroundTag = backgroundImageUrl
-    ? `<img src="${escapeHtml(backgroundImageUrl)}" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" />`
+    ? `<div style="position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('${escapeHtml(backgroundImageUrl)}');background-size:cover;background-position:center;background-repeat:no-repeat;"></div>`
     : "";
 
   const fieldTags = fields.map((field) => {
